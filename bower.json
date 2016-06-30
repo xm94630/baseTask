@@ -9,12 +9,7 @@
   "moduleType": [],
   "license": "MIT",
   "ignore": [
-    "**/.*",
     "node_modules",
-    "bower_components",
-    "js/libs",
-    "test",
-    "tests"
   ],
   "dependencies": {
     "underscore": "~1.8.3"

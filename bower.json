@@ -1,0 +1,22 @@
+{
+  "name": "deerTask",
+  "homepage": "https://github.com/xm94630/deerTask",
+  "authors": [
+    "xuming3 <xuming3@yiche.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "js/libs",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "underscore": "~1.8.3"
+  }
+}

@@ -9,7 +9,7 @@
   "moduleType": [],
   "license": "MIT",
   "ignore": [
-    "node_modules",
+    "node_modules"
   ],
   "dependencies": {
     "underscore": "~1.8.3"

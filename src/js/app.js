@@ -275,10 +275,19 @@ var bee = (function(bee){
 //bee.case09();
 
 
+var obj = {
+	a:function(){
+		l(123)
+		var xxx = obj.a;
+		l(xxx)
+		obj.a = function(){
+			xxx.call()
+		}
+	}
+}
 
-
-
-
+obj.a()
+l(obj.a)
 
 
 

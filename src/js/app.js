@@ -374,7 +374,24 @@ var bee = (function(bee){
 
 
 
+/*var a = ({fun:function(){return this}}).fun();tj
 
+var fun = ({fun:function(){return this}}).fun;
+l(fun())*/
+
+
+
+/*var a = function b(){l(b);}
+l(a);
+l(a());*/
+
+
+//函数aaa所在作用域
+//函数aaa体内作用域,函数体内的变量（比如bbb）对外部是不可见的。（也验证了上面的道理）
+/*function aaa(){
+	function bbb(){};
+	bbb();
+}*/
 
 
 

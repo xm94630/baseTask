@@ -397,8 +397,27 @@ l(a());*/
 
 
 
+/*
+var xxx=0;
+function a(){
+	var xxx=1;
+	function b(){
+		xxx=2;
+	}
+	b();
+}
+a();
+l(xxx)*/
 
 
-
-
+var i=0;
+function a(){
+	var i=1;
+	function b(){
+		for(i=0;i<10;i++);
+	}
+	b();
+}
+a();
+l(i)
 

@@ -261,33 +261,125 @@ var bee = (function(bee){
 	}
 
 
+	/* 
+	 * 研究案例10:函数把自己返回
+	 * 把自身返回的效果，可以用作链式调用法
+	 * 返回自身的行为，比普通函数更加复杂
+	 */
+	bee.case10 = function(){
+
+		function fun(){
+			return fun;
+		}
+		l(fun()()()==fun);
+
+	}
+
+
+	/* 
+	 * 研究案例11:函数改变自身的效果
+	 * 这样子的函数很有混淆性，因为他在运行时，改变了自身
+	 * 所以我们从词法角度去看原函数时候，不是很明了
+	 */
+	bee.case11 = function(){
+
+		var fun = function(){
+			fun = function(){
+				return 123;
+			}
+		}
+		l(fun);
+		fun();
+		l(fun);
+
+	}
+
+
+	/* 
+	 * 研究案例12:函数调用自身
+	 * 这其实是递归实现原理，如果没有终止条件，就会进入死循环，如下代码
+	 */
+	bee.case12 = function(){
+
+		function fun(){
+			fun();
+		}
+		fun();
+
+	}
+
+
+	/* 
+	 * 研究案例13:被函数作用域屏蔽的值
+	 * 通常，没有var声明的变量是全局的，然而下面情况并不是
+	 * 函数fun中的“a=a;”其实是函数的参数中的a，外层的a因为和fun函数同名，所以被屏蔽了。
+	 * 第二种情况就没有
+	 */
+	bee.case13 = function(){
+
+		var a = 123;
+		function fun(a){
+			a = a;
+			return a;
+		}
+		l(fun(222));
+		l(a);
+
+		var b = 'aaa';
+		function fun2(a){
+			b = a;
+			return a;
+		}
+		l(fun2('bbb'));
+		l(b);
+
+	}
+
+
+	/* 
+	 * 研究案例14:案例11的扩展，同时也是对案例09中内存溢出的那种情况的解释
+	 * 第一种情况，把obj.fun寄存到xxx是正确的操作
+	 * 第二种看上去很像第一种，其实不然
+	 * “obj2.fun=...”的操作会立即生效，导致“obj2.fun()“会马上执行，于是变成了函数自身调用，死循环一个
+	 * 因此呢，要解决第二种问题，其实第一种寄存的方案就是其解决方案呢
+	 */
+	bee.case14 = function(){
+
+		var obj = {
+			fun:function (){return 123;}
+		}
+		var xxx = obj.fun;
+		obj.fun = function(){
+			return xxx();
+		}
+		l(obj.fun());
+
+		var obj2 = {
+			fun:function (){return 123;}
+		}
+		obj2.fun = function(){
+			return obj2.fun();
+		}
+		l(obj2.fun());
+
+	}
+
+
+
+
 	return bee;
 })(bee || {});
 
-//bee.case01();
-//bee.case02();
-//bee.case03();
-//bee.case04();
-//bee.case05();
-//bee.case06();
-//bee.case07();
-//bee.case08();
-//bee.case09();
+//bee.case14();
 
 
-var obj = {
-	a:function(){
-		l(123)
-		var xxx = obj.a;
-		l(xxx)
-		obj.a = function(){
-			xxx.call()
-		}
-	}
-}
 
-obj.a()
-l(obj.a)
+
+
+
+
+
+
 
 
 

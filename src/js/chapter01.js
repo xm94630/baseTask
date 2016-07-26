@@ -1,4 +1,7 @@
-//这里都是一些js中比较绕的知识点
+/*******************************
+* 第一章 
+********************************/
+
 var bee = (function(bee){
 
 	/* 
@@ -364,60 +367,6 @@ var bee = (function(bee){
 
 	}
 
-
-
-
 	return bee;
 })(bee || {});
-
-//bee.case14();
-
-
-
-/*var a = ({fun:function(){return this}}).fun();tj
-
-var fun = ({fun:function(){return this}}).fun;
-l(fun())*/
-
-
-
-/*var a = function b(){l(b);}
-l(a);
-l(a());*/
-
-
-//函数aaa所在作用域
-//函数aaa体内作用域,函数体内的变量（比如bbb）对外部是不可见的。（也验证了上面的道理）
-/*function aaa(){
-	function bbb(){};
-	bbb();
-}*/
-
-
-
-
-
-/*
-var xxx=0;
-function a(){
-	var xxx=1;
-	function b(){
-		xxx=2;
-	}
-	b();
-}
-a();
-l(xxx)*/
-
-
-var i=0;
-function a(){
-	var i=1;
-	function b(){
-		for(i=0;i<10;i++);
-	}
-	b();
-}
-a();
-l(i)
 

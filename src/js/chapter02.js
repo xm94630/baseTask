@@ -23,7 +23,7 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例3:函数表达式
+	 * 研究案例2:函数表达式
 	 * 这里再次验证了这个结论：
 	 * aaa只是函数标识符，只有在函数内部作用域识别
 	 */
@@ -87,7 +87,7 @@ var bee = (function(bee){
 
 	/* 
 	 * 研究案例6:函数调用
-	 * 只要函数（bee.caseB5）不调用，nnn函数中的内容就算出错（这里fun没有定义）也没有关系（除非是语法错误）
+	 * 只要函数（bee.caseB6）不调用，nnn函数中的内容就算出错（这里fun没有定义）也没有关系（除非是语法错误）
 	 * 再次验证：在没有被调用的时候，它什么也不是
 	 */
 	bee.caseB6 = function nnn(){
@@ -103,7 +103,7 @@ var bee = (function(bee){
 	/* 
 	 * 研究案例7:引用
 	 * 这个例子会为后面的讲解做铺垫，所以需要讲一下
-	 * 看是很简答的问题，却非常容易错
+	 * 看似很简答的问题，却非常容易错
 	 * 给a赋值，值是对象，所以值引用
 	 * b = a,表示的是b获取和a相同的引用，所以l(b===a)的结果是true
 	 * 但是，不要以为两者全等了，a和b就是同一个东西，你我不分，融为一体了，错！
@@ -190,7 +190,7 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例11:异想天开——函数把自己穿进去
+	 * 研究案例11:异想天开——函数把自己传进去
 	 * fn获得了对fun的对象的引用，所以 l(fun==fn) 必须成立
 	 * 然后把fn的引用改了，但是fun还是不变的！这其实是案例7的运用
 	 * 之前总以为 因为是引用，fun和fn就你我不分了呢
@@ -229,7 +229,7 @@ var bee = (function(bee){
 
 	/* 
 	 * 研究案例13:BOSS
-	 * 7-12的问题全是由他引出的！
+	 * 7-12的问题全是由它引出的！
 	 * 里面的代码简单的不能简单，就是把bee放空！
 	 * 但是结果呢，全局中的依然存在，为什么呢?
 	 * 就是案例12的结论
@@ -281,9 +281,7 @@ var bee = (function(bee){
 
 		var bee2 = (function(bee2){
 			bee2.aaa = function(){};
-			bee2.bbb = function(){
-				return 123;
-			}
+			bee2.bbb = function(){return 123;}
 			return bee2;
 		})(bee2||{});
 
@@ -294,47 +292,50 @@ var bee = (function(bee){
 
 		l(bee2);
 		l(bee3);
+
+		l(bee2.bbb);
+		l(bee3.bbb);
 	}
 
 	/* 
-	 * 研究案例16:无闭包
-	 * 这里私有变量privite虽然被引用了，但是不是被内部函数引用，只是被变量aaa引用
-	 * 这个也不是闭包
-	 * 这个即时函数一旦被调用完毕，原来的privite就销毁了
+	 * 研究案例16:闭包
+	 * 这里私有变量privite也可以是引用类型的（比如对象）
+	 * 闭包生成之后，继续保持对privite的引用
+	 * 之前，我以为引用对象为自由变量就不是闭包了，看来是我错啦，目前已经改正
+	 * 下面的例子很好的说明了这点
 	 */
 	bee.caseB16 = function(){
 
-		var bee2 = (function(bee2){
-			var privite = {a:123};
-			bee2.aaa = privite;
-			return bee2;
-		})(bee2||{});
+		var bee2 = (function(){
+			var privite = {a:0};
+			return {
+				add:function(){
+					privite.a +=1;
+					return;
+				},
+				get:function(){
+					return privite.a;
+				}
+			};
+		})();
 
-		l(bee2)
+		l(bee2);
+		bee2.add();
+		bee2.add();
+		bee2.add();
+		bee2.add();
+		l(bee2.get());
 	}
 
 	/* 
-	 * 研究案例17:无闭包
-	 * 我觉得闭包还得有个条件：是有变量必须为非引用类型的吧
-	 * 这里bee2.aaa 获得了和privite相同的引用，可以和privite本身没有半点关系
-	 * 所以也不是闭包，这个需要验证下，看看老外的书上是否出现反例
+	 * 研究案例17:-
 	 */
 	bee.caseB17 = function(){
-
-		var bee2 = (function(bee2){
-			var privite = {a:123};
-			bee2.aaa = function(){
-				return privite;
-			};
-			return bee2;
-		})(bee2||{});
-
-		l(bee2)
 	}
 
 	/* 
 	 * 研究案例18:闭包
-	 * 看了之前两个反例，这里见识下真正的闭包
+	 * 和16的区别只在privite是不是引用类型，其实没有关系，结果都一样的
 	 */
 	bee.caseB18 = function(){
 
@@ -389,7 +390,7 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例20:
+	 * 研究案例20:this
 	 * 第一个是方法的调用，this指向对象本身
 	 * 第二个引用函数的调用
 	 */
@@ -405,5 +406,30 @@ var bee = (function(bee){
 
 	return bee;
 })(bee || {});
+
+//bee.caseB16()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

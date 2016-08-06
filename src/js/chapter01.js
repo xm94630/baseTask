@@ -210,8 +210,9 @@ var bee = (function(bee){
 			appName:'大鱼一条',
 			fun:function (){return this.appName;}
 		}
-		function myBind(myFunc,AttrName){
-			myFunc[AttrName] = myFunc[AttrName].bind(myFunc);
+		function myBind(myObj,AttrName){
+			//替换了原来的方法
+			myObj[AttrName] = myObj[AttrName].bind(myObj);
 		}
 
 		var b = obj2.fun;
@@ -222,6 +223,9 @@ var bee = (function(bee){
 		var b = obj2.fun;
 		l(b());
 		l(b.call({appName:'用call可以改变this'}));
+
+		//从log输出来看和原来的是一模一样的
+		l(obj2.fun)
 	}
 
 
@@ -229,7 +233,7 @@ var bee = (function(bee){
 	 * 研究案例9:自己写一个类似于_.bind的简单例子
 	 * 这里不用bind的情况下也实现了上案例8的功能
 	 * 由此可见，underscore的_.bindAll,基本上就是用这里提到的方法实现的
-	 * 当然我这里是简答的实现，是原理级的
+	 * 当然我这里是简单的实现，是原理级的
 	 * 刚才看了_.bindAll源码，正如我所言
 	 */
 	bee.case09 = function(){
@@ -238,6 +242,8 @@ var bee = (function(bee){
 			appName:'大鱼一条',
 			fun:function (){return this.appName;}
 		}
+
+		//myFunc命名为myObj会好点哦
 		function myBind(myFunc,AttrName){
 
 			//不要写成注释中的那样，堆栈会溢出
@@ -315,7 +321,7 @@ var bee = (function(bee){
 	/* 
 	 * 研究案例13:被函数作用域屏蔽的值
 	 * 通常，没有var声明的变量是全局的，然而下面情况并不是
-	 * 函数fun中的“a=a;”其实是函数的参数中的a，外层的a因为和fun函数同名，所以被屏蔽了。
+	 * 函数fun中的“a=a;”其实是函数的参数中的a，外层的a因为和fun函数中的同名，所以被屏蔽了。
 	 * 第二种情况就没有
 	 */
 	bee.case13 = function(){
@@ -367,6 +373,82 @@ var bee = (function(bee){
 
 	}
 
+	/* 
+	 * 研究案例15:this
+	 * 这个问题其实是困扰我很久的一个例子
+	 * 就是fun的调用的时候，第二个参数是个函数，而且里面用了this
+	 * 那么这个this是指什么？
+	 * 其实，没有定论：一定要记住，函数在没有调用之前，里面的代码是没有意义的！
+	 * 所以关键看函数内部是如何使用这个函数
+	 * 于是结果也是完全不同的，例子中给了三种类型的，结果都不同
+	 */
+	bee.case15 = function(){
+
+		function fun(obj,fun){
+			//使用1
+			fun();
+			//使用2
+			fun.call(obj)
+			//使用3
+			fun = fun.bind({x:2});
+			fun();
+		}
+
+		fun({a:1},function(){
+			l(this);
+			return this;
+		});
+	}
+
+	/* 
+	 * 研究案例16:BOSS:函数中的this
+	 * 15中的研究，开始就是出自这个
+	 * 我以前一直想this是谁呢，当然根据经验我知道是dom对象
+	 * 但是我一直是很好奇为什么是这样子
+	 * 其实this完全取决于$对bind的定义
+	 * 这就是高阶函数最最混淆之处：
+	 * 比如别人定义的高阶函数，你知道这里可以传入一个函数
+	 * 但是你完全不知道函数在内部是如何被使用的！只有写的人自己知道，包括函数传什么参数之类的
+	 * 所以在看别人的库的时候，一遇到高阶就头晕也是正常
+	 * 特别是出现几个闭包，几个this(这些很多伴随高阶而来)
+	 */
+	bee.case16 = function(){
+
+		$(function(){
+			$('.C1').bind('click',function(){
+				l(this);
+			});
+		});
+
+	}
+
+
+
+
 	return bee;
 })(bee || {});
+
+
+//bee.case16();
+
+
+
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

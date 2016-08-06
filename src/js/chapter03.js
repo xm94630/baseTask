@@ -31,7 +31,7 @@ var bee = (function(bee){
 		worker.postMessage({a:'啦啦'});  		
 		//worker.postMessage({a:function(){}});  		
 		worker.postMessage([1,2,3]);  		
-		worker.postMessage(document.getElementById('xxx'));  		
+		worker.postMessage(document.getElementById('xxx'));//其实是null		
 		worker.postMessage(/abc/);  		
 		worker.postMessage(123);  		
 		worker.postMessage(undefined);  		
@@ -118,10 +118,38 @@ var bee = (function(bee){
 		}
 
 		fun();
+	}
 
-
+	/* 
+	 * 研究案例7:JQ发布订阅模式
+	 * 这里可以看出，这种形式的事件回调，其实是同步的代码
+	 */
+	bee.caseC7 = function(){
+		$(function(){
+			$('body').on('click',function(){l('xixi')})
+				.trigger('click');
+			console.log('我是同步的代码')
+		});
 	}
 	
+	/* 
+	 * 研究案例8:把需要复杂的、不需要马上发生的事情推后（异步执行）
+	 * 这样子不会阻塞
+	 */
+	bee.caseC8 = function(){
+		var tasks = [
+			function(){l('任务1：这是个复杂的任务')},
+			function(){l('任务2：这是个复杂的任务')},
+			function(){l('任务3：这是个复杂的任务')},
+			function(){l('任务4：这是个复杂的任务')}
+		];
+		setInterval(function(){
+			if(task=tasks.shift()){
+				task();
+			}
+		},0);
+		l('我是同步的代码');
+	}
 
 	return bee;
 })(bee || {});
@@ -129,7 +157,9 @@ var bee = (function(bee){
 
 
 
-bee.caseC6();
+
+//bee.caseC8();
+
 
 
 

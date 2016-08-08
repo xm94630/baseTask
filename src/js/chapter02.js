@@ -403,7 +403,35 @@ var bee = (function(bee){
 
 	}
 
+	/* 
+	 * 研究案例21:值引用
+	 */
+	bee.caseB21 = function(){
+
+		//修改arr的第一个元素的值
+		var my  = [1] 
+		var arr = my;
+		arr[0] = 222;
+		l(arr);
+		l(arr==my);
+
+		//不要这样子
+		var my2 = [1]
+		var arr2 = my2;
+		arr2 = [222];
+		l(arr2);
+		l(arr2==my2);
+
+	}
+
+
 	return bee;
 })(bee || {});
+
+
+
+//bee.caseB21();
+
+
 
 

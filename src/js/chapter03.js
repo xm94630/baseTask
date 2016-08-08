@@ -129,7 +129,7 @@ var bee = (function(bee){
 
 
 
-bee.caseC6();
+//bee.caseC6();
 
 
 

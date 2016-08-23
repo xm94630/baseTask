@@ -151,8 +151,75 @@ var bee = (function(bee){
 		l('我是同步的代码');
 	}
 
+	/* 
+	 * 研究案例9:parseInt第二个参数
+	 */
+	bee.caseC9 = function(){
+
+		function curry(fun){
+			return function(x){
+				return fun(x);
+			}
+		}
+
+		l([11,11,11,11].map(parseInt));
+
+		//上面的相当于执行了
+		l(parseInt(11,0));
+		l(parseInt(11,1));
+		l(parseInt(11,2));
+		l(parseInt(11,3));
+	}
+
 	return bee;
 })(bee || {});
+
+
+
+
+
+
+/*var x ='我是全局的';
+
+function newFun(){
+	x = '我是闭包的，别人休想访问';
+	return {
+		name:'xixi',
+		fun:function(a,b){
+			return x;
+		}
+	}
+}
+
+var fun = newFun().fun;
+l(fun);
+l(fun());*/
+
+
+/*var x ='我是全局的'
+function newFun(){
+	x = '我是闭包的，别人休想访问';
+	return {
+		name:'xixi',
+		fun:function(x,a,b){
+			return x;
+		}
+	}
+}
+var fun = newFun().fun;
+l(fun);
+l(fun('除非是参数的形式进来，闭包的捕获的值才能被覆盖！'));*/
+
+
+
+
+
+
+
+
+
+
+
 
 
 

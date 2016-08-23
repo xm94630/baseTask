@@ -430,34 +430,5 @@ var bee = (function(bee){
 })(bee || {});
 
 //bee.caseB16()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //bee.caseB21();
-
-
-
 

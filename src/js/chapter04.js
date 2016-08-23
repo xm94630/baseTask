@@ -33,12 +33,40 @@ var bee = (function(bee){
 
 	}
 
+	/* 
+	 * 研究案例3:原型研究
+	 */
+	bee.caseD3 = function(){
+
+		function Animal(){}
+		Animal.prototype.a=123;
+		function Fish(){}
+		Fish.prototype = new Animal();
+		var fish = new Fish;
+		l(fish);
+	}
+
+	/* 
+	 * 研究案例4:原型研究
+	 */
+	bee.caseD4 = function(){
+
+		function Animal(){}
+		Animal.prototype.a=123;
+		function Fish(){}
+		Fish.prototype = Animal.prototype;
+		var fish = new Fish;
+		l(fish);
+
+	}
+
+
 	return bee;
 })(bee || {});
 
 
-
-bee.caseD2();
+bee.caseD3();
+bee.caseD4();
 
 
 

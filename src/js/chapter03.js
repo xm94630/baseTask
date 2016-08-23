@@ -179,36 +179,8 @@ var bee = (function(bee){
 
 
 
-/*var x ='我是全局的';
-
-function newFun(){
-	x = '我是闭包的，别人休想访问';
-	return {
-		name:'xixi',
-		fun:function(a,b){
-			return x;
-		}
-	}
-}
-
-var fun = newFun().fun;
-l(fun);
-l(fun());*/
 
 
-/*var x ='我是全局的'
-function newFun(){
-	x = '我是闭包的，别人休想访问';
-	return {
-		name:'xixi',
-		fun:function(x,a,b){
-			return x;
-		}
-	}
-}
-var fun = newFun().fun;
-l(fun);
-l(fun('除非是参数的形式进来，闭包的捕获的值才能被覆盖！'));*/
 
 
 

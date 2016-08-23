@@ -422,6 +422,58 @@ var bee = (function(bee){
 
 	}
 
+	/* 
+	 * 研究案例17:闭包(结合案例18一起学习)
+	 * 这里闭包中欧捕获的自由变量x,外界是无法改变的
+	 * 为何研究本案例呢，来自给晓燕解决的问题，项目用sea.js作为模块加载，在模块间交互的时候，总是有一个变量为undefined
+	 * 那个道理和这个是一样的，sea模块就好比这里fun2对象，有属性name、fun等，但是它维持引用了一个自由变量x
+	 * 所以我无论如何改变全局中的x的值，fun2中的值还是捕获的那个自由变量
+	 * 那么如何改变自由变量，见案例18
+	 */
+	bee.case17 = function(){
+
+		var x ='我是全局的';
+		function newFun(){
+			var x = '我是闭包的，别人休想访问';
+			return {
+				name:'xixi',
+				fun:function(a,b){
+					return x;
+				}
+			}
+		}
+
+		var fun2 = newFun().fun;
+		l(fun2);
+		l(fun2());
+
+	}
+
+	/* 
+	 * 研究案例18:闭包(结合案例17一起学习)
+	 * 案例17的解决办法就是——
+	 * 在fun函数中加入一个和x同名的参数“x”,这样子，fun函数的内部的函数就阻断了那个私有变量
+	 */
+	bee.case18 = function(){
+	
+		var x ='我是全局的'
+		function newFun(){
+			var x = '我是闭包的，别人休想访问';
+			return {
+				name:'xixi',
+				fun:function(x,a,b){
+					return x;
+				}
+			}
+		}
+		var fun2 = newFun().fun;
+		l(fun2);
+		//使用自己传入的参数，来作为x值
+		l(fun2('除非是参数的形式进来，闭包的捕获的值才能被覆盖！'));
+		//也可以使用全局的x
+		l(fun2(x));
+
+	}
 
 
 
@@ -429,7 +481,7 @@ var bee = (function(bee){
 })(bee || {});
 
 
-//bee.case16();
+//bee.case17();
 
 
 

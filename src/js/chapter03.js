@@ -151,12 +151,29 @@ var bee = (function(bee){
 		l('我是同步的代码');
 	}
 
+	/* 
+	 * 研究案例9:parseInt第二个参数
+	 */
+	bee.caseC9 = function(){
+
+		function curry(fun){
+			return function(x){
+				return fun(x);
+			}
+		}
+
+		l([11,11,11,11].map(parseInt));
+
+		//上面的相当于执行了
+		l(parseInt(11,0));
+		l(parseInt(11,1));
+		l(parseInt(11,2));
+		l(parseInt(11,3));
+	}
+
 	return bee;
 })(bee || {});
 
 
-//bee.caseC8();
-
-l("a".toString == [].toString)
 
 

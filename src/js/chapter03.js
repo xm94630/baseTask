@@ -155,11 +155,8 @@ var bee = (function(bee){
 })(bee || {});
 
 
-
-
-
 //bee.caseC8();
 
-
+l("a".toString == [].toString)
 
 

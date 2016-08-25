@@ -416,7 +416,7 @@ var bee = (function(bee){
 
 		$(function(){
 			$('.C1').bind('click',function(){
-				l(this);
+				l(this.id);
 			});
 		});
 
@@ -429,7 +429,7 @@ var bee = (function(bee){
 })(bee || {});
 
 
-//bee.case16();
+bee.case16();
 
 
 

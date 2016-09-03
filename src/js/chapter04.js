@@ -164,11 +164,136 @@ var bee = (function(bee){
 		l(0x3|0)
 	}
 
+	/* 
+	 * 研究案例12: 混淆的同名
+	 * obj.$ 方法中包含$函数（和方法同名）的调用，那么这个$到底是谁呢？
+	 * 事实证明，不可能是obj.$的~
+	 * 但是这样子的写法总是怪怪的，最好避免下吧。
+	 */
+	bee.caseD12 = function(){
+
+		var $ = function(x){return x;}
+		var obj = {
+			$:function(){
+				return $("xixi");
+			}
+		}
+		l(obj.$());
+	}
+
+	/* 
+	 * 研究案例13: arguments研究
+	 */
+	bee.caseD13 = function(){
+
+		function fun(){
+			l(arguments);
+			l(typeof arguments);
+			l(arguments instanceof Object);
+			l(arguments instanceof Array);
+			l(Object.prototype.toString.call(arguments));
+			//arguments不是真实的数组，所以没有forEach这样子的数组方法
+			/*arguments.forEach(function(i){
+				l(i);
+			})*/
+
+			//转化为数组之后
+			var arr = _.toArray(arguments);
+			l(arr);
+			l(arr instanceof Object);
+			l(arr instanceof Array);
+			arr.forEach(function(i){
+				l(i);
+			})
+
+			return (function fish(a,b,c){
+				return a+b+c;
+			//}).apply(null,arguments);
+			}).apply(null,arr);
+		}
+		l(fun(11,22,33));
+
+		//获得arguments的引用，可以用来做什么呢？
+		function fun2(){
+			return arguments;
+		}
+		var thisArguments= fun2();
+		l(thisArguments);
+		l(Object.prototype.toString.call(thisArguments));
+
+		//对于原生的数组方法concat而言，下面两种是一样的
+		l([99,77,88].concat([123]));
+		l([99,77,88].concat(123));
+		//如果参数对象的话，就直接添加在末尾，同上面的第二种
+		l([99,77,88].concat({a:'haha'}));
+		//显然thisArguments这里被处理成对象了
+		l([99,77,88].concat(thisArguments));
+	}
+
+	/* 
+	 * 研究案例14: 数组拷贝
+	 */
+	bee.caseD14 = function(){
+
+		var arr = [11,22,33];
+		//这两种方式其实是一样的~
+		var arrCopy1 = Array.prototype.slice.call(arr);
+		var arrCopy2 = arr.slice();
+		l(arr);
+		l(arrCopy1);
+		l(arrCopy2);
+		l(arr == arrCopy1);
+		l(arr == arrCopy2);
+		l(arrCopy1 == arrCopy2);
+	}
+
+	/* 
+	 * 研究案例15:NaN
+	 */
+	bee.caseD15 = function(){
+		l(NaN);
+		l(!NaN);
+		l(!!NaN);
+		if(NaN)l(111);
+		if(!NaN)l(222);
+		l(NaN==undefined);
+		l(typeof NaN);
+		l(NaN == NaN);
+		l(NaN != NaN);
+	}
+
+	/* 
+	 * 研究案例16:保证最小值
+	 */
+	bee.caseD16 = function(){
+		var base =1;
+		var v=4;
+		l(Math.max(base,v));
+		var v=-1;
+		l(Math.max(base,v));
+	}
+
+	/* 
+	 * 研究案例17:数组方法——sort排序
+	 * 这个例子很简单，需要深入封装的话，可以参看_.sortBy的源码，非常优秀
+	 */
+	bee.caseD17 = function(){
+		var arr = [{a:0},{a:-1},{a:1}]
+		arr.sort(function(left,right){
+			if(left.a>right.a)return 1;
+			if(left.a<right.a)return -1;
+			return 0;
+		});
+		l(arr)
+	}
+
+
+
 	return bee;
 })(bee || {});
 
+//bee.caseD13();
 
-bee.caseD11();
 
 
 

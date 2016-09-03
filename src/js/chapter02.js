@@ -218,7 +218,7 @@ var bee = (function(bee){
 	bee.caseB12 = function(){
 
 		function fun(fun){
-			l(fun==fun);
+			l(fun===fun);
 			l(fun);
 			fun = {};
 			l(fun);
@@ -296,7 +296,7 @@ var bee = (function(bee){
 		l(bee2.bbb);
 		l(bee3.bbb);
 	}
-
+	
 	/* 
 	 * 研究案例16:闭包
 	 * 这里私有变量privite也可以是引用类型的（比如对象）
@@ -429,6 +429,4 @@ var bee = (function(bee){
 	return bee;
 })(bee || {});
 
-//bee.caseB16()
-//bee.caseB21();
 

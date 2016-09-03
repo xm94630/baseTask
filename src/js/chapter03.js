@@ -24,7 +24,7 @@ var bee = (function(bee){
 	 * 支持下面7种数据，注释的是不可以传递的
 	 * 函数是不可以传递的，对象可以，不过对象中包含函数的形式也是不可以的-
 	 */
-	bee.caseC1 = function(){
+	bee.caseC2 = function(){
 
 		var worker =new Worker("../js/morejs/worker.js");
 		worker.postMessage('文本');  		
@@ -36,7 +36,7 @@ var bee = (function(bee){
 		worker.postMessage(123);  		
 		worker.postMessage(undefined);  		
 		//worker.postMessage(function(){});  		
-		//worker.postMessage(this);  		
+		//worker.postMessage(this);  		//这里的this指代的是bee本身，因为包含函数也不可以
 		//worker.postMessage(window);  		
 		//worker.postMessage(document);  		
 		//worker.postMessage(document.getElementsByTagName('body'));
@@ -165,10 +165,12 @@ var bee = (function(bee){
 		l([11,11,11,11].map(parseInt));
 
 		//上面的相当于执行了
-		l(parseInt(11,0));
-		l(parseInt(11,1));
-		l(parseInt(11,2));
-		l(parseInt(11,3));
+		l(parseInt(11,0,[11,11,11,11]));
+		l(parseInt(11,1,[11,11,11,11]));
+		l(parseInt(11,2,[11,11,11,11]));
+		l(parseInt(11,3,[11,11,11,11]));
+
+		l([11,11,11,11].map(curry(parseInt)));
 	}
 
 	return bee;

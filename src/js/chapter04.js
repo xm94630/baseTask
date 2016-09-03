@@ -117,7 +117,7 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例8:二进制
+	 * 研究案例8:二进制、位与操作
 	 * 85等于二进制1010101
 	 * 如果 a & 85 结果还是等于85
 	 * 就表示 a 的1、3、5、7位都为1（87等于二进制1010111）
@@ -128,7 +128,8 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例9:“位与”运算
+	 * 研究案例9:“位或”运算
+	 * 位操作的结果是十进制的哦
 	 */
 	bee.caseD9 = function(){
 		var a = parseInt(1001,2);
@@ -139,7 +140,8 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例10:“位与”运算
+	 * 研究案例10:“位或”运算
+	 * 位操作的结果是十进制的哦
 	 */
 	bee.caseD10 = function(){
 		var a = parseInt(0x3,16);
@@ -151,9 +153,11 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例11:强大的“位与”运算
+	 * 研究案例11:强大的“位或”运算
 	 */
 	bee.caseD11 = function(){
+		l((12.2).toString(2)) //看看12.2的二进制
+
 		l(12.2|0)    //去掉了小数点后的内容
 		l('12.2'|0)  //字符形式的数字也能处理
 		l('ss'|0)    //这个最强大了，转化为0，若用parseInt("sss")的话，会返回NaN
@@ -161,6 +165,7 @@ var bee = (function(bee){
 		l((-1)|0)
 		l([]|0)
 		l({}|0)
+		l({a:123}|0)
 		l(0x3|0)
 	}
 
@@ -273,11 +278,52 @@ var bee = (function(bee){
 		l(Math.max(base,v));
 	}
 
-	/* 
+	/*
 	 * 研究案例17:数组方法——sort排序
-	 * 这个例子很简单，需要深入封装的话，可以参看_.sortBy的源码，非常优秀
 	 */
 	bee.caseD17 = function(){
+		var lessThan = function(a,b){
+			if(a<b){
+				return true;
+			}else{
+				return false;
+			}
+		};
+		var isEqual = function(a,b){
+			if(a==b){
+				return true;
+			}else{
+				return false;
+			}
+		};
+		function comparator(fun){
+			return function(a,b){
+				if(fun(a,b))
+				    return -1;
+				//else if(!fun(a,b))
+				else if(fun(b,a))
+					return 1;
+				else
+					return 0;
+			}
+		};
+		var arr = [1,-3,5,3,-9];
+		l(arr.sort(comparator(lessThan)));
+
+		//这里isEqual 和 comparator 组合就是有问题的
+		//第一次获取1，和-3，因为不等，所以return 1,表示交换
+		//这里都是不同的数字，所以每次都会进行交换
+		//最后的结果成了“反序”
+		var arr2 = [1,-3,5,3,-9];
+		l(arr2.sort(comparator(isEqual)));
+
+	}
+
+	/* 
+	 * 研究案例18:数组方法——sort排序
+	 * 这个例子很简单，需要深入封装的话，可以参看_.sortBy的源码，非常优秀
+	 */
+	bee.caseD18 = function(){
 		var arr = [{a:0},{a:-1},{a:1}]
 		arr.sort(function(left,right){
 			if(left.a>right.a)return 1;
@@ -289,11 +335,11 @@ var bee = (function(bee){
 
 
 
+
 	return bee;
 })(bee || {});
 
 //bee.caseD13();
-
 
 
 

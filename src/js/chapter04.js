@@ -333,24 +333,166 @@ var bee = (function(bee){
 		l(arr)
 	}
 
+	/* 
+	 * 研究案例19:apply
+	 * apply 巧妙的化解“[]”结构。
+	 */
+	bee.caseD19 = function(){
+		
+		var arr1 = [99];
+		var arr2 = [77];
+		var arr3 = [88];
+		var r = [99].concat([77],[88]);
+		l(r);
+		var r = [99].concat([77,88]);
+		l(r);
+
+		function cat(){
+			var first = arguments[0];
+			var rest = Array.prototype.slice.apply(arguments,[1]);
+			
+			//这样子是由问题的，因为rest中的结构是 [[77],[88]] 
+			//return first.concat(rest);
+			
+			//这里灵活地运用了apply，将[[77],[88]]中外层的[]结构化解了，非常巧妙！
+			return first.concat.apply(first,rest);
+
+			//这里绑定对象不能为null
+			//return first.concat.apply(null,rest);
+			
+			//这中写法也是可以的，只是这个first就没有用上了，被字符串“代理”了！
+			//return first.concat.apply(['居然还可以这样子'],rest);
+			
+		}
+
+		var r2 = cat(arr1,arr2,arr3);
+		l(r2);
+	}
+
+	/* 
+	 * 研究案例20:call
+	 * 本来想用call随便写一个，改变函数参数调用结构的
+	 * 然后写着写着就写出了下面的例子
+	 * 最后发现，这个例子就是《函数式编程》中，那个unsplat函数
+	 * 现在总算纯熟的掌握了
+	 */
+	bee.caseD20 = function(){
+		
+		function fun(arr){
+			return arr.join('-');
+		}
+
+		function change(fn){
+			return function(){
+				
+				//直接使用arguments，是不可以的，不是真正的数组
+				//var arr = arguments;
+				
+				//拷贝生成一个真正的数组
+				var arr = Array.prototype.slice.call(arguments,0);
+				
+				//注意这里call的用法很精妙
+				return fn.call(null,arr);
+			}
+		}
+
+		//原来的调用形式
+		var r1 = fun([99,77,88]);
+		l(r1);
+
+		//被change改变完之后的函数的用法
+		var r2 = change(fun)(99,77,88);
+		l(r2);
+	}
+
+
+	/* 
+	 * 研究案例21:apply
+	 * 随便实现《函数式编程》中，那个splat函数（就是这里的change）
+	 * 由此可见，call、apply可以非常灵活的改变参数的形式
+	 */
+	bee.caseD21 = function(){
+		
+		function fun(a,b,c){
+			return a+b+c;
+		}
+
+		function change(fn){
+			return function(){
+				
+				//这里直接用arguments，不数组也是可以的
+				var arr = arguments;		
+
+				//拷贝生成一个真正的数组
+				//var arr = Array.prototype.slice.call(arguments,0);
+				
+				//注意这里apply的用法很精妙
+				return fn.apply(null,arr[0]);
+			}
+
+			//这样子就更加精炼
+			/*return function(arr){
+				return fn.apply(null,arr);
+			}*/
+		}
+
+		//原来的调用形式
+		var r1 = fun(111,222,333);
+		l(r1);
+
+		//被change改变完之后的函数的用法
+		var r2 = change(fun)([111,222,333]);
+		l(r2);
+
+	}
+
+	/* 
+	 * 研究案例22:apply
+	 * 利用apply部分改变函数addBy的参数调用形式
+	 * addBy(obj,key1,key2...)
+	 * newAddBy(obj,[key1,key2...])
+	 * 这个一种在高阶函数中最为常用的手段,在undersore、async的源码中多有出现
+	 * 以前还不是很纯熟，掌握下面这种模式就可以一通百通。
+	 */
+	bee.caseD22 = function(){
+		
+		var obj={
+			a:1,
+			b:2,
+			c:44,
+			d:100
+		};
+		function addBy(obj){
+			var rest = Array.prototype.slice.call(arguments,1);
+			var sum = 0;
+			rest.forEach(function(v,i){
+				sum += obj[v];
+			});
+			return sum;
+		}
+
+		function change(fn){
+			return function(obj,arr){
+				var fist = obj;
+				var rest = arr;
+				var arr = [obj].concat(rest);
+				return addBy.apply(null,arr);
+			}
+		}
+
+		l(addBy(obj,'a','c','d'));
+		l(change(addBy)(obj,['a','c','d']));
+		l(change(addBy)(obj,['a','a','a','a']));
+
+	}
+
 
 
 
 	return bee;
 })(bee || {});
 
-//bee.caseD13();
-
-
-
-
-
-
-
-
-
-
-
+//bee.caseD21();
 
 
 

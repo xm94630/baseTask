@@ -170,9 +170,118 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例12:
+	 * 研究案例12: 混淆的同名
+	 * obj.$ 方法中包含$函数（和方法同名）的调用，那么这个$到底是谁呢？
+	 * 事实证明，不可能是obj.$的~
+	 * 但是这样子的写法总是怪怪的，最好避免下吧。
 	 */
 	bee.caseD12 = function(){
+
+		var $ = function(x){return x;}
+		var obj = {
+			$:function(){
+				return $("xixi");
+			}
+		}
+		l(obj.$());
+	}
+
+	/* 
+	 * 研究案例13: arguments研究
+	 */
+	bee.caseD13 = function(){
+
+		function fun(){
+			l(arguments);
+			l(typeof arguments);
+			l(arguments instanceof Object);
+			l(arguments instanceof Array);
+			l(Object.prototype.toString.call(arguments));
+			//arguments不是真实的数组，所以没有forEach这样子的数组方法
+			/*arguments.forEach(function(i){
+				l(i);
+			})*/
+
+			//转化为数组之后
+			var arr = _.toArray(arguments);
+			l(arr);
+			l(arr instanceof Object);
+			l(arr instanceof Array);
+			arr.forEach(function(i){
+				l(i);
+			})
+
+			return (function fish(a,b,c){
+				return a+b+c;
+			//}).apply(null,arguments);
+			}).apply(null,arr);
+		}
+		l(fun(11,22,33));
+
+		//获得arguments的引用，可以用来做什么呢？
+		function fun2(){
+			return arguments;
+		}
+		var thisArguments= fun2();
+		l(thisArguments);
+		l(Object.prototype.toString.call(thisArguments));
+
+		//对于原生的数组方法concat而言，下面两种是一样的
+		l([99,77,88].concat([123]));
+		l([99,77,88].concat(123));
+		//如果参数对象的话，就直接添加在末尾，同上面的第二种
+		l([99,77,88].concat({a:'haha'}));
+		//显然thisArguments这里被处理成对象了
+		l([99,77,88].concat(thisArguments));
+	}
+
+	/* 
+	 * 研究案例14: 数组拷贝
+	 */
+	bee.caseD14 = function(){
+
+		var arr = [11,22,33];
+		//这两种方式其实是一样的~
+		var arrCopy1 = Array.prototype.slice.call(arr);
+		var arrCopy2 = arr.slice();
+		l(arr);
+		l(arrCopy1);
+		l(arrCopy2);
+		l(arr == arrCopy1);
+		l(arr == arrCopy2);
+		l(arrCopy1 == arrCopy2);
+	}
+
+	/* 
+	 * 研究案例15:NaN
+	 */
+	bee.caseD15 = function(){
+		l(NaN);
+		l(!NaN);
+		l(!!NaN);
+		if(NaN)l(111);
+		if(!NaN)l(222);
+		l(NaN==undefined);
+		l(typeof NaN);
+		l(NaN == NaN);
+		l(NaN != NaN);
+	}
+
+	/* 
+	 * 研究案例16:保证最小值
+	 */
+	bee.caseD16 = function(){
+		var base =1;
+		var v=4;
+		l(Math.max(base,v));
+		var v=-1;
+		l(Math.max(base,v));
+	}
+
+	/*
+	 * 研究案例17:数组方法——sort排序
+	 */
+	bee.caseD17 = function(){
 		var lessThan = function(a,b){
 			if(a<b){
 				return true;
@@ -211,11 +320,177 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例13:元编程
+	 * 研究案例18:数组方法——sort排序
+	 * 这个例子很简单，需要深入封装的话，可以参看_.sortBy的源码，非常优秀
+	 */
+	bee.caseD18 = function(){
+		var arr = [{a:0},{a:-1},{a:1}]
+		arr.sort(function(left,right){
+			if(left.a>right.a)return 1;
+			if(left.a<right.a)return -1;
+			return 0;
+		});
+		l(arr)
+	}
+
+	/* 
+	 * 研究案例19:apply
+	 * apply 巧妙的化解“[]”结构。
+	 */
+	bee.caseD19 = function(){
+		
+		var arr1 = [99];
+		var arr2 = [77];
+		var arr3 = [88];
+		var r = [99].concat([77],[88]);
+		l(r);
+		var r = [99].concat([77,88]);
+		l(r);
+
+		function cat(){
+			var first = arguments[0];
+			var rest = Array.prototype.slice.apply(arguments,[1]);
+			
+			//这样子是由问题的，因为rest中的结构是 [[77],[88]] 
+			//return first.concat(rest);
+			
+			//这里灵活地运用了apply，将[[77],[88]]中外层的[]结构化解了，非常巧妙！
+			return first.concat.apply(first,rest);
+
+			//这里绑定对象不能为null
+			//return first.concat.apply(null,rest);
+			
+			//这中写法也是可以的，只是这个first就没有用上了，被字符串“代理”了！
+			//return first.concat.apply(['居然还可以这样子'],rest);
+			
+		}
+
+		var r2 = cat(arr1,arr2,arr3);
+		l(r2);
+	}
+
+	/* 
+	 * 研究案例20:call
+	 * 本来想用call随便写一个，改变函数参数调用结构的
+	 * 然后写着写着就写出了下面的例子
+	 * 最后发现，这个例子就是《函数式编程》中，那个unsplat函数
+	 * 现在总算纯熟的掌握了
+	 */
+	bee.caseD20 = function(){
+		
+		function fun(arr){
+			return arr.join('-');
+		}
+
+		function change(fn){
+			return function(){
+				
+				//直接使用arguments，是不可以的，不是真正的数组
+				//var arr = arguments;
+				
+				//拷贝生成一个真正的数组
+				var arr = Array.prototype.slice.call(arguments,0);
+				
+				//注意这里call的用法很精妙
+				return fn.call(null,arr);
+			}
+		}
+
+		//原来的调用形式
+		var r1 = fun([99,77,88]);
+		l(r1);
+
+		//被change改变完之后的函数的用法
+		var r2 = change(fun)(99,77,88);
+		l(r2);
+	}
+
+	/* 
+	 * 研究案例21:apply
+	 * 随便实现《函数式编程》中，那个splat函数（就是这里的change）
+	 * 由此可见，call、apply可以非常灵活的改变参数的形式
+	 */
+	bee.caseD21 = function(){
+		
+		function fun(a,b,c){
+			return a+b+c;
+		}
+
+		function change(fn){
+			return function(){
+				
+				//这里直接用arguments，不数组也是可以的
+				var arr = arguments;		
+
+				//拷贝生成一个真正的数组
+				//var arr = Array.prototype.slice.call(arguments,0);
+				
+				//注意这里apply的用法很精妙
+				return fn.apply(null,arr[0]);
+			}
+
+			//这样子就更加精炼
+			/*return function(arr){
+				return fn.apply(null,arr);
+			}*/
+		}
+
+		//原来的调用形式
+		var r1 = fun(111,222,333);
+		l(r1);
+
+		//被change改变完之后的函数的用法
+		var r2 = change(fun)([111,222,333]);
+		l(r2);
+
+	}
+
+	/* 
+	 * 研究案例22:apply
+	 * 利用apply部分改变函数addBy的参数调用形式
+	 * addBy(obj,key1,key2...)
+	 * newAddBy(obj,[key1,key2...])
+	 * 这个一种在高阶函数中最为常用的手段,在undersore、async的源码中多有出现
+	 * 以前还不是很纯熟，掌握下面这种模式就可以一通百通。
+	 */
+	bee.caseD22 = function(){
+		
+		var obj={
+			a:1,
+			b:2,
+			c:44,
+			d:100
+		};
+		function addBy(obj){
+			var rest = Array.prototype.slice.call(arguments,1);
+			var sum = 0;
+			rest.forEach(function(v,i){
+				sum += obj[v];
+			});
+			return sum;
+		}
+
+		function change(fn){
+			return function(obj,arr){
+				var fist = obj;
+				var rest = arr;
+				var arr = [obj].concat(rest);
+				return addBy.apply(null,arr);
+			}
+		}
+
+		l(addBy(obj,'a','c','d'));
+		l(change(addBy)(obj,['a','c','d']));
+		l(change(addBy)(obj,['a','a','a','a']));
+
+	}
+
+	/*
+	 * 研究案例23:元编程
 	 * 感觉是不是和案例5中的mixin模式有共同之处呢
 	 * 这里也是利用了this的作用
 	 */
-	bee.caseD13 = function(){
+	bee.caseD23 = function(){
 
 		function Fish(name){
 			this.name = name;
@@ -233,9 +508,9 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例14:模板中的变量渲染
+	 * 研究案例24:模板中的变量渲染
 	 */
-	bee.caseD14 = function(){
+	bee.caseD24 = function(){
 
 		var obj = {
 			name:'lala',
@@ -251,40 +526,15 @@ var bee = (function(bee){
 		}
 		var r = randerTmpl(tmpl,obj);
 		l(r);
-	
+
 	}
+
+
 
 
 
 	return bee;
 })(bee || {});
-
-
-bee.caseD14();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

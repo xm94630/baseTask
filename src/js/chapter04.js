@@ -210,14 +210,57 @@ var bee = (function(bee){
 
 	}
 
+	/* 
+	 * 研究案例13:元编程
+	 * 感觉是不是和案例5中的mixin模式有共同之处呢
+	 * 这里也是利用了this的作用
+	 */
+	bee.caseD13 = function(){
+
+		function Fish(name){
+			this.name = name;
+		}
+		function Whale(weight,name){
+			
+			//直接这样使用是不行的
+			//Fish();
+			//需要把Fish构造器绑定到当前this才可以哦
+			Fish.call(this,name);
+			this.weight = weight;
+		}
+		var whale = new Whale(126,'lala');
+		l(whale);
+	}
+
+	/* 
+	 * 研究案例14:模板中的变量渲染
+	 */
+	bee.caseD14 = function(){
+
+		var obj = {
+			name:'lala',
+			desc:'貌美如花'
+		}
+		var tmpl = '{{name}}看上去20来岁的样子，长得{{desc}}';
+		function randerTmpl(tmpl,obj){
+			for(var i in obj){
+				var reg = new RegExp('{{'+i+'}}','g');
+				tmpl = tmpl.replace(reg,obj[i]);
+			}
+			return tmpl;
+		}
+		var r = randerTmpl(tmpl,obj);
+		l(r);
+	
+	}
+
+
+
 	return bee;
 })(bee || {});
 
 
-
-
-
-
+bee.caseD14();
 
 
 

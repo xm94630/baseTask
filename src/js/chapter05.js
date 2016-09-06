@@ -187,8 +187,80 @@ var bee = (function(bee){
 		l(fun.call({a:1}));
 	}
 
+	/* 
+	 * 研究案例12: 变量屏蔽
+	 */
+	bee.caseE12 = function(){
 
+		function fun(){
+			var a = '我会被屏蔽';
+			return function(){
+				//只有声明，没有赋值，默认为undefined
+				var a;
+				l(a);
+			}
+		}
+		fun()();
+	}
+
+	/* 
+	 * 研究案例13: 泄漏的闭包
+	 * 其实下面的这种情况可是标准的闭包
+	 * return出去的a维持了对最外层的那个a的引用（根据作用域原理，再外层的都能捕获呢）
+	 * 不过呢，这个距离有点遥远...
+	 * 那个外层的a并没有被保护起来，可以随便被改动
+	 * 这样子闭包的意义就不存在了
+	 * 所以闭包要捕获的，一定是被立即执行的函数所保护的，比如注释处a才是合适的位置
+	 */
+	bee.caseE13 = function(){
+
+		var a = 1000;
+		function fun(){
+			//把上面的a放在这里才是私有的哦
+			//var a = 1000;
+			return {
+				v:a,
+				add:function(){
+					a++;
+				},
+				get:function(){
+					return a;
+				}
+
+			}
+		}
+		var newFun = fun();
+		newFun.add();
+		l(newFun.get());
+		newFun.add();
+		newFun.add();
+		l(newFun.get());
+		//a还可以在这里直接修改，就比较坑人了
+		a = 10;
+		newFun.add();
+		l(newFun.get());
+	}
 	
+	/* 
+	 * 研究案例14: 泄漏的闭包
+	 * 本例子和案例12完全一个意思
+	 * 然而这个例子就来源于《函数式编程》，58页的案例
+	 * 说的就是我案例12的道理，现在有看到书这里，有了共鸣
+	 * 说明我这部分已经掌握的很纯熟了，哈哈
+	 */
+	bee.caseE14 = function(){
+
+		function fun(obj){
+			return function(){
+				return obj;
+			}
+		}
+		var fish = {width:100};
+		var newFun = fun(fish);
+		l(newFun());
+		fish.width = 200;
+		l(newFun());
+	}
 
 
 
@@ -196,17 +268,7 @@ var bee = (function(bee){
 })(bee || {});
 
 
-
-bee.caseE11();
-
-
-
-
-
-
-
-
-
+//bee.caseE14();
 
 
 

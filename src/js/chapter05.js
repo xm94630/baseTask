@@ -262,13 +262,110 @@ var bee = (function(bee){
 		l(newFun());
 	}
 
+	/* 
+	 * 研究案例15: 前馈函数
+	 * 本例子很简单，思想很重要
+	 * pipe实现原来就来源于此
+	 */
+	bee.caseE15 = function(){
+
+		var result=1;
+		function fun(n){
+			return 2*n;
+		}
+		while(result<1000){
+			
+			//之前把代码写成这样子了，结果页面就渲染不出来了，我以为是gulp中的依赖文件出问题了呢。
+			//fun(result);
+			result = fun(result);
+		}
+		l(result);
+	}
+
+	/* 
+	 * 研究案例16: 使用函数，而不是值
+	 * 本例子很简单，思想很重要
+	 * 用实现2代替实现1
+	 */
+	bee.caseE16 = function(){
+
+		//实现1
+		function repeat(n,value){
+			return _.map(_.range(n),function(){
+				return value;
+			});
+		}
+		l(repeat(3,"hello~"));
+
+		//实现2
+		function repeat2(n,fun){
+			return _.map(_.range(n),fun);
+		}
+		l(repeat2(3,function(){
+			return "hello~";
+		}));
+	}
+
+	/* 
+	 * 研究案例17: 默认值
+	 * 这里直接设计defaults这个函数的时候，其实我自己也是蒙圈了
+	 * 后来想想，如果从实现目标来反推，是不是就清晰多了
+	 * 比如：defaults({a:123})({a:undefined},'a')
+	 * 首先，它是个高阶函数，有两个‘()’,
+	 * 第1对是，默认值的设置
+	 * 第2对是，获取对象的某个属性
+	 * 这样子的思路，再来设计defaults就明确多了
+	 */
+	bee.caseE17 = function(){
+
+		//为函数添加默认参数
+		function fnull(fun){
+			var rest = Array.prototype.slice.call(arguments,1);
+			return function(){
+				var args = _.map(arguments,function(v,i){
+					return v==null?rest[i]:v;
+				});
+				return fun.apply(null,args);
+			}
+		}
+		function abc(a,b,c,d){
+			return a+b+c+d;
+		}
+		var safe = fnull(abc,0,0,0,0);
+		l(safe(undefined,9,null,91));
+
+		//获取对象的默认值
+		function defaults(obj){
+			return function(o,k){
+				var val = fnull(_.identity,obj[k]);
+				return o && val(o[k]);
+			}
+		}
+		l(defaults({a:123})({a:undefined},'a'));
+	}
+
 
 
 	return bee;
 })(bee || {});
 
 
-//bee.caseE14();
+bee.caseE17();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

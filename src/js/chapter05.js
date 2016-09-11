@@ -345,12 +345,101 @@ var bee = (function(bee){
 	}
 
 
+	/* 
+	 * 研究案例18: 高阶中的特例——curry化
+	 */
+	bee.caseE18 = function(){
+		
+		function mult(n){
+			return 2*n;
+		}
+		
+		//普通的高阶，把需要的参数一次性传入
+		//不推荐使用此方法，既然用了高阶，处理成curry是更好的做法
+		function fun(fn,n){
+			return fn(n);
+		}
+		l(fun(mult,10));
+
+		//curry：每一次消耗一个参数，直到完成，更加灵活
+		function curry(fn){
+			return function(n){
+				return fn(n);
+			}
+		}
+		var myMult = curry(mult);
+		l(myMult(100));
+	}
+
+
+	/* 
+	 * 研究案例19: 2级curry
+	 * 就是最后调用函数需要逐级消耗两个参数，如这里的：firstArg,secondArg
+	 * 这里curry的顺序是从右到左，所以第一次进入的参数是secondArg，第二次才是firstArg
+	 *
+	 * 和1级curry的异同：
+	 * 不同之处是，1级的消耗一个参数，2级的消耗两个参数
+	 * 相同之处是，第一次层级都是接受一个函数
+	 * 无论是curry、和curry2消耗的参数的个数是固定的，这种被称之为“显式”，或者“手动”
+	 */
+	bee.caseE19 = function(){
+		
+		function double(n){
+			return 2*n;
+		}
+		function tenfold(n){
+			return 10*n;
+		}
+		function operate(fun,a){
+			return fun(a);
+		}
+		function curry2(fn){
+			return function(secondArg){
+				return function(firstArg){
+					return fn(firstArg,secondArg);
+				}
+			}
+		}
+
+		//处理10
+		var dealWith10 = curry2(operate)(10);
+		//双倍
+		l(dealWith10(double));
+		//十倍
+		l(dealWith10(tenfold));
+	}
+
+	/* 
+	 * 研究案例20: curry1（2）的优势
+	 * 用在回调里面有很好的可读性
+	 */
+	bee.caseE20 = function(){
+		
+		var arr = [1,2,3,4,5];
+		function curry2(fn){
+			return function(second){
+				return function(first){
+					return fn(first,second);
+				}
+			}
+		}
+		
+		//这里filter的第二个参数是匿名函数
+		l(_.filter(arr,function(n){
+			return n>3;
+		}));
+
+		var greatThan = curry2(function(a,b){
+			return a>b;
+		});
+		////这里filter的第二个参数是curry化用法，使用很灵活，可读性强
+		l(_.filter(arr,greatThan(3)));
+	}
+
 
 	return bee;
 })(bee || {});
 
-
-bee.caseE17();
 
 
 

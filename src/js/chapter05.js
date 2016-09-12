@@ -407,7 +407,7 @@ var bee = (function(bee){
 		l(dealWith10(double));
 		//十倍
 		l(dealWith10(tenfold));
-	}
+	};
 
 	/* 
 	 * 研究案例20: curry1（2）的优势
@@ -434,13 +434,26 @@ var bee = (function(bee){
 		});
 		////这里filter的第二个参数是curry化用法，使用很灵活，可读性强
 		l(_.filter(arr,greatThan(3)));
-	}
+	};
+
+	/* 
+	 * 研究案例21:字符串的乘法
+	 * 最后一例是比较奇葩的
+	 */
+	bee.caseE20 = function(){
+		
+		l(10*10);
+		l(10*'10');
+		l(10*'a');
+		l(10*'10a');
+		l('10'*'10');
+		l('10a'*'10a');
+		l(''*'');
+	};
 
 
 	return bee;
 })(bee || {});
-
-
 
 
 

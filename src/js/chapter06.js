@@ -156,19 +156,77 @@ var bee = (function(bee){
 		unbind('click','fun2');
 		unbind('click','fun1');
 		l(arr);
+	}
 
+	/* 
+	 * 研究案例6:BOSS 函数结构的相互转换
+	 * 本例子涉及高阶函数之“部分应用”
+	 * 例子中的变化非常灵活，其中可以看出apply的灵活之处，当然闭包也是少不了的
+	 * 也可以看到arguments在其中被各种切割和拼接
+	 */
+	bee.caseF6 = function(){
 
+		// 部分应用一个参数的函数
+		// 能把 f(a,b,c) 的形式改变成 f(a)(b,c),当为f(a)时候，为期待两个参数的函数
+		function partical1(fun,arg1){
+			return function(/*args*/){
+				var restArgs = Array.prototype.slice.apply(arguments,[0]);
+				var args = [arg1].concat(restArgs);
+				return fun.apply(fun,args);
+			}
+		}
+
+		//本函数用 fun(f,a,b,c) 的形式代替常见的 f(a,b,c) 形式
+		function fun(fn/*args*/){
+			var restArgs = Array.prototype.slice.apply(arguments,[1]);
+			return fn.apply(fn,restArgs);
+		}
+
+		//本函数是常见的计算全部参数之和
+		var getSum = function(){
+			var sum = 0;
+			for(var i=0;i<arguments.length;i++){
+				sum += arguments[i];
+			}
+			return sum;
+		}
+
+		//一下三种模式是一样的意思，但是根据需要变化，很是灵活
+		l(getSum(11,22,33));
+		l(fun(getSum,11,22,33));
+		l(fun(partical1(getSum,11),22,33))
+	}
+
+	/* 
+	 * 研究案例7:arguments拼接
+	 * fun内部调用了getSum，对初始的参数做了变化
+	 */
+	bee.caseF7 = function(){
+
+		//本函数是常见的计算全部参数之和
+		var getSum = function(){
+			var sum = 0;
+			for(var i=0;i<arguments.length;i++){
+				sum += arguments[i];
+			}
+			return sum;
+		}
+		//一个期待参数的函数，在内部使用的使用，还不知道怎么去用参数呢~
+		function fun(/*args*/){
+			//这个是参入的参数
+			var thisArgs = Array.prototype.slice.apply(arguments,[0]);
+			//真正使用的时候，其实只是一部分而已
+			var args = thisArgs.concat([500,500]);
+			return getSum.apply(getSum,args);
+		}
+		l(fun(1,2))
 	}
 
 
 	return bee;
 })(bee || {});
 
-bee.caseF5();
-
-
-
-
+//bee.caseF7();
 
 
 

@@ -222,11 +222,34 @@ var bee = (function(bee){
 		l(fun(1,2))
 	}
 
+	/* 
+	 * 研究案例8:检测
+	 */
+	bee.caseF8 = function(){
+
+		//构造函数调用检测
+		function _classCallCheck(instance, Constructor) { 
+			if (!(instance instanceof Constructor)) { 
+				throw new TypeError("不能像函数一样直接调用构造函数"); 
+			} 
+		}
+		function Fish() {
+		    _classCallCheck(this, Fish);
+		    this.name = '鲸鱼';
+		};
+		//直接这样子使用是会报错的
+		//Fish()
+		
+		//使用new调用就好了
+		var f = new Fish();
+		l(f);
+
+	}
 
 	return bee;
 })(bee || {});
 
-//bee.caseF7();
+bee.caseF8();
 
 
 

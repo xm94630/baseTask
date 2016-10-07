@@ -205,8 +205,6 @@ var bee = (function(bee){
 })(bee||{});
 
 
-bee.test9();
-
 
 
 

@@ -4,8 +4,28 @@ var l = function(){
 
 var bee = (function(bee){
 	
-	// 实例1：self函数
+
+	/********************************************
+	 * 第1章节所用实例
+	 * 回顾的时候也要做讲解
+	 ********************************************/
+
+	// 实例1：curry 函数
 	bee.test1 = function(){
+		
+		function curry(fn){
+			return function(n){
+				return fn(n);
+			}
+		}
+		l(parseInt('11',0));
+		l(parseInt('11',1));
+		l(parseInt('11',2));
+		l(['11','22','123'].map(parseInt));
+		l(['11','22','123'].map(curry(parseInt)));
+	}
+	// 实例2：self函数
+	bee.test2 = function(){
 		var x = 123;
 		var arr = [1,2,3];
 		function self(n){
@@ -19,23 +39,161 @@ var bee = (function(bee){
 		l(arr.map(double));
 	}
 
-	// 实例2：curry 函数
-	bee.test2 = function(){
+
+
+
+
+
+
+
+	/********************************************
+	 * 第2章节中间所用
+	 * 讲谓词的时候用
+	 ********************************************/
+
+	//实例3：高阶函数、谓词函数
+	bee.test3 = function(){
 		
-		function curry(fn){
-			return function(n){
-				return fn(n);
+		[0,2,-108,-6,43].sort();
+		[0,2,-108,-6,43,-1].sort();
+
+		//传入比较器函数，这就高阶的行为
+		[0,2,-108,-6,43,-1].sort(function(x,y){
+			if(x<y) return -1;
+			if(x>y) return 1;
+			return 0;
+		});
+	}
+	//实例4：高阶函数、谓词函数(对实例6的改造)
+	bee.test4 = function(){
+		
+		//吧这部分抽象出来，我们还会在别出用到这个逻辑
+		//但是问题是，这个比较器耦合度很高啊，不够通用
+		function lessThanOrEqual(x,y){
+			if(x<y) return -1;
+			if(x>y) return 1;
+			return 0;
+		}
+		l([0,2,-108,-6,43,-1].sort(lessThanOrEqual));
+
+		//这个比较器单独用的话.........
+		if(lessThanOrEqual(1,1)){
+			l('小于等于');
+		}else{
+			l('大于');
+		}	
+	}
+	//实例5：高阶函数、谓词函数(对实例7的改造)
+	bee.test5 = function(){
+		
+		function lessThanOrEqual(x,y){
+			return x<=y;
+		}
+
+		//谁能告诉我做一个什么操作就能ok
+		l([0,2,-108,-6,43,-1].sort(lessThanOrEqual));
+
+		//这个比较器单独用的话.........
+		if(lessThanOrEqual(1,1)){
+			l('小于等于');
+		}else{
+			l('大于');
+		}
+	}
+	//实例6：高阶函数、谓词函数(对实例8的改造)
+	bee.test6 = function(){
+		
+		function lessThanOrEqual(x,y){
+			return x<=y;
+		}
+
+		function comparator(pred){
+			return function(x,y){
+				/*if(pred(x,y)){
+					return -1;
+				}else if(pred(y,x)){
+					return 1;
+				}else{
+					return 0;
+				}*/
+				return pred(x,y)?-1:1;
 			}
 		}
-		l(parseInt('11',0));
-		l(parseInt('11',1));
-		l(parseInt('11',2));
-		l(['11','22','123'].map(parseInt));
-		l(['11','22','123'].map(curry(parseInt)));
+
+		[0,2,-108,-6,43,-1].sort(comparator(lessThanOrEqual));
+
+		//这个比较器单独用的话.........
+		if(lessThanOrEqual(1,1)){
+			l('小于等于');
+		}else{
+			l('大于');
+		}
 	}
+
+
+
+
+
+
+
+
+	/********************************************
+	 * 第2章节结束处所用
+	 * 将命令式编程时候要讲
+	 ********************************************/
 	
-	// 实例3：函数构建函数
-	bee.test3 = function(){
+	//实例7：函数式编程简单的开始
+	bee.test7 = function(){
+		//命令式写法
+		function parseAge(age){
+			if(!_.isString(age)) throw new Error('接受字符串');
+			l('开始转换...');
+			var a = parseInt(age,10);
+			if(_.isNaN(a)){
+				l('转换失败!');
+				a = 0;
+			}
+			return a;
+		}		
+	}
+	//实例8：对上面的函数式优化
+	bee.test8 = function(){
+
+		function fail(thing){
+			throw new Error(thing);
+		}
+		function warn(thing){
+			console.log('Warning:'+thing);
+		}
+		function note(thing){
+			console.log('note:'+thing);
+		}
+		
+		//函数式写法
+		function parseAge(age){
+			if(!_.isString(age)) fail('接受字符串');
+			note('开始转换...');
+			var a = parseInt(age,10);
+			if(_.isNaN(a)){
+				warn('转换失败!');
+				a = 0;
+			}
+			return a;
+		}		
+	}
+
+
+
+	
+
+
+
+	/********************************************
+	 * 第3章节 任何时间合适的时候可以讲
+	 ********************************************/
+
+	// 实例9：函数构建函数
+	bee.test9 = function(){
 		
 		var nums = [1,2,3,null,5];
 		_.reduce(nums,function(total,n){
@@ -77,132 +235,11 @@ var bee = (function(bee){
 		dosomething({id:'12680'});
 	}
 
-	//实例4：函数式编程简单的开始
-	bee.test4 = function(){
-		
-		//命令式写法
-		function parseAge(age){
-			if(!_.isString(age)) throw new Error('接受字符串');
-			l('开始转换...');
-			var a = parseInt(age,10);
-			if(_.isNaN(a)){
-				l('转换失败!');
-				a = 0;
-			}
-			return a;
-		}		
-	}
-
-	//实例5：对上面的函数式优化
-	bee.test5 = function(){
-
-		function fail(thing){
-			throw new Error(thing);
-		}
-		function warn(thing){
-			console.log('Warning:'+thing);
-		}
-		function note(thing){
-			console.log('note:'+thing);
-		}
-		
-		//函数式写法
-		function parseAge(age){
-			if(!_.isString(age)) fail('接受字符串');
-			note('开始转换...');
-			var a = parseInt(age,10);
-			if(_.isNaN(a)){
-				warn('转换失败!');
-				a = 0;
-			}
-			return a;
-		}		
-	}
-
-	//实例6：高阶函数、谓词函数
-	bee.test6 = function(){
-		
-		[0,2,-108,-6,43].sort();
-		[0,2,-108,-6,43,-1].sort();
-
-		//传入比较器函数，这就高阶的行为
-		[0,2,-108,-6,43,-1].sort(function(x,y){
-			if(x<y) return -1;
-			if(x>y) return 1;
-			return 0;
-		});
-	}
-	//实例7：高阶函数、谓词函数(对实例6的改造)
-	bee.test7 = function(){
-		
-		//吧这部分抽象出来，我们还会在别出用到这个逻辑
-		//但是问题是，这个比较器耦合度很高啊，不够通用
-		function lessThanOrEqual(x,y){
-			if(x<y) return -1;
-			if(x>y) return 1;
-			return 0;
-		}
-		l([0,2,-108,-6,43,-1].sort(lessThanOrEqual));
-
-		//这个比较器单独用的话.........
-		if(lessThanOrEqual(1,1)){
-			l('小于等于');
-		}else{
-			l('大于');
-		}	
-	}
-	//实例8：高阶函数、谓词函数(对实例7的改造)
-	bee.test8 = function(){
-		
-		function lessThanOrEqual(x,y){
-			return x<=y;
-		}
-
-		//谁能告诉我做一个什么操作就能ok
-		l([0,2,-108,-6,43,-1].sort(lessThanOrEqual));
-
-		//这个比较器单独用的话.........
-		if(lessThanOrEqual(1,1)){
-			l('小于等于');
-		}else{
-			l('大于');
-		}
-	}
-	//实例9：高阶函数、谓词函数(对实例8的改造)
-	bee.test9 = function(){
-		
-		function lessThanOrEqual(x,y){
-			return x<=y;
-		}
-
-		function comparator(pred){
-			return function(x,y){
-				if(pred(x,y)){
-					return -1;
-				}else if(pred(y,x)){
-					return 1;
-				}else{
-					return 0;
-				}
-			}
-		}
-
-		[0,2,-108,-6,43,-1].sort(comparator(lessThanOrEqual));
-
-		//这个比较器单独用的话.........
-		if(lessThanOrEqual(1,1)){
-			l('小于等于');
-		}else{
-			l('大于');
-		}
-	}
-
-
-
 
 
 	return bee;
 })(bee||{});
+
 
 
 

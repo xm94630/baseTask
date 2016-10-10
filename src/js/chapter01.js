@@ -359,7 +359,34 @@ var bee = (function(bee){
 		//结论是，原生的bind内部还处理了this,并且this必须是个方法,所以bind.apply调用的时候，受第一个参数的影响。
 		//所以原生的 bind 和 bind.apply 还是有点点不一样, 后这稍微灵活点。见【标记001】处，apply偷换了函数。
 		//自己实现的 bind, 就无所谓apply调用了。
-	
+	}
+
+
+	/* 
+	 * 研究案例7_5: 使用 bind.apply 的真正原因
+	 * 这个结论让我恍然大悟，之前7_*系列的都是为了搞明白区别，这样要从使用apply的目的来看：
+	 * 使用apply一方面可以解决this的归宿，一方面可以处理参数的形式（这个是超级重要）
+	 * 这里 bind.apply 这样子写，仅仅是为了得到自己想要的参数组合形式！！！！！！！！！！
+	 */
+	bee.case07_5 = function(){
+
+		var obj = {
+			base:900,
+			add:function(x,y){return x+y+this.base;}
+		}
+
+		//使用apply与否，这里仅仅影响的参数的形式
+		l( obj.add.bind(obj,90,9)() );
+		l( obj.add.bind.apply(obj.add,[obj,90,9])() );
+
+		//两者在使用参数上都很灵活，有点像 curry 和patical 的气质
+		l( obj.add.bind(obj,90)(9) );
+		l( obj.add.bind.apply(obj.add,[obj,90])(9) );
+		
+		//但是apply明显更加的灵活，看看 concat 函数的介入
+		var args = [9,90];
+		l( obj.add.bind.apply(obj.add,[obj].concat(args))() );
+
 	}
 
 

@@ -133,11 +133,11 @@ var bee = (function(bee){
 	 * 研究案例5:_.bindAll
 	 * 本案例研究的是《函数式编程》P50页中提到的函数_.bindAll
 	 * 对比上下两种情况，下面的绑定生了效
-	 * _.bindAll函数调用的时候并没有返回一个新的函数，可见一定是直接修改了第一个参数
+	 * _.bindAll函数调用的时候并没有返回一个新的函数，可见一定是直接修改了第一个参数(这里指的是obj2，具体的说就是obj2.fun这个函数)
 	 * 直接输出两者fun函数发现是一样的，至少在表面上是的
 	 * 要真正的观察fun的不同，必须输出外层的对象，发现func函数对象确实被改动了
 	 * fun函数对象的name属性变成了“bound fun”，这个带空格的写法很奇特，因为函数的名字不可能带空格
-	 * fun函数对象还有[[bound fun]]、[[BoundThis]]、[[BoundArgs]]这样的写法
+	 * fun函数对象还有[[bound fun]]（最近一次看，变成了[[TargetFunction]]）、[[BoundThis]]、[[BoundArgs]]这样的写法
 	 * 百度了下发现和原生的bind实现有关系，其中诡异的写法也就原生的能做到了
 	 * 可见_.bindAll函数可以用bind来实现封装的
 	 */
@@ -198,6 +198,168 @@ var bee = (function(bee){
 		}
 		myFunc = func.bind( null, 'aa','bb' );
 		console.log( myFunc('cc') );
+	}
+
+	/* 
+	 * 研究案例7_1:案例7和本例的 partical 功能非常的接近
+	 * 这里案例是我后来添加的，这个partical也是我自己凭借记忆写的
+	 * 先前也实现过一个名为 partical1 的函数，这个是书上标准的写法
+	 * 和我的区别在于，它提前消耗了一个函数和一个参数，然后最后一次补全
+	 * 而我的第一次消耗的是一个需要被包装的函数，第二次是消耗的任意参数，第三次消耗任意参数，当然受到原函数的作用func，只有一共是3个参数是有效的，再多的就被忽略的
+	 * 
+	 * 当然，案例7和partical 在包装函数的时候，形式上还是有些区别的，bind包装函数后，返回的新的函数，如果直接log出来，发现长的和原来的函数是一模一样的
+	 * partical 包装后的函数，和原函数就不一样了。
+	 *
+	 * 这里 newFunc 和 newFunc2 都用partical实现，只是消耗的参数不同。
+	 */
+	bee.case07_1 = function(){
+
+		var partical = function(fn){
+			return function(){
+				var args1 = Array.prototype.slice.call(arguments,0);
+				return function(){
+					var args2 = Array.prototype.slice.call(arguments,0);
+					return fn.apply(null,args1.concat(args2));
+				};
+			}
+		}
+
+		var func = function( a,b,c ) {
+		    return a+b+c;
+		}
+
+		var newFunc = partical(func)('aa','bb');
+		l(newFunc)
+		l(newFunc('cc','dd'));
+
+		var newFunc2 = partical(func)('aa');
+		l(newFunc2)
+		l(newFunc2('bb','cc'));
+
+	}
+
+	/* 
+	 * 研究案例7_2:案例7和 partical1
+	 */
+	bee.case07_2 = function(){
+
+		//这个是书上的partical1
+		var partical1 = function(fn,arg){
+			return function(){
+				var args = Array.prototype.slice.call(arguments,0);
+				return fn.apply(null,[arg].concat(args));
+			}
+		};
+		var func = function( a,b,c ) {
+		    return a+b+c;
+		};
+		l(partical1(func,'aa')('bb','cc'));
+	}
+
+	/* 
+	 * 研究案例7_3: fn.bind 和 fn.bind.apply 【BOSS】
+	 * 
+	 */
+	bee.case07_3 = function(){
+
+		var fish = {
+			age:'9岁',
+			name:'lala',
+			getAge:function(){
+				return this.age;
+			},
+			getName:function(){
+				return this.name;
+			}
+		}
+		var getAgeFun = fish.getAge;
+		var getNameFun = fish.getName;
+		l('========分隔线1=======');
+		l(getAgeFun());
+		l(getAgeFun.bind(fish)());
+		l(getAgeFun.bind.apply(getAgeFun,[fish])());
+		l(getAgeFun.bind.apply(getNameFun,[fish])()); // 【标记001】方便别处索引
+		
+
+		l('========分隔线2=======');
+		//getAgeFun.bind 也是一个函数，我把他想象成 myBind:
+		//如果，myBind本身不涉及 this 的参与，其实call调用完全没有意义！和直接调用一样的
+		//所以下面的3中调用是不会影响结果的
+		function myBind(a){return a;}
+		l( myBind.call({},'我是参数') );
+		l( myBind.call(function(){},'我是参数') );
+		l( myBind.call([],'我是参数') );
+
+
+		l('========分隔线3=======');
+		//getAgeFun.bind 也是一个函数，我把他想象成 myBind2:
+		//如果，myBind2本身涉及 this 的参与，那么call调用就有趣多了
+		//比如下面的情况：
+		
+		function myBind2(a){
+			return this(a);
+		}
+		
+		//这个是不行的，因为this绑定到{}，所以执行 this(a) 是有错误的
+		//l( myBind2.call({},'我是参数') );
+		
+		//同理：也是有错误
+		//l( myBind2.call([],'我是参数') );
+		
+		//这个是可以的，this指代的是function(){}，不过这个函数返回的是undefined
+		l( myBind2.call(function(){},'我是参数') );
+
+		//这个是可以的，this指代的是function(x){return x;}，正确返回
+		l( myBind2.call(function(x){return x;},'我是参数') );
+
+		/* 小结
+		 * 这里实现的 myBind2 比较接近 getAgeFun.bind（其实就是原生bind） 的实现
+		 * 因为内部至少存在一个this，这样子call的第一个参数才会生效。
+		 * 另外，myBind2 中 this作为方法在调用，务必需要call的第一个参数是函数，这点上和也比较接近原生的bind
+		 *
+		 * 当然，我这里myBind2是随意写的，bind 内部实现肯定不是如此：如我的myBind2内部直接调用了this（this指代了方法），
+		 * bind至少不会直接调用函数，而是返回这个函数吧
+		 */		
+	}
+
+	/* 
+	 * 研究案例7_4: 自定义bind 和 自定义bind.apply 【BOSS】
+	 * 这是研究fn.bind 和 fn.bind.apply的最好办法
+	 */
+	bee.case07_4 = function(){
+
+		var fish = {
+			age:'9岁',
+			name:'lala',
+			getAge:function(){
+				return this.age;
+			},
+			getName:function(){
+				return this.name;
+			}
+		}
+		var getAgeFun = fish.getAge;
+		var getNameFun = fish.getName;
+
+		//自定义bind
+		function bind (myFun,obj){
+			return function(){
+				return myFun.call(obj);
+			}
+		}
+
+		//和原生bind是一样的效果哦，无非原生的形式是：getAgeFun.bind(fish);
+		l( bind(getAgeFun,fish)() );
+		//和上面是一样的效果，关键看，这里的 apply 第一个参数改变会如何影响
+		l( bind.apply(null,[getAgeFun,fish])() );
+		//将null换成了function(){return 'xxx';}，没有啥影响。
+		//其实看自定义的bind的源码就可以知道，因为内部不存在this,这里使用apply其实是没有关系的。
+		l( bind.apply(function(){return 'xxx';},[getAgeFun,fish])() );
+
+		//结论是，原生的bind内部还处理了this,并且this必须是个方法,所以bind.apply调用的时候，受第一个参数的影响。
+		//所以原生的 bind 和 bind.apply 还是有点点不一样, 后这稍微灵活点。见【标记001】处，apply偷换了函数。
+		//自己实现的 bind, 就无所谓apply调用了。
+	
 	}
 
 

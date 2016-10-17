@@ -243,13 +243,101 @@ var bee = (function(bee){
 		//使用new调用就好了
 		var f = new Fish();
 		l(f);
-
 	}
+
+	/* 
+	 * 研究案例9:Object.create 
+	 * 这个之前就研究过，写成印象笔记的日志了
+	 * 现在需要添加到这里
+	 */
+	bee.caseF9 = function(){
+		var obj1= Object.create({});
+		var obj2= {};
+
+		//可以看出，原型链的末端就是一个Object的空实例
+		//用了Object.create构建的obj1，在原型链上比直接实例的obj2，要多出一个链节
+		l(obj1.__proto__.__proto__);
+		l(obj2.__proto__);
+
+		//这里的构造函数都是Object
+		l(obj1.constructor==Object);
+		l(obj2.constructor==Object);
+	}
+
+	/* 
+	 * 研究案例10:Object.create 和 原型继承的方法 是相通的
+	 */
+	bee.caseF10 = function(){
+		function Fish (){
+			this.a = 123;
+		}
+
+		var obj1= Object.create(new Fish());  //使用Fish的实例
+		var obj2= {a:123};
+
+		l(obj1.__proto__.__proto__);
+		l(obj2.__proto__);
+
+		l(obj1.constructor); //构造器使用是Fish
+		l(obj2.constructor);
+
+		function Fish (){
+			this.a = 123;
+		}
+
+		l('');
+		l('===>等效于');
+		l('');
+
+		function Jing (){}
+		Jing.prototype = new Fish();
+
+		var obj1= new Jing();  //使用Jing的实例
+		var obj2= {a:123};
+
+		l(obj1.__proto__.__proto__);
+		l(obj2.__proto__);
+
+		l(obj1.constructor); //构造器使用是Fish
+		l(obj2.constructor);
+	}
+
+	/* 
+	 * 研究案例11:封装一个和 Object.create 等效的函数 createObject
+	 */
+	bee.caseF11 = function(){
+		function Fish (){
+			this.a = 123;
+		}
+		function createObject(object){
+			var Fun = function(){};
+			Fun.prototype = object;
+			return new Fun;
+		}
+
+		var obj1= createObject(new Fish());   //使用Fish的实例
+		var obj2= Object.create(new Fish());  //使用Fish的实例
+
+		l(obj1.__proto__);
+		l(obj2.__proto__);
+
+		l(obj1.__proto__.__proto__);
+		l(obj2.__proto__.__proto__);
+
+		l(obj1.constructor); //构造器使用是Fish
+		l(obj2.constructor);
+	}
+
+
 
 	return bee;
 })(bee || {});
 
-//bee.caseF8();
+
+//bee.caseF10();
+
+
+
 
 
 

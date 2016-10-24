@@ -328,18 +328,41 @@ var bee = (function(bee){
 		l(obj2.constructor);
 	}
 
+	/* 
+	 * 研究案例12:惊叹！对象还有这样子的写法！！
+	 * 我学了那么多年的js，第一次知道这个。
+	 */
+	bee.caseF12 = function(){
+
+		//第一种
+		function say(){l('还可以这样子!!')}
+		var fish = {say} //通过这个函数的引用名字，作为对象的键
+		l(fish);
+		l(fish.say);
+
+		//第二种
+		var width = 100;
+		var getWidth = function(){
+			return this.width;
+		}
+		var bigFish = {say,width,getWidth,aaa:'也支持这样子的混合写法...'}
+		l(bigFish)
+		l(bigFish.getWidth());
+
+		//第三种
+		//这样子确是不行的，只有变量是可以如此做
+		//var obj = {1,2,3,4}
+		//l(obj)
+	}
+
+
 
 
 	return bee;
 })(bee || {});
 
 
-//bee.caseF10();
-
-
-
-
-
+//bee.caseF12();
 
 
 

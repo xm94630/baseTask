@@ -78,7 +78,8 @@ var bee = (function(bee){
 	return bee;
 })(bee || {});
 
-bee.caseG2();
+
+
 
 
 

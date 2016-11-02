@@ -17,6 +17,12 @@ var bee = (function(bee){
 		var r3 = new RegExp(/abc/,'g') ; 
 	}
 
+
+
+	/*******************************
+	* 正则对象的3个方法
+	********************************/
+
 	/* 
 	 * 研究案例2:正则对象 方法：exec
 	 */
@@ -145,24 +151,43 @@ var bee = (function(bee){
 
 
 
+	 /*******************************
+	 * 3个修饰符
+	 ********************************/
+
+	 /* 
+	  * 研究案例8:正则 修饰符
+	  * 超级简单
+	  */
+	 bee.caseI8 = function(){
+	 	l(/abc/g);     //全局匹配，案例3和4的match方法就因为这个g标志，有不同结果。
+	 	l(/abc/i);     //忽略大小写匹配，这个简单不说了
+	 	l(/abc/m);     //多行匹配，这个目前还没有合适的例子，看到实际问题再增加吧。
+	 }
+
+
+	 /*******************************
+	 * 正则对象的5个属性
+	 ********************************/
+
+	 /* 
+	  * 研究案例9:正则对象 属性
+	  * 超级简单
+	  */
+	 bee.caseI9 = function(){
+	 	l(/abc/.source);      //获取字符串形式  
+	 	l(/abc/g.global);     //是否有g标志
+	 	l(/abc/i.ignoreCase); //是否有i标志
+	 	l(/abc/m.multiline);  //是否有m标志
+	 	l(/abc/.lastIndex);   //之前已经出现了，不在细说
+	 }
+
+
+
 
 	return bee;
 })(bee || {});
 
-bee.caseI7();
-
-
-
-var str1 = "abcd";
-var str2 = "efg";
-
-var reg=/abc/;
-l(str1.match(reg));
-
-reg.compile(/efg/);
-//reg=/efg/;
-l(str2.match(reg));
-
-
+//bee.caseI9();
 
 

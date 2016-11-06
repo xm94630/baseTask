@@ -283,6 +283,82 @@ var bee = (function(bee){
 	}
 
 
+	/* 
+	 * 研究案例9: 案例3 解决方案一
+	 * 这里用案例8中实现的promise的方法来解决。
+	 */
+	bee.caseH9 = function(){
+
+		function promise(fn){
+			var myFun = function(){};
+			var callback = function(data){myFun(data);};
+			var promiseObject = {then:function(dealFun){myFun = dealFun;}}
+			fn(callback);
+			return promiseObject;
+		}
+
+		var fish = {
+			eat:function(cb){
+				setTimeout(function(){
+					l('吃小鱼！');
+					cb('这条小鱼很鲜呢');
+				},1000);
+			},
+			run:function(data){
+				l('开始跑！');
+				l('这里还可以传递数据呢，如果你想要的话:'+data);
+			}
+		}
+
+		//需要声明的是，用promise实现的话，异步的eat就成为了run实现的依赖，只有eat成功了，run才能得以进行。
+		//如果run是类似ajax的实现，那好需要有处理出错的情况。不过这里只是思路实现的示例，不是完整的实现。
+		promise(fish.eat).then(fish.run);
+		/*
+		 * 用promise解决这个问题当然是妥妥的啦
+		 * 不过呢，好像和我的初衷实现的结构不太一样哦，我希望这样实现：
+		 * fish.eat().run();
+		 * 上述到底有没有出路，我们再案例10里面实现下吧！
+		 */
+	}
+
+
+	/* 
+	 * 研究案例10: 案例3 解决方案二(无解的)
+	 * 采用这样子的解决方案：fish.eat().run();是无解的
+	 */
+	bee.caseH10 = function(){
+
+		var fish = {
+			eat:function(){
+				setTimeout(function(){
+					l('吃小鱼！');
+				},1000);
+				return this;
+			},
+			run:function (){
+				l('开始跑！');
+				return this;
+			}
+		}
+		fish.eat().run();
+
+		/* 这个为何是无解的呢？
+		 * 对于案例8的promise而言，他能够对eat、run方法进行包装。
+		 * 而且eat和run函数本身并没有遭到破坏，最多在eat函数中嵌入了一个必要的cb回调（可成为一种规范，简单好记）。
+		 * 另外被包装的是两个函数作为高阶函数传入，本身就灵活抽象，eat和run函数保持了很好的独立性。
+		 *
+		 * 这里的 fish.eat().run(); 写法，是站不住脚的：
+		 * 这里的eat、run直接就是调用的形式了，没有像上面那样作为高阶存在（能被包装），没有被包装的余地。
+		 * 同样，作为处理异步的极其重要的callback函数没有合适的切入口。
+		 * 外层没有包装的余地，那么要处理异步同步的问题的逻辑必须放在eat、run本身中！
+		 * 如此，eat、run本身就变复杂了，也不能把这部分逻辑抽出来。
+		 *
+		 * 所以，如果eat是异步的，run是同步的，那么run()必然是先行的，除非在run内部添加格外的处理逻辑，就像案例3那样。
+		 * 但是和初衷矛盾。因此我认为这种模式是不能站住脚的。
+		 * 如果有的话，我想早有人实现了吧。
+		 * 我在观察观察。
+		 */
+	}
 
 
 
@@ -290,13 +366,7 @@ var bee = (function(bee){
 })(bee || {});
 
 
-//bee.caseH8()
-
-
-
-
-
-
+//bee.caseH10()
 
 
 

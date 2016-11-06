@@ -29,6 +29,6 @@ var bee = (function(bee){
 })(bee || {});
 
 
-bee.caseJ1();
+//bee.caseJ1();
 
 

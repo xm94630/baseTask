@@ -25,10 +25,59 @@ var bee = (function(bee){
 		l(r.test('+.123e-123'));
 	}
 
+
+	/* 
+	 * 研究案例2:自测
+	 * 正则表达式匹配开头为11N, 12N或1NNN，后面是-7-8个数字的电话号码
+	 */
+	bee.caseJ2 = function(){
+
+		var r = /1(?:1\d|2\d|\d{3})-\d{7,8}/;  
+		l(r.test('112-1234567'));
+		l(r.test('122-1234567'));
+		l(r.test('1789-1234567'));
+		l(r.test('1789-12345678'));
+		l(r.test('222-12345678'));
+	}
+
+	/* 
+	 * 研究案例3:一个小坑
+	 */
+	bee.caseJ3 = function(){
+
+		//这个例子和下面的是有区别的，这个会变成死循环。。
+		//看上去差别很小，其实大有玄机
+		//这里的正则表达式是字面量，在每次做循环的时候，都是重新实例。
+		//所以 lastIndex的值总是为零。
+		/*while((arr=/\S+/g.exec('\n\r\f\v\b你好 \n哈哈')) !== null){
+			l(arr);
+		}*/
+		
+		var r = /\S+/g;
+		l(r.lastIndex);
+		while((arr=r.exec('\n\r\f\v\b你好 \n哈哈')) !== null){
+			l(arr);
+			l(r.lastIndex);
+		}
+	}
+
+
 	return bee;
 })(bee || {});
 
 
-bee.caseJ1();
+bee.caseJ3();
+
+
+
+
+
+
+
+
+
+
+
+
 
 

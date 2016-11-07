@@ -467,6 +467,7 @@ var bee = (function(bee){
 	bee.case10 = function(){
 
 		function fun(){
+			l('运行一次')
 			return fun;
 		}
 		l(fun()()()==fun);

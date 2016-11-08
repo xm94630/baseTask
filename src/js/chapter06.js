@@ -349,10 +349,29 @@ var bee = (function(bee){
 		l(bigFish)
 		l(bigFish.getWidth());
 
+		
 		//第三种
+		//支持匿名函数，键值为'function'
+		//当有多个匿名函数的时候，以最后的覆盖前面的！
+		var obj = {function(){alert(1)},function(){alert(2)}};
+		l(obj.function);
+
+
 		//这样子确是不行的，只有变量是可以如此做
-		//var obj = {1,2,3,4}
-		//l(obj)
+		/*var obj = {1,2,3,4}
+		l(obj)*/
+		
+		//这样子写也是有问题的
+		/*var obj = {function xxx(){}};
+		l(obj);*/
+
+		//这样子也是不行的
+		/*function require(){
+			var a=function(){}
+			return a;
+		}
+		var x = {require()}*/
+
 	}
 
 

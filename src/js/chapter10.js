@@ -140,22 +140,7 @@ var bee = (function(bee){
 	return bee;
 })(bee || {});
 
-
-
 //bee.caseJ1();
-
-
-
-
-
-
-
-
-
-
-=======
-//bee.caseJ4();
->>>>>>> cdf400df6ac44ba11a19c4d03984d2426724f29b
 
 
 

@@ -371,17 +371,34 @@ var bee = (function(bee){
 			return a;
 		}
 		var x = {require()}*/
-
 	}
 
+	/* 
+	 * 研究案例13: for in
+	 * 有一次我看到这个模式的时候，突然晕菜了。不知道for in中的match是啥了。
+	 */
+	bee.caseF13 = function(){
 
+		//这里是match的初始值
+		var match = [null,'yy',null];
+		var context = {html:'xxx',title:'hi'};
+		//这里是for in中match和上面的初始值没有关系，这里的match是循环获取
+		//context对象中的key值
+		for ( match in context ) {
+			//每次获取key值的时候，match的值都会得到更新
+			l(match);
+		}
+		//最后match的值是“title”。
+		l('===>');
+		l(match);
+	}
 
 
 	return bee;
 })(bee || {});
 
 
-//bee.caseF12();
+bee.caseF13();
 
 
 

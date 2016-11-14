@@ -86,8 +86,21 @@ var bee = (function(bee){
 		function fun(holder){
 			clearTimeout(holder);
 		}
-
 	}
+
+	/* 
+	 * 研究案例5_2:定时器
+	 * 我记得那边看到还有这样子的实现，但是我试了下是不行的。。。
+	 */
+	/*bee.caseC5_2 = function(){
+
+		function xxx(){
+			console.log('一秒钟之后，取消定时器')
+			clearInterval(xxx);
+		}
+		setInterval(xxx,1000);
+	}
+	bee.caseC5_2();*/
 
 	/* 
 	 * 研究案例6:定时器

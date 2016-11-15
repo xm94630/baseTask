@@ -393,12 +393,61 @@ var bee = (function(bee){
 		l(match);
 	}
 
+	/* 
+	 * 研究案例14: 长的像数组的对象
+	 */
+	bee.caseF14 = function(){
+
+		//这个对象用字符串形式的数字作为key,使用的时候很像数组。
+		//但是并没有数组默认的length属性
+		//当然数组的很多方法都是没有的，毕竟他不是数组。
+		var fish ={
+			0:'haha',
+			1:'xixi'
+		}
+		l(fish);
+		l(fish[0]);
+		l(fish.length);
+
+		//但是我们可以手动添加一个length的方法的
+		//这样子看上去真的像个数组，但是log出来的时候，就有Object标示
+		//而jquery的实例似乎也是这样子的对象，为何log出来有“[]”符号？感觉好像是数组，其实也是Object。
+		//可以用 Object.prototype.toString.apply($('body')) 判断
+		//jquery是如何做到的出现[]的呢？
+		var fish2 ={
+			0:'haha',
+			1:'xixi',
+			content:'xxx',
+			length:2
+		}
+		l(fish2);
+		l(fish2[0]);
+		l(fish2.length);
+	}
+
+	/* 
+	 * 研究案例15: 长的像对象的数组
+	 */
+	bee.caseF15 = function(){
+
+		var fish =[77,88,99];
+		l(fish);
+		l(fish.length);
+
+		var fish2 =[77,88,99];
+		fish2.xixi = 'xixi';
+		l(fish2);
+		l(fish2.length); //这个不会变化
+
+		//直接这样子写是不对的
+		//var fish3 = [77,88,99,'xixi':'xixi'];
+	}
 
 	return bee;
 })(bee || {});
 
 
-bee.caseF13();
+bee.caseF15();
 
 
 

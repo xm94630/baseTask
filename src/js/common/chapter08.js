@@ -416,7 +416,6 @@ var bee = (function(bee){
 		l(newP)
 	}
 
-
 	/* 
 	 * 研究案例13: 【BOSS】jq 的 noConflict 
 	 * 观察jq中的实现，确实比我的高明多了。逻辑更加的谨慎。
@@ -448,16 +447,105 @@ var bee = (function(bee){
 				window.$ = jQuery;
 			}
 		})(window);
-
 	}
 
+	/* 
+	 * 研究案例14: undersoce 结构
+	 * 上面研究了 jQuery,其实也研究了 jQuery 最外层的大的结构
+	 * 那么我们来看看 undersoce 用了什么结构呢？
+	 */
+	bee.caseH14 = function(){
+
+		(function(){l('...')})();       //jquery
+		(function(){l('...')}());		//？
+		//function(){l('...')}();		//这个时候错误的
+		(function(){l('...')}.call());  //underscore
+		
+		/* 这个三种基本上类似的，只有小小的区别
+		 * 第1、2两种意思是一样的，那个括号是不可以少的，第3种就不行了。
+		 * 第3种和前面两种是一样的，只会用call来进行调用了而已，
+		 * call比较灵活，可以执行this的指向，仅此而已
+		 */
+	}
+
+	/* 
+	 * 研究案例15: undersoce 结构
+	 */
+	bee.caseH15 = function(){
+
+		(function(){
+			l(this);
+		}.call(this));
+		/* 
+		 * 看这个例子，call传入的this，其实指代的就是bee
+		 * 如此，匿名函数内部的this，都指代的就是bee了。
+		 * underscore使用这样子的结构，this作为上下文环境，
+		 * 相对比较的灵活，当它用在node的时候，这个this就是global了！！
+		 */
+	}
+
+	/* 
+	 * 研究案例16: 自己实现 undersoce 中的 conflict
+	 * 这个是我根据之前的总结自己来实现的一个。
+	 * 真实的实现看案例17
+	 */
+	bee.caseH16 = function(){
+
+		this._ = '我是本来就存在的变量！';
+		(function(){
+			var root = this;
+			var clone = root._
+			var _ = {
+				name:'我是插件哦',
+				conflict:function(){
+					if(root._===_){
+						root._ = clone;
+					}
+					return _;
+				}
+			};
+			if(typeof this==='object'){
+				root._ = _;
+			}
+		}.call(this));
+
+		var new_ = this._.conflict();
+		l(this._);
+		l(new_);
+	}
+
+	/* 
+	 * 研究案例17: undersoce 中的 conflict
+	 * 可以发现真实_中的实现和我的推测也是相差无几的。
+	 */
+	bee.caseH17 = function(){
+
+		this._ = '我是本来就存在的变量！';
+		(function(){
+			var root = this;
+			var previousUnderscore = root._
+			var _ = {
+				name:'我是插件哦',
+				conflict:function(){
+					root._ = previousUnderscore;
+					return this;
+				}
+			};
+			//注意，这里只是支持了浏览器端的一种全局抛出。
+			//实际上，_还对node、amd等做了支持！
+		    root._ = _;
+		}.call(this));
+
+		var new_ = this._.conflict();
+		l(this._);
+		l(new_);
+	}
 
 
 	return bee;
 })(bee || {});
 
-
-bee.caseH13()
+//bee.caseH17()
 
 
 

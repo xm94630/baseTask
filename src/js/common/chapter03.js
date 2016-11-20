@@ -86,7 +86,28 @@ var bee = (function(bee){
 		function fun(holder){
 			clearTimeout(holder);
 		}
+	}
 
+	/* 
+	 * 研究案例5-2:事件监听器
+	 * 定时器和事件监听器中都有取消设置的方法，我曾经一度混淆过他们两个的“取消”的实现。
+	 * 对定时器而言，取消如上，有一个从1开始计数的句柄，在clearTimeout中传入就可以实现取消。
+	 * 对于事件监听而言，也是调用对应的取消方法：removeEventListener，而参数是绑定的那个函数。切记。
+	 */
+	bee.caseC5_2 = function(){
+		var ele;
+		var eles;
+		function fun(){
+			l('只会响应一次哦');
+			ele.removeEventListener('click',fun);//取消！！
+		}
+		window.onload = function(){
+			eles = document.getElementsByTagName('body');
+			ele = document.getElementsByTagName('body')[0]; 
+			//通过getElementsByTagName 返回的是一个数组集合，这个要注意哦
+			l(eles);
+			ele.addEventListener('click',fun);
+		}
 	}
 
 	/* 

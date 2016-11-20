@@ -355,6 +355,30 @@ var bee = (function(bee){
 		//l(obj)
 	}
 
+	/* 
+	 * 研究案例13: for
+	 * 再来一种不常用的写法
+	 */
+	bee.caseF13 = function(){
+		var i = 0,
+		    length = 10;
+		//for中，第一部分的内容省略的写法，我自己写的时候没有尝试过
+		for(;i<length;i++){
+		}
+	}
+
+	/* 
+	 * 研究案例14: random
+	 */
+	bee.caseF14 = function(){
+		var r = Math.random();
+		l(r);
+		//仔细观察随机数的长度，常见范围为16-20之间，一般为18个。
+		//这个长度的规则还不是很明确。
+		l(r.toString().length);
+		//这个是把随机数字，处理成字符串的方法
+		l(r.toString().replace(/\D/g,''));
+	}
 
 
 
@@ -362,7 +386,7 @@ var bee = (function(bee){
 })(bee || {});
 
 
-//bee.caseF12();
+//bee.caseF14();
 
 
 

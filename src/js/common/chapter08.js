@@ -360,13 +360,104 @@ var bee = (function(bee){
 		 */
 	}
 
+	/* 
+	 * 研究案例11: noConflict 
+	 * 插件防止冲突的逃生舱
+	 * 这里展示的是覆盖的情况
+	 */
+	bee.caseH11 = function(){
+
+		//这个整个就是一个插件
+		;(function(window,undefined){
+			//假设这个就是插件的内容
+			var plugin = {name:'我是一个插件'};
+			//插件挂载到全局
+			if(typeof window =='object' && typeof window.document=='object'){
+				window.plugin = plugin;
+			}
+		})(window);
+		//全局中的那个插件
+		l(plugin)
+		//全局中有使用同名的，于是就发生了覆盖。
+		plugin = 123;
+		l(plugin)
+	}
+
+	/* 
+	 * 研究案例12: noConflict 
+	 * 插件防止冲突的逃生舱
+	 * 这里的noConflict实现是我自己想的，所以...
+	 * 可能还会有漏洞吧，所以我们还要参考$中noConflict的实现！
+	 */
+	bee.caseH12 = function(){
+
+		//这个整个就是一个插件
+		;(function(window,undefined){
+			//假设这个就是插件的内容
+			var plugin = {
+				name:'我是一个插件',
+				noConflict:function(){
+					return plugin;
+				}
+			};
+			//插件挂载到全局
+			if(typeof window =='object' && typeof window.document=='object'){
+				window.plugin = plugin;
+			}
+		})(window);
+		//全局中的那个插件
+		l(plugin)
+		//使用了一个别名进行逃生
+		var newP = plugin.noConflict();
+		//这个时候全局中使用了plugin，也没有关系
+		//我们的插件名字已经改成了newP
+		plugin = 123;
+		l(plugin)
+		l(newP)
+	}
+
+
+	/* 
+	 * 研究案例13: 【BOSS】jq 的 noConflict 
+	 * 观察jq中的实现，确实比我的高明多了。逻辑更加的谨慎。
+	 * 1）我上面的问题：如果把plugin插件部分整体移动到最后，
+	 * 那么原来的plugin变量中的值就消失了。而在这里，被备份了
+	 * 2）这里的if条件的使用，逻辑很严密。
+	 */
+	bee.caseH13 = function(){
+
+		;(function(window,undefined){
+			//这里记录了全局中原来的$,以备后用，这个是核心！
+			_$ = window.$;
+			var jQuery = {
+				name:'我是一个插件',
+				noConflict:function(){
+					if(window.$===jQuery){
+						//这个也是重要的实现
+						//之前全局的$，被我们的$插件覆盖了，好在我们有个备份，
+						//这个时候把备份的还给人家，完成了逃生。
+						window.$ = _$;
+
+						//外层的if是做什么的呢？来确保这个一开始的$确实是被我这个$插件覆盖了才进行逃生
+						//你要是被别的插件或者变量修改了，我可不管。
+					}
+					return jQuery;
+				}
+			};
+			if(typeof window =='object' && typeof window.document=='object'){
+				window.$ = jQuery;
+			}
+		})(window);
+
+	}
+
 
 
 	return bee;
 })(bee || {});
 
 
-//bee.caseH10()
+bee.caseH13()
 
 
 

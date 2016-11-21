@@ -26,9 +26,44 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例2:[\w\W]+ 
+	 * 研究案例2:自测
+	 * 正则表达式匹配开头为11N, 12N或1NNN，后面是-7-8个数字的电话号码
 	 */
 	bee.caseJ2 = function(){
+
+		var r = /1(?:1\d|2\d|\d{3})-\d{7,8}/;  
+		l(r.test('112-1234567'));
+		l(r.test('122-1234567'));
+		l(r.test('1789-1234567'));
+		l(r.test('1789-12345678'));
+		l(r.test('222-12345678'));
+	}
+
+	/* 
+	 * 研究案例3:一个小坑
+	 */
+	bee.caseJ3 = function(){
+
+		//这个例子和下面的是有区别的，这个会变成死循环。。
+		//看上去差别很小，其实大有玄机
+		//这里的正则表达式是字面量，在每次做循环的时候，都是重新实例。
+		//所以 lastIndex的值总是为零。
+		/*while((arr=/\S+/g.exec('\n\r\f\v\b你好 \n哈哈')) !== null){
+			l(arr);
+		}*/
+		
+		var r = /\S+/g;
+		l(r.lastIndex);
+		while((arr=r.exec('\n\r\f\v\b你好 \n哈哈')) !== null){
+			l(arr);
+			l(r.lastIndex);
+		}
+	}
+
+	/* 
+	 * 研究案例4:[\w\W]+ 
+	 */
+	bee.caseJ4 = function(){
 
 		var r1 = /[\w]+/;
 		var r2 = /[\W]+/;
@@ -50,10 +85,10 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例3:jquery中用到的一个正则
+	 * 研究案例5:jquery中用到的一个正则
 	 * 这里就有[\w\W]+
 	 */
-	bee.caseJ3 = function(){
+	bee.caseJ5 = function(){
 
 		var rquickExpr = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]*))$/;
 		l(rquickExpr.test('<div>'));    	//true
@@ -71,10 +106,10 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例4: \1、\2
+	 * 研究案例6: \1、\2
 	 * 这样子用于对对应括号的配对用的，用来保证一样的字符
 	 */
-	bee.caseJ4 = function(){
+	bee.caseJ6 = function(){
 
 		var rsingleTag = /^(\w+)-\1/;
 		l(rsingleTag.test('123-123'));             //true
@@ -86,9 +121,9 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例5:空标签
+	 * 研究案例7:空标签
 	 */
-	bee.caseJ5 = function(){
+	bee.caseJ7 = function(){
 
 		var rsingleTag = /^<(\w+)\s*\/?>(?:<\/\1>|)$/;
 		l(rsingleTag.test('<div></div>'));     //true
@@ -105,8 +140,7 @@ var bee = (function(bee){
 	return bee;
 })(bee || {});
 
-
-//bee.caseJ4();
+//bee.caseJ1();
 
 
 

@@ -541,11 +541,138 @@ var bee = (function(bee){
 		l(new_);
 	}
 
+	/* 
+	 * 研究案例18: 函数声明 和 函数表达式
+	 * 这里看出，作为构造函数来用，这两种形式没有大的区别
+	 * 当有别的变量（如xxx,yyy）对构造函数引用的时候，实例对象也是这些变量的实例。
+	 */
+	bee.caseH18 = function(){
+
+		function Fish(age){
+			this.age = age;
+		}
+		var Bird = function(age){
+			this.age = age;
+		}
+		var xxx = Fish;
+		var yyy = Bird;
+
+		var f = new xxx(123);
+		l(f)
+		//需要说明的是，在浏览器中log显示的时候，constructor是命名函数Fish，而不是xxx.
+		//虽然在用instanceof的时候都是对的。
+		l(f.constructor)           
+		l(f instanceof Fish);
+		l(f instanceof xxx);
+
+		var b = new yyy(123);
+		l(b)
+		l(b.constructor)       //在函数表达式子的时候，这个constructor是一个匿名函数，既不是yyy、也不睡Bird（因为这个两个其实都是表达式引用）
+		l(b instanceof Bird);
+		l(b instanceof yyy);
+	}
+
+	/* 
+	 * 研究案例19: 工厂模式
+	 */
+	bee.caseH19 = function(){
+
+		function Fish(option){
+			this.age = option.age || 1;
+			this.weight = option.weight || 100;
+		}
+		function Bird(option){
+			this.age = option.age || 1;
+			this.height = option.height || 100;
+		}
+
+		var Factory = function(){}
+		Factory.prototype.type = Fish;
+		Factory.prototype.create = function(option){
+			if(option.type == 'Bird'){
+				this.type = Bird;
+			}else{
+				this.type = Fish;
+			}
+			return new this.type(option);
+		}
+
+		var factory = new Factory();
+
+		var myBird = factory.create({
+			type:'Bird',
+			age:4,
+			height:300
+		});
+		l(myBird)
+		var myFish = factory.create({
+			type:'Fish',
+			age:2,
+			height:300   //Fish构造的时候是不需要有这个height属性的，也没关系。而没传入的weight会采用默认的值。
+		});
+		l(myFish)
+	}
+
+	/* 
+	 * 研究案例20: 子类工厂
+	 */
+	bee.caseH20 = function(){
+
+		function Fish(option){
+			this.age = option.age || 1;
+			this.weight = option.weight || 100;
+		}
+		function Bird(option){
+			this.age = option.age || 1;
+			this.height = option.height || 100;
+		}
+
+		//工厂
+		function Factory(){}
+		Factory.prototype.type = Fish;
+		Factory.prototype.create = function(option){
+			//这里的时候就不需要type的处理了
+			//因为在子类工厂就已经指定好类型了。
+			/*if(option.type == 'Bird'){
+				this.type = Bird;
+			}else{
+				this.type = Fish;
+			}*/
+			return new this.type(option);
+		}
+
+		//子类工厂
+		var BirdFactory = function(){}
+		BirdFactory.prototype = new Factory;
+		BirdFactory.prototype.type = Bird;
+		var bfactory = new BirdFactory();
+
+		var myBird = bfactory.create({
+			age:10,
+			height:660
+		});
+		l(myBird)
+		l(myBird instanceof Bird)
+
+		//在这个例子中看看 bfactory 的构造函数吧~ 结果是Factory呢
+		//这个是因为“BirdFactory.prototype = new Factory;”中是对原来的原型进行了覆盖。
+		l(bfactory.constructor)
+	}
+
+
+
+
 
 	return bee;
 })(bee || {});
 
-//bee.caseH17()
+
+
+
+
+
+
+//bee.caseH18()
 
 
 

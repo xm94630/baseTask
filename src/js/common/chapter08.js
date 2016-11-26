@@ -258,7 +258,7 @@ var bee = (function(bee){
 				myFun(data);
 			};
 
-			//异步方法的调用，在“对调”中呼起对myFun的使用
+			//异步方法的调用，在“回调”中呼起对myFun的使用
 			fn(callback);
 
 			var promiseObject = {
@@ -658,6 +658,21 @@ var bee = (function(bee){
 		//这个是因为“BirdFactory.prototype = new Factory;”中是对原来的原型进行了覆盖。
 		l(bfactory.constructor)
 	}
+
+	/* 
+	 * 研究案例21: 自己实现类似jquery中使用的 promise  
+	 */
+	bee.caseH21 = function(){
+
+	}
+
+	/* 
+	 * 研究案例22: $.holdReady 的实现原理
+	 */
+	bee.caseH22 = function(){
+
+	}
+
 
 
 

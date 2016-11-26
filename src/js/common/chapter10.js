@@ -137,10 +137,34 @@ var bee = (function(bee){
 		l(rsingleTag.test('<div  /></div>'));  
 	}
 
+	/* 
+	 * 研究案例8: 【BOSS】(.)* 和 (.*)的区别
+	 * 注意观察输出
+	 */
+	bee.caseJ8 = function(){
+		var r=/(.)*/;
+		l(r.exec('123456'))
+		var r=/(.*)/;
+		l(r.exec('123456'))
+	}
+
+	/* 
+	 * 研究案例9: ?!的运用
+	 * 其实在上个章节中已经有解释。但是我后来看到的时候又忘记了
+	 * 所以还是要把这个实例讲讲
+	 */
+	bee.caseJ9 = function(){
+		//匹配的时候要排除 匹配xm94630的情况
+		var r=/^(?!xm94630).*\.js/;
+		l(r.exec('xm94630.min.js'))
+		l(r.exec('xm9463000.min.js'))
+		l(r.exec('jy2006.min.min.js'))
+	}
+
 	return bee;
 })(bee || {});
 
-//bee.caseJ1();
+//bee.caseJ9();
 
 
 

@@ -660,16 +660,9 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例21: 自己实现类似jquery中使用的 promise  
+	 * 研究案例21: $.holdReady 的实现原理
 	 */
 	bee.caseH21 = function(){
-
-	}
-
-	/* 
-	 * 研究案例22: $.holdReady 的实现原理
-	 */
-	bee.caseH22 = function(){
 		var a = 0;
 		var d = $.Deferred();
 		function hold(b){
@@ -697,10 +690,10 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例23: $.holdReady 的实现原理 
+	 * 研究案例22: $.holdReady 的实现原理 
 	 * 应用
 	 */
-	bee.caseH23 = function(){
+	bee.caseH22 = function(){
 		var a = 0;
 		var d = $.Deferred();
 		function hold(b){
@@ -729,10 +722,10 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例24: 23案例的扩展
+	 * 研究案例23: 22案例的扩展
 	 * 使用我自己的promise，也是可以方便实现同上功能
 	 */
-	bee.caseH24 = function(){
+	bee.caseH23 = function(){
 
 		//这个是我在bee.caseH8案例中实现的
 		function promise(fn){
@@ -759,7 +752,42 @@ var bee = (function(bee){
 		});
 	}
 
+	/* 
+	 * 研究案例24: jquery版本的promise  
+	 * 自己实现下，记得和 bee.caseH08 的对比
+	 * 这个版本我没有参考过jquery的源码，花了5分钟写出来的，以后在研究源码的时候
+	 * 看看自己是不是和他的一致。
+	 * 另外从思考上来看，我现在思路比以前清晰了，很多原理能够马上领悟和实现。
+	 */
+	bee.caseH24 = function(){
+		function Deferred(){
+			var dealWithFun = function(){};
+			return {
+				promise:function(){
+					return {
+						done:function(fn){
+							dealWithFun = fn;
+						}
+					}
+				},
+				resolveWith:function(){
+					dealWithFun();
+				}
+			}
+		}
 
+		//应用
+		var d = Deferred();
+		setTimeout(function(){
+			l('延时1000，执行');
+			d.resolveWith();
+		},1000);
+		d.promise().done(function(){
+			setTimeout(function(){
+				l('延时500，执行');
+			},500);
+		});
+	}
 
 
 	return bee;
@@ -771,7 +799,7 @@ var bee = (function(bee){
 
 
 
-bee.caseH24()
+//bee.caseH24()
 
 
 

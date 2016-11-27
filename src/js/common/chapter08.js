@@ -670,10 +670,94 @@ var bee = (function(bee){
 	 * 研究案例22: $.holdReady 的实现原理
 	 */
 	bee.caseH22 = function(){
-
+		var a = 0;
+		var d = $.Deferred();
+		function hold(b){
+			if(b){a++;}else{
+				a--;
+				if(a<=0){ 
+					a=0;
+					d.resolveWith();
+				}
+			}			
+		}
+		function promiseFun(fn){
+			setTimeout(function(){
+				d.promise().done(function(){
+					l('执行了');
+				})
+			})
+		}
+		//hold住了两次，释放两次最后还是会被执行的。
+		hold(true);
+		hold(true);
+		hold(false);
+		hold(false);
+		promiseFun();
 	}
 
+	/* 
+	 * 研究案例23: $.holdReady 的实现原理 
+	 * 应用
+	 */
+	bee.caseH23 = function(){
+		var a = 0;
+		var d = $.Deferred();
+		function hold(b){
+			if(b){a++;}else{
+				a--;
+				if(a<=0){ 
+					a=0;
+					d.resolveWith();
+				}
+			}			
+		}
+		function promiseFun(fn){
+			setTimeout(function(){
+				d.promise().done(function(){
+					l('执行了');
+				})
+			},200)
+		}
 
+		hold(true);
+		setTimeout(function(){
+			l('我被延时了1000秒，但是还是我先执行哦');
+			hold(false);
+		},1000)
+		promiseFun();
+	}
+
+	/* 
+	 * 研究案例24: 23案例的扩展
+	 * 使用我自己的promise，也是可以方便实现同上功能
+	 */
+	bee.caseH24 = function(){
+
+		//这个是我在bee.caseH8案例中实现的
+		function promise(fn){
+			var myFun = function(){};
+			var callback = function(data){myFun(data);};
+			fn(callback);
+			var promiseObject = {
+				then:function(dealFun){
+					myFun = dealFun;
+				}
+			}
+			return promiseObject;
+		}
+
+		promise(function(cb){
+			setTimeout(function(){
+				l('我被延时了2000秒，但是还是我先执行哦');
+				cb();
+			},2000);
+		}).then(function(){
+			setTimeout(function(){
+				l('执行了');
+			},1000);
+		});
+	}
 
 
 
@@ -687,7 +771,7 @@ var bee = (function(bee){
 
 
 
-//bee.caseH18()
+bee.caseH24()
 
 
 

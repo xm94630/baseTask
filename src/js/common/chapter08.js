@@ -1,6 +1,6 @@
 /*******************************
 * 第八章
-* 这里研究集中常见的模式
+* 这里研究几种常见的模式
 ********************************/
 
 var bee = (function(bee){
@@ -789,6 +789,67 @@ var bee = (function(bee){
 		});
 	}
 
+	/* 
+	 * 研究案例25: 抽象工厂
+	 * 这个可以结合“研究案例19”来看
+	 * 在案例19的时候，我就想到：这种工厂模式，和构造函数的耦合度视乎很高的样子。
+	 * 如何来自己灵活的配置需要在内部实例化的那个构造函数呢？
+	 * 抽象工厂就可以做到。这种模式视乎在新浪的项目中也有涉及。
+	 *
+	 * 这个是我自己实现的，和书上的对比了下，几乎是一样，就算掌握啦
+	 */
+	bee.caseH25 = function(){
+
+		//构造函数
+		function Fish(option){
+			this.age = option.age;
+			this.weight = option.weight;
+		}
+		Fish.prototype.run = 1000;
+
+		function Bird(option){
+			this.age = option.age;
+			this.weight = option.weight;
+		}
+		Fish.prototype.fly = 900;
+
+		//抽象工厂
+		function absoluteFactory(){
+			var arr ={};
+			return {
+				register:function(name,myConstructor){
+					if(myConstructor.prototype.run){ //这有符合这个规范的才能被注册哦
+						arr[name] = myConstructor;
+					}
+					//这个有没有都无所谓了
+					return this;
+				},
+				getObject:function(name,opts){
+					return (thisConstructor = arr[name]) ? new thisConstructor(opts) : null;
+				}
+			}
+		}
+
+		//鱼的工厂
+		var myFactory = absoluteFactory();
+		myFactory.register('myFish',Fish);
+		var fish = myFactory.getObject('myFish',{
+			age:99,
+			weight:299
+		});
+		l(fish)
+
+		//鱼的工厂
+		var myFactory2 = absoluteFactory();
+		myFactory2.register('myBird',Bird);
+		var bird = myFactory2.getObject('myBird',{
+			age:11,
+			weight:22
+		});
+		//这里的鸟的实例获取失败，是因为register中必须有“.prototype.run”的实现才行~
+		l(bird)
+	}
+
 
 	return bee;
 })(bee || {});
@@ -799,7 +860,7 @@ var bee = (function(bee){
 
 
 
-//bee.caseH24()
+//bee.caseH25()
 
 
 

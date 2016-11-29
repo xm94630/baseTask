@@ -526,7 +526,17 @@ var bee = (function(bee){
 		}
 		var r = randerTmpl(tmpl,obj);
 		l(r);
+	}
 
+	/* 
+	 * 研究案例25: 判断对象是否为对象自变量
+	 * 自己来实现JQ的 isPlainObject 
+	 */
+	bee.caseD25 = function(){
+		//通过 hasOwnProperty 就可以检测jquery对象的继承层级
+		l($('body').hasOwnProperty('hasOwnProperty'))
+		l($('body').__proto__.hasOwnProperty('hasOwnProperty'))
+		l($('body').__proto__.__proto__.hasOwnProperty('hasOwnProperty'))
 	}
 
 
@@ -537,7 +547,7 @@ var bee = (function(bee){
 })(bee || {});
 
 
-
+bee.caseD25();
 
 
 

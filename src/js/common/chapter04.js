@@ -533,13 +533,68 @@ var bee = (function(bee){
 	 * 自己来实现JQ的 isPlainObject 
 	 */
 	bee.caseD25 = function(){
-		//通过 hasOwnProperty 就可以检测jquery对象的继承层级
-		l($('body').hasOwnProperty('hasOwnProperty'))
-		l($('body').__proto__.hasOwnProperty('hasOwnProperty'))
-		l($('body').__proto__.__proto__.hasOwnProperty('hasOwnProperty'))
+
+		//Object.prototype.hasOwnProperty.call( obj.constructor.prototype, "isPrototypeOf" ) 
+
 	}
 
+	/* 
+	 * 研究案例26: .constructor.prototype 和 __proto__ 的区别 【BOSS】
+	 */
+	bee.caseD26 = function(){
 
+		//通过 hasOwnProperty 就可以检测jquery对象的继承层级
+		//实例对象中的hasOwnProperty肯定不是实例自己的
+		l('==>1')
+		l($('body').hasOwnProperty('hasOwnProperty'))
+
+		l('==>2')
+		l($('body').__proto__===jQuery.prototype)
+		//jQuery.prototype 就是一个对象自变量哦~ 但是任何对象自变量也会继承自Object中的原型（它才具备有hasOwnProperty方法）哦。
+		l($('body').__proto__.hasOwnProperty('hasOwnProperty'))
+
+		l('==>3')
+		//这个时候就是Object上的原型对象了，必然有自己的属性“hasOwnProperty”
+		l($('body').__proto__.__proto__===Object.prototype)
+		l($('body').__proto__.__proto__.hasOwnProperty('hasOwnProperty'))
+
+
+		l('==>4')
+		//jquery实例的constructor是jQuery，这是内部制定好的。
+		l($('body').constructor==jQuery)
+		//那么这个其实就是指的jQuery构造函数的原型对象（就是有一堆方法的那个对象）
+		l($('body').constructor.prototype)
+		//所以这里是相等的，没有什么疑问吧
+		//我以前就得出结论“.constructor.prototype 效果同 __proto__”，但是这个并不是完全对的，比如下面这个就不行：
+		l($('body').constructor.prototype == $('body').__proto__)
+
+		l('==>5')
+		//按照上面的理论，应该是等效的啊！
+		l( $('body').constructor.prototype.constructor.prototype == $('body').__proto__.__proto__);
+		//不要着急，我们先来简化下：
+		var thatPrototypeObject = jQuery.prototype;
+		l( thatPrototypeObject.constructor.prototype == thatPrototypeObject.__proto__);  //标记为（1）
+		//再来分别观察：
+		//使用“.constructor.prototype”这种会进入一个死循环。。。
+		l( thatPrototypeObject.constructor.prototype == jQuery.prototype);
+		//利用上面这个，将（1）简化
+		//到这里的时候，我们就可以知道，为什么返回的是false了。
+		l( jQuery.prototype == jQuery.prototype.__proto__);
+
+		/* 
+		 * 小结
+		 * 1.也就是说 $('body').constructor.prototype 之后，无论加多少个“.constructor.prototype” 结构都是一样的结果。进入了一个死循环。
+		 * 这是因为，人为修改了constructor的指向，导致的。因为本来jQuery那个原型的constructor 应该是Object才对！
+		 * 2.而__proto__ 这个呢！是不会因为后期修改而改变的，人家还是认为是那个Object!! 
+		 * 这个就是使用 .constructor.prototype 和 __proto__ 的区别！
+		 * 也就是说__proto__ 能够真正找到那个构造他的函数，而 .constructor.prototype 却不行！因为可以被修改！！！
+		 */
+		
+		l('==>6')
+		l(jQuery.prototype
+			== jQuery.prototype.constructor.prototype.constructor.prototype.constructor.prototype.constructor.prototype)
+		l(jQuery.prototype.__proto__==Object.prototype)
+	}
 
 
 
@@ -547,7 +602,7 @@ var bee = (function(bee){
 })(bee || {});
 
 
-//bee.caseD25();
+bee.caseD25();
 
 
 

@@ -534,8 +534,35 @@ var bee = (function(bee){
 	 */
 	bee.caseD25 = function(){
 
-		//Object.prototype.hasOwnProperty.call( obj.constructor.prototype, "isPrototypeOf" ) 
+		//这个是简化版本的，严谨方案可以参考jquery
+		function isPlainObject(xxx){
+			return Object.prototype.hasOwnProperty.call( xxx.constructor.prototype, "isPrototypeOf");
+		}
+		l(isPlainObject({a:213}))
+		l(isPlainObject($('body')))
 
+		//这个是个反例...
+		//照理来说，这个也算是对象自变量了，但是因为prototype上的constructor 被修改了
+		l(isPlainObject($.prototype))
+
+		//不过jquery这个新版本的里面判断没有错误！
+		//因为 它的实现和我研究的那个2.0.3不是一个版本
+		//这里的版本的源码我看了 是用了 Object.getPrototypeOf 来获取原型
+		//就没有问题了
+		l($.isPlainObject($.prototype))
+	}
+
+	/* 
+	 * 研究案例25_2: 判断对象是否为对象自变量
+	 */
+	bee.caseD25_2 = function(){
+
+		function isPlainObject(xxx){
+			//这里优化了下，用call感觉是很奇怪
+			return xxx.constructor.prototype.hasOwnProperty("isPrototypeOf");
+		}
+		l(isPlainObject({a:213}))
+		l(isPlainObject($('body')))
 	}
 
 	/* 
@@ -597,12 +624,22 @@ var bee = (function(bee){
 	}
 
 
+	/* 
+	 * 研究案例27: Object.getPrototypeOf
+	 * 这个其实就是 谷歌浏览器支持的 __proto__ !!
+	 * 我们用这个来代替上面的例子中的__proto__ 看看
+	 */
+	bee.caseD27 = function(){
+		//完美！
+		l( Object.getPrototypeOf(jQuery.prototype) == jQuery.prototype.__proto__);
+	}
+
 
 	return bee;
 })(bee || {});
 
 
-bee.caseD25();
+bee.caseD27();
 
 
 

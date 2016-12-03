@@ -850,18 +850,393 @@ var bee = (function(bee){
 		l(bird)
 	}
 
+	/* 
+	 * 研究案例26: 工厂模式再思考
+	 * 之前我们已经学习了工厂模式、子类工厂、抽象工厂
+	 * 在上面的工厂中，工厂本身就是个构造函数，通过实例化一个实例工厂，才能创建真正的实例对象。
+	 * 那么工厂是构造函数，和直接是工厂对象会有何区别呢？
+	 * 其实就是类和对象的区别。工厂是构造函数，就可以有很多的独立的工厂呗！
+	 *
+	 * 下面是react中的工厂。
+	 * myFactory = React.createFactory(Text);  //React.createFactory相当于是工厂的构造函数
+	 * myFactory({})  //这里获取的工厂实例和之前的案例中不同，哪里是对象，通过调用create在创建目标，而这里是函数，通过直接调用完实现。
+	 * 好吧，反正都一样的，灵活。这里就实现下吧~
+	 */
+	bee.caseH26 = function(){
+
+		//构造函数
+		function Fish(option){
+			this.age = option.age;
+			this.weight = option.weight;
+		}
+		function Bird(option){
+			this.name = option.name;
+		}
+
+		React = {
+			createFactory:function(klass){
+				return function(options){
+					return new klass(options);
+				}
+			}
+		}
+
+		var myFactory  = React.createFactory(Fish);
+		var myFactory2 = React.createFactory(Bird);
+		var fish  = myFactory ({age:99,weight:100});
+		var bird  = myFactory2({name:'xm'});
+		var bird2 = myFactory2({name:'jy'});
+		l(fish);
+		l(bird);
+		l(bird2);	
+	}
+
+	/* 
+	 * 研究案例27: React 的模式
+	 */
+	bee.caseH27 = function(){
+
+		//构造函数
+		function Fish(opts){
+			this.props = opts;
+			this.render = function(){
+				l(this.props.name);
+				return "开始渲染！";
+			}
+		}
+
+		React = {
+			createFactory:function(klass){
+				return function(options){
+					return new klass(options);
+				}
+			}
+		}
+		ReactDOM = {
+			render:function(obj){
+				l(obj.render());
+			}
+		}
+
+
+		var myFactory  = React.createFactory(Fish);
+		ReactDOM.render( myFactory({name:'XiaoYu'}) );
+	}
+
+	/* 
+	 * 研究案例28: React 的模式 继续深入
+	 * 这个案例和 React 的大面上的实现已经非常的类似了。
+	 * 不过这里，Fish这个类，还是通过用户自己来写的，能不能更加高级一点呢，我们来看案例29
+	 */
+	bee.caseH28 = function(){
+
+		//模拟react中两个核心方法
+		var React = {
+			createFactory:function(klass){
+				return function(options){
+					return new klass(options);
+				}
+			},
+			DOM:{
+				p:function(content){
+					var newEle = document.createElement('p');
+					var text = document.createTextNode(content);
+					newEle.appendChild(text);
+					return newEle;
+				}
+			}
+
+		}
+		var ReactDOM = {
+			render:function(obj,element){
+				$(element).html( obj.render() );
+			}
+		}
+		
+		//构造函数
+		function Fish(opts){
+			this.props = opts;
+			this.render = function(){
+				l(this.props.name);
+				return React.DOM.p('我是组件:'+this.props.name);
+			}
+		}
+
+		//创建组件
+		var myFactory  = React.createFactory(Fish);
+		$(function(){
+			ReactDOM.render( myFactory({name:'XiaoYu'}) , document.getElementById('container'));
+		})
+	}
+
+	/* 
+	 * 研究案例29: React 的模式 
+	 * 这个就相对比较完美了
+	 *
+	 * 但是 ReactDOM.render 外层还有个jquery的dom加载的玩样，这个逻辑应该封装起来。
+	 * 在优化上面的问题的前，我们就先来看看真正的Rect中是如何的？
+	 *
+	 * 我试验的结果是：也是和我存在一样的问题，可以通过下面的方法来规避：
+	 * 1.在body标签关闭之前使用js.
+	 * 2.把渲染的行为放在异步中，比如setTimeout
+	 */
+	bee.caseH29 = function(){
+
+		//模拟react中两个核心方法
+		var React = {
+			createFactory:function(klass){
+				return function(options){
+					return new klass(options);
+				}
+			},
+			DOM:{
+				p:function(content){
+					var newEle = document.createElement('p');
+					var text = document.createTextNode(content);
+					newEle.appendChild(text);
+					return newEle;
+				},
+				div:function(content){
+					var newEle = document.createElement('div');
+					var text = document.createTextNode(content);
+					newEle.appendChild(text);
+					return newEle;
+				}
+			},
+			createClass:function(obj){
+				return function(opts){
+					this.props = opts;
+					this.render = obj.render?obj.render:function(){};
+				}
+			}
+		}
+		var ReactDOM = {
+			render:function(obj,element){
+				element.innerHTML = '';
+				element.append(obj.render());
+				//等效于:
+				//$(element).html(obj.render());
+			}
+		}
+		
+		//构造函数
+		var Fish = React.createClass({
+			render:function(){
+				return React.DOM.p('我是组件:'+this.props.name);
+			}
+		});
+		var Bird = React.createClass({
+			render:function(){
+				return React.DOM.div(this.props.name+'的体重是'+this.props.weight);
+			}
+		});
+		var Counter = React.createClass({
+			render:function(){
+				return React.DOM.div('即时开始：'+this.props.time);
+			}
+		});
+
+		//创建组件
+		var myFactory  = React.createFactory(Fish);
+		var myFactory2 = React.createFactory(Bird);
+		var myFactory3 = React.createFactory(Counter);
+		$(function(){
+			ReactDOM.render( myFactory({name:'XiaoYu'}) , document.getElementById('container'));
+			ReactDOM.render( myFactory({name:'DaYu'}) , document.getElementById('container2'));
+			ReactDOM.render( myFactory2({name:'XiaoNiao',weight:'200g'}) , document.getElementById('container3'));
+			var n = 0;
+			window.setInterval(function(){
+				n+=100
+				ReactDOM.render( myFactory3({time:n}) , document.getElementById('container4'));
+			},100)
+		})
+	}
+
+	/* 
+	 * 研究案例30: getElementById
+	 * getElementById只有等待dom加载完毕才能获取
+	 * 除了使用 $() 和 DOMContentLoaded时间，使用异步方法也是确保DOM加载完毕的方法
+	 */
+	bee.caseH30 = function(){
+		//异步的优先级要低于addEventListener事件的触发！
+		window.setTimeout(function(){
+			l(1)
+			l(document.getElementById('container'))
+		},0)
+		document.addEventListener("DOMContentLoaded",function(){
+			l(2)
+			l(document.getElementById('container'))
+		})
+	}
+
+	/* 
+	 * 研究案例31: innerHTML
+	 */
+	bee.caseH31 = function(){
+		window.setTimeout(function(){
+			var ele = document.getElementById('container');
+			var ele2 = document.getElementById('container2');
+			var ele3 = document.getElementById('container3');
+
+			//innerHTML的用法：
+			//注意他不是一个方法，我一直以为是方法的调用形式！
+			ele.innerHTML = '你好吗';
+
+			var newEle = document.createElement('p');
+			var text = document.createTextNode('我是动态创建的DOM元素');
+			newEle.appendChild(text);
+			//innerHTML 添加元素对象的话视乎是不是我想要的
+			ele2.innerHTML = newEle;
+
+			ele3.innerHTML = '';
+			ele3.append(newEle);
+			//等效于:
+			//$(ele3).html(newEle);
+
+		},0)
+	}
+
+	/* 
+	 * 研究案例32: React 的模式 【BOSS】
+	 * 这个还是很有成就感的！哈哈
+	 */
+	bee.caseH32 = function(){
+
+		//模拟react中两个核心方法
+		var React = {
+
+			createClass:function(obj){
+				var _state = {};
+				return function(opts){
+					this.CID = Math.random();
+					this.state = _state;
+					this.state = {};
+					this.flag = true;
+					this.getInitialState = function(){
+						return this.state;
+					}
+					//这里要做值的监听，如果发生变化的话需要重新渲染
+					//也就是说这里要有一个值变化的判断
+					this.setState = function(obj){
+						var str = JSON.stringify(this.state);
+						$.extend(this.state,obj);
+						var str2 = JSON.stringify(this.state);
+						if(str!==str2){
+							ReactDOM.reRender(this.CID);
+						}
+					}
+					this.props = opts;
+
+					//只有这样子，obj中的所有属性才能得到全部的扩展
+					//如果opts中就包含了 setState 的方法（或其他），就会发生覆盖。
+					for(var k in obj){
+						this[k] = obj[k];
+					}
+				}
+			},
+
+			createFactory:function(klass){
+				var FID = Math.random();
+				return function(options){
+					var instance = new klass(options);
+					instance.id = FID+'-'+ instance.CID ;
+					//getInitialState 是用来初始化 state，而且只会被调用一次
+					if(instance.flag){
+						instance.flag = false;
+						$.extend(instance.state,instance.getInitialState());
+					}
+					return instance;
+				}
+			},
+			
+			DOM:{
+				p:function(content){
+					var newEle = document.createElement('p');
+					var text = document.createTextNode(content);
+					newEle.appendChild(text);
+					return newEle;
+				},
+				div:function(content){
+					var newEle = document.createElement('div');
+					var text = document.createTextNode(content);
+					newEle.appendChild(text);
+					return newEle;
+				}
+			}
+
+			
+		}
+
+		var ReactDOM = {
+			
+			lists:{},
+
+			reRender:function(cid){
+				this.render(this.lists[cid][0],this.lists[cid][1]);
+			},
+			
+			render:function(obj,element){
+
+				//通过实例id，记录经过渲染的那些dom
+				this.lists[obj.id.split('-')[1]] = [obj,element]; 
+
+				element.innerHTML = '';
+				element.append(obj.render());
+			}
+
+		}
+		
+		//构造函数
+		var Fish = React.createClass({
+			getInitialState:function(){
+				l(this.id);
+				return {n:0};
+			},
+			clickFun:function(){
+				var x = this.state.n;
+				x += 1; 
+				this.setState({n:x});
+			},
+			render:function(){
+				var ele = React.DOM.p(this.props.name+' 组件，被点击了: '+this.state.n+' 次');
+				ele.addEventListener('click',this.clickFun.bind(this));
+				return ele;
+			}
+		});
+		//创建组件
+		var myFactory  = React.createFactory(Fish);
+		var myDom = myFactory({name:'XiaoYu'});
+		var myDom2 = myFactory({name:'XiaoYu2'});
+		$(function(){
+			ReactDOM.render( myDom , document.getElementById('container'));
+			ReactDOM.render( myDom2 , document.getElementById('container2'));
+		})
+	}
+
+
+	/* 
+	 * 研究案例33: 还没有 append 的元素的事件绑定
+	 * 结果居然是可以绑定事件的！！
+	 */
+	bee.caseH33 = function(){
+		var newEle = document.createElement('div');
+		var text = document.createTextNode('我是动态创建的元素，点击我看看！');
+		newEle.appendChild(text);
+		newEle.addEventListener('click',function(){
+			alert(123);
+		})
+		$(function(){
+			document.getElementById('container').append(newEle);
+		})
+		
+	}
+
+
 
 	return bee;
 })(bee || {});
 
-
-
-
-
-
-
-//bee.caseH25()
-
+bee.caseH32();
 
 
 

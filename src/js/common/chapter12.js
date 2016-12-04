@@ -103,21 +103,74 @@ var bee = (function(bee){
 		//但是对于这个 (0, _xx2.default)(); 中的0有意义呢？
 	}
 
-	//研究案例9: 
+	//研究案例9: 整数除10后的保留一位小数点的做法！
 	bee.caseL9 = function(){
-
+		var m1 = 1234;
+		var m2 = 1240;
+		l( m1 / 10 + (m1 % 10 ? '' : '.0' ) );
+		l( m2 / 10 + (m2 % 10 ? '' : '.0' ) );
 	}
 
-	//研究案例10: 
+	//研究案例10: 案例9扩展 
 	bee.caseL10 = function(){
+		var m1 = 1200;
+		//var m1 = 1314;
+		//var m1 = 1310;
+		var a = m1/100 
+		var b = m1%100?'':'.0';
+		var c = m1%10?'':'0';
+		l(a+b+c)
 	}
+
+	//研究案例11:小数点后两位
+	bee.caseL11 = function(){
+		function get(n){
+			var s= n+'';
+			var r = /^(\d*).{0,1}(\d{0,2})/.exec(s);
+			if(!r[1] && !r[2]) return false;
+			var len = 2-r[2].length
+			for(var i=0;i<len;i++){
+				r[2] =r[2] + '0';
+			}
+			if(!r[1]){
+				r[1] = '0'+r[1];
+			}
+			return r[1]+'.'+r[2];
+		}
+		l(get(12));
+		l(get(12.));
+		l(get(12.1));
+		l(get(12.12));
+		l(get(12.123));
+		l(get(.1));
+		l(get(.12));
+		l(get(.123));
+		l('--->')
+		l(get('12'));
+		l(get('12.'));
+		l(get('12.1'));
+		l(get('12.12'));
+		l(get('12.123'));
+		l(get('.1'));
+		l(get('.12'));
+		l(get('.123'));
+	}
+
+	//研究案例12:小数点操作
+	bee.caseL12 = function(){
+		var num=22.155678;
+		l( Math.round(num*100)/100);
+
+		var num=22.155;
+		l( num.toFixed(2));
+	}
+
+
 
 	return bee;
 })(bee || {});
 
-
-bee.caseL9();
-//console.log(xx)
+//bee.caseL12();
 
 
 

@@ -1231,12 +1231,19 @@ var bee = (function(bee){
 		
 	}
 
+	/* 
+	 * 研究案例34: 
+	 */
+	bee.caseH34 = function(){
+
+	}
 
 
 	return bee;
 })(bee || {});
 
 bee.caseH32();
+
 
 
 

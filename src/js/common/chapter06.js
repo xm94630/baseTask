@@ -324,9 +324,129 @@ var bee = (function(bee){
 		l(obj1.__proto__.__proto__);
 		l(obj2.__proto__.__proto__);
 
-		l(obj1.constructor); //构造器使用是Fish
+		l(obj1.constructor);
 		l(obj2.constructor);
 	}
+
+	/* 
+	 * 研究案例11_2: Object.create 深入
+	 * 第二个参数可以指定返回的实例的属性，参数的写法比较特殊（Property descriptors 使用属性描述）
+	 */
+	bee.caseF11_2 = function(){
+		function Fish (){
+			this.width = 123;
+		}
+		var fish= Object.create(new Fish(),{
+			width:{
+				value:'199'
+			},
+			height:{
+				configurable: false,  //不可设置值
+				get: function() { return 10; }
+			}
+		});
+		l(fish);
+		l(fish.width);
+		l(fish.height);
+		fish.height=20; //设置无效，但是不会报错。
+		l(fish.height);
+	}
+
+	/* 
+	 * 研究案例11_3: Object.create 深入
+	 * 第二个参数可以指定返回的实例的属性，参数的写法比较特殊（Property descriptors 使用属性描述）
+	 */
+	bee.caseF11_3 = function(){
+		
+		//这种用法，生成的对象真的是啥也没有
+		//连基本toString都不会有，真的是一个空空的对象！
+		//我没有用过，不知道有何妙用？
+		var o = Object.create(null);
+		//l(o);
+		//l(o.toString);
+
+		//这两种情况是完全等效的。
+		var o1  = {};
+		var o2 = Object.create(Object.prototype);
+		l(o1)
+		l(o2)
+
+		//这两种也是等效的！
+		var o3 = Object.create({});
+		var o4 = Object.create(o1);
+		l(o3)
+		l(o4)
+	}
+
+	/* 
+	 * 研究案例11_4: Object.create 
+	 * 如何实现继承？
+	 */
+	bee.caseF11_4 = function(){
+		
+		//在之前的案例10中，我提到 Object.create 和原型继承是相同的
+		//言外之意可以用它来做继承方面的工作,如下：
+		var Fish = function(name){this.name = name;}
+		var fish = new Fish('小鱼');
+
+		var Fish2 = function(){}
+		Fish2.prototype = Object.create(fish);
+		Fish2.prototype.constructor = Fish2;
+
+		var f = new Fish2();
+		l(f.constructor);
+
+		//没错这个确实属于原型继承。但是并不是真正的意义上的继承！
+		//而我却一直以为这样子的写法就是所谓“继承了”
+		//仔细想想，这里的 Fish2 真的就是 Fish 的子类了吗？？
+		//其实没有，这里只完成对Fish的实例的继承，并不是真正对“类”的继承啊！！！！
+		//这个我也是看 Object.create 文档的时候发现的！！！
+		//请看下一个案例！！
+	}
+
+	/* 
+	 * 研究案例11_5: Object.create  实现“真正”的“类的继承”
+	 */
+	bee.caseF11_5 = function(){
+		
+		var Fish = function(name){this.name = name;}
+		Fish.prototype.run = function(){l('小鱼在游泳！');}
+
+		var Fish2 = function(name){
+			//通过这种方式继承属性
+			Fish.call(this,name);
+		}
+		//通过这种方式继承方法
+		Fish2.prototype = Object.create(Fish.prototype);
+		Fish2.constructor = Fish2;
+
+		var f = new Fish2('小鱼鱼');
+		l(f);
+	}
+
+	/* 
+	 * 研究案例11_5: Object.create  继承多个类
+	 * 伪代码
+	 * 这里使用call获取多个类的属性
+	 * 使用 Object.create 来继承一个类
+	 * 另外一个类是采用“混入模式”，说白了就是类似 $.extend 方法来扩展
+	 */
+	bee.caseF11_5 = function(){
+		
+		/*function MyClass() {
+		  SuperClass.call(this);
+		  OtherSuperClass.call(this);
+		}
+
+		MyClass.prototype = Object.create(SuperClass.prototype); // inherit
+		mixin(MyClass.prototype, OtherSuperClass.prototype); // mixin
+
+		MyClass.prototype.myMethod = function() {
+		  // do a thing
+		};*/
+	}
+
+	bee.caseF11_5 ();
 
 	/* 
 	 * 研究案例12:惊叹！对象还有这样子的写法！！

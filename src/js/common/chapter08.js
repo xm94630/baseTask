@@ -1242,7 +1242,7 @@ var bee = (function(bee){
 	return bee;
 })(bee || {});
 
-bee.caseH32();
+//bee.caseH34();
 
 
 

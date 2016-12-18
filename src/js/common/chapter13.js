@@ -16,7 +16,18 @@ var bee = (function(bee){
 		    }
 		  }
 		});
-		document.registerElement('my-fish', {prototype: proto});
+		document.registerElement('my-xxx', {prototype: proto});
+
+		var fish = Object.create(HTMLElement.prototype, {
+		  attachedCallback: {
+		    value: function() {
+		      var mountPoint = document.createElement('div');
+		      this.createShadowRoot().appendChild(mountPoint);
+		      mountPoint.innerHTML = ('我是一条小鱼哦');
+		    }
+		  }
+		});
+		document.registerElement('my-fish', {prototype: fish});
 	}
 
 

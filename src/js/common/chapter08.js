@@ -1232,17 +1232,112 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例34: 
+	 * 研究案例34: mockschema
+	 * 这里研究的是一个简单的插件 mockschema 中的两个函数是如何通信的。
 	 */
 	bee.caseH34 = function(){
 
+		function createSchema(obj){
+			//从 mock 函数的使用来看，并没有和 createSchema 交互。
+			//可以见一定是内部创建了一个全局的变量。
+			globalMockObject = obj;
+		}
+		function mock(name,n){
+			var obj,arr=[];
+			var obj = (obj = globalMockObject[name])?obj:{};
+			for(var i=0;i<n;i++){
+				//其实这里应该push的是obj的一个副本，我为了方便起见，就不写那么麻烦了。
+				arr.push(obj);
+			}
+			return arr;
+		}
+		createSchema({
+		  fish: {
+		    age: 25,
+		    name:'lala'
+		  }
+		});
+		var arr = mock('fish', 10);
+		l(arr);
+
+		/* 结论：
+		 * 由此可见，连个函数没有直接交换数据，必定有一个全局的变量来进行交换。
+		 * 但是这样子的设计模式，并不是很高明，因为我们不希望把插件的状态泄露到全局。
+		 */
 	}
+
+	/* 
+	 * 研究案例35: 正则的练习
+	 * 为案例36做准备
+	 */
+	bee.caseH35 = function(){
+		var str1 = '<div class></div>';
+		var str2 = '<div class = ""></div>';
+		var str3 = '<div class = \'\'></div>';
+		var str4 = '<div class = "red"></div>';
+
+		var reg = /div.+class\s+=\s+([\'\"])(.*)\1|div.+class/;
+		l(reg.exec(str1))
+		l(reg.exec(str2))
+		l(reg.exec(str3))
+		l(reg.exec(str4))
+	};
+
+
+	/* 
+	 * 研究案例36: 
+	 */
+	bee.caseH36 = function(){
+		function load(htmlStr){
+			var html = htmlStr;
+			function jquery(selector){
+
+				//正则匹配 selector 对应的 class 部分
+				var reg = new RegExp('<\s*('+selector+').+class\s*=\s*([\"\'])(.*)\\2');
+				var arr = reg.exec(html);
+				l(arr)
+
+				return {
+					addClass:function(myClass){
+						htmlStr.replace()
+						l('在“'+selector+'”上添加“'+myClass+"”");
+
+						//正则处理文案
+						if(arr==null){
+							//没有class，则直接添加class
+							html = html.replace(new RegExp('<\s*'+selector),'<'+selector+' class="'+myClass+'"')
+						}else{
+							//已经有了class，在class中追加
+
+						}
+
+						return this;
+					}
+				}
+			}
+			jquery.html = function(){
+				return html;
+			}
+			return jquery;
+		}
+		$ = load('<div class=\'xx\'><p>你好</p></div>');
+		$('div').addClass('myb').addClass('myb2');
+		$('p').addClass('red');
+		l($.html());
+	}();
 
 
 	return bee;
 })(bee || {});
 
 //bee.caseH34();
+//bee.caseH35();
+
+
+
+
+
+
 
 
 

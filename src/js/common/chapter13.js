@@ -35,7 +35,7 @@ var bee = (function(bee){
 	return bee;
 })(bee || {});
 
-bee.caseM1();
+//bee.caseM1();
 
 
 

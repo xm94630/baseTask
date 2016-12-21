@@ -120,6 +120,7 @@ var bee = (function(bee){
 		l(rsingleTag.test('abc9-9'));              //true 
 	}
 
+
 	/* 
 	 * 研究案例7:空标签
 	 */
@@ -164,7 +165,7 @@ var bee = (function(bee){
 	return bee;
 })(bee || {});
 
-//bee.caseJ9();
+
 
 
 

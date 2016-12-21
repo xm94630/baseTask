@@ -32,6 +32,7 @@ var bee = (function(bee){
 	 */
 	bee.caseI2 = function(){
 
+		//这里就算最后加上g，匹配的也只有一个
 		var r = /cde/;
 		//var r = /(c)d(e)/;
 		//var r = /CDE/;   //不匹配的时候，返回null
@@ -50,6 +51,7 @@ var bee = (function(bee){
 	 */
 	bee.caseI3 = function(){
 
+		//这里的小括号不是可选，而是作为子表达式来用
 		var r = /(c)d(e)/;
 		var arr = r.exec('abcdefg-abcdefg'); 
 		l(arr);         
@@ -63,6 +65,8 @@ var bee = (function(bee){
 		//这里的字符串的match方法，得到和上面一样的结果。
 		//（注意：仅当非全局正则对象）
 		l('abcdefg-abcdefg'.match(/(c)d(e)/));
+		//当全局正则对象的时候，会有点不同
+		l('abcdefg-abcdefg'.match(/(c)d(e)/g));
 	}
 
 	/* 
@@ -143,7 +147,7 @@ var bee = (function(bee){
 		l(r.test(str));
 
 		//重新编译之后，匹配
-		r.compile(/cde/);  //感觉等效于：r = /cde/g;
+		r.compile(/cde/);  //感觉等效于：r = /cde/;
 		l(r.test(str));
 	}
 	/*
@@ -152,8 +156,6 @@ var bee = (function(bee){
 	 * 字母数量在4个或者7个的是正则对象的，其他的是字符串对象的！
 	 * 好记吧！
 	 */
-
-
 
 	 /*******************************
 	 * 3个修饰符
@@ -317,18 +319,19 @@ var bee = (function(bee){
 	 	var reg = /(abc|def)*/;
 	 	l(reg.exec('abcccc'));
 	 	l(reg.exec('abcabc'));
-	 	l(reg.exec('abcdef'));
+	 	l(reg.exec('abcdef'));  //这个时候，括号中匹配了abc和def,最后只显示后者
 	 	l(reg.exec(''));        //这里子表达式的结果是undefined，有点意思
+	 						 	//length为2
 	 	l('-------------------------------');
 
 	 	//这里|右边的是空格的时候，也有点意思。
 	 	var reg = /(abc| )+/;
 	 	l(reg.exec('abc  abc'));
 
-	 	//空格还可以简写为：
+	 	//空格省略，这种比较诡异...展示没有研究明白，特别是第二个
 	 	var reg = /(abc|)+/;
 	 	l(reg.exec('abc  abc'));//优先匹配的是|符号左边的，也就是abc
-	 	l(reg.exec('abd  abc'));//|左边的不满住，才找右边的，也就是""
+	 	l(reg.exec('abd  abc'));//|左边的不满足，才找右边的，也就是""
 	 	l('-------------------------------');
 
 	 	//关于子表达式子
@@ -340,7 +343,6 @@ var bee = (function(bee){
 	 	l(reg.exec('abcd'));
 	 	l('-------------------------------');
 	 }
-
 
 
 	 /********************************
@@ -360,7 +362,8 @@ var bee = (function(bee){
 	 	//另外^在没有中括号的时候是别的意思！
 	 	l(/[^abc]/.exec('abacdsa'));   
 	 	
-	 	//以为结果是‘ds’，结果是‘’，因为*允许是零个，所以就终止了
+	 	//以为结果是‘ds’，结果是‘’，因为*允许是零个，匹配了最最开始的空字符串
+	 	//有点奇怪的说，index为0，若匹配了'a'的情况，index也是0
 	 	l(/[^abc]*/.exec('abacdsa'));      
 	 	//改变下，上面的意图就达到了。
 	 	l(/[^abc]+/.exec('abacdsa'));    
@@ -408,7 +411,14 @@ var bee = (function(bee){
 	 	l(/\v+/ .exec(str));  //vertical
 	 }
 
-
+	 /* 
+	  * 研究案例14: | 的优先级
+	  * 首先出现的优先级总是要高点
+	  */
+	 bee.caseI14 = function(){
+	 	l(/ab|a/.exec('ab'));
+	 	l(/a|ab/.exec('ab'));
+	 }
 
 	 /********************************
 	  * 高级用法
@@ -423,9 +433,9 @@ var bee = (function(bee){
 	  ********************************/
 
 	 /* 
-	  * 研究案例14:
+	  * 研究案例15:
 	  */
-	 bee.caseI14 = function(){
+	 bee.caseI15 = function(){
 
 	 }
 

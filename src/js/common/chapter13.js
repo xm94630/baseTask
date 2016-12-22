@@ -31,6 +31,16 @@ var bee = (function(bee){
 	}
 
 
+	//案例2: 巧妙利用数组做映射
+	bee.caseM2 = function(){
+		let months = ['1月份', '2月份', '3月份', '4月份', '5月份', '6月份',
+					  '7月份','8月份', '9月份', '10月份', '11月份', '12月份'];
+		var m = months[new Date().getMonth()];
+		l(m);
+	}
+
+
+
 
 	return bee;
 })(bee || {});

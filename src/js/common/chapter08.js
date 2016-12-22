@@ -1285,7 +1285,7 @@ var bee = (function(bee){
 
 
 	/* 
-	 * 研究案例36: 
+	 * 研究案例36: 模拟 npm插件 cheerio 的实现
 	 */
 	bee.caseH36 = function(){
 		function load(htmlStr){
@@ -1293,9 +1293,9 @@ var bee = (function(bee){
 			function jquery(selector){
 
 				//正则匹配 selector 对应的 class 部分
-				var reg = new RegExp('<\s*('+selector+').+class\s*=\s*([\"\'])(.*)\\2');
+				//// \3 中\要转义
+				var reg = new RegExp('(<\s*('+selector+').+class\s*=\s*)([\"\'])(.*)(\\3)(>)');   
 				var arr = reg.exec(html);
-				l(arr)
 
 				return {
 					addClass:function(myClass){
@@ -1308,7 +1308,11 @@ var bee = (function(bee){
 							html = html.replace(new RegExp('<\s*'+selector),'<'+selector+' class="'+myClass+'"')
 						}else{
 							//已经有了class，在class中追加
+							html = html.replace(reg,function(a,b,c,d,e,f,g){
 
+								return b+d+e+' '+myClass+f+g;
+
+							});
 						}
 
 						return this;
@@ -1324,7 +1328,7 @@ var bee = (function(bee){
 		$('div').addClass('myb').addClass('myb2');
 		$('p').addClass('red');
 		l($.html());
-	}();
+	};
 
 
 	return bee;

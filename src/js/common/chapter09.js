@@ -420,6 +420,26 @@ var bee = (function(bee){
 	 	l(/a|ab/.exec('ab'));
 	 }
 
+	 /* 
+	  * 研究案例15: 字符串方法 match
+	  * 这里学习match方法
+	  * 同时这里的正则的写法也有点意思
+	  * 在bee.caseH36 案例中详细的应用
+	  */
+	 bee.caseI15 = function(){
+	 	var selector = 'div';
+	 	var myClass  = 'red';
+	 	var html = '<div class="ML10"><p>你好</p></div>';
+	 	var reg = new RegExp('(<\s*('+selector+').+class\s*=\s*)([\"\'])(.*)(\\3)(>)');   
+
+	 	//当使用函数的作为第二个参数的时候，函数中的参数a,b,c...对应的值就是正则中的匹配值
+	 	//他和 reg.exec('xxxxxxx'); 这个表达式返回的结果是类似的！
+	 	html = html.replace(reg,function(a,b,c,d,e,f,g){
+	 		return b+d+e+' '+myClass+f+g;
+	 	});
+	 	l(html);
+	 }
+
 	 /********************************
 	  * 高级用法
 	  * 
@@ -433,9 +453,9 @@ var bee = (function(bee){
 	  ********************************/
 
 	 /* 
-	  * 研究案例15:
+	  * 研究案例99:
 	  */
-	 bee.caseI15 = function(){
+	 bee.caseI99 = function(){
 
 	 }
 
@@ -443,5 +463,6 @@ var bee = (function(bee){
 })(bee || {});
 
 //bee.caseI13();
+
 
 

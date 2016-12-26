@@ -1331,11 +1331,32 @@ var bee = (function(bee){
 	};
 
 
+	/* 
+	 * 研究案例37: factory function 
+	 * 工厂函数，其实就是之前出现过的工厂模式
+	 * 这里主要需要强调的是，他是由闭包的效用产生的。
+	 */
+	bee.caseH37 = function(){
+		var counter = function(){
+			var i=1000;
+			return {
+				increment:function(){
+					i++;
+					l(i);
+				}
+			}
+		}
+		var c = counter();
+		c.increment();
+		c.increment();
+		c.increment();
+	}
+
 	return bee;
 })(bee || {});
 
 //bee.caseH34();
-//bee.caseH35();
+//bee.caseH37();
 
 
 

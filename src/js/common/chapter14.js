@@ -67,6 +67,171 @@ var bee = (function(bee){
 		//函数式编程也分精妙与否，关键看 add100、less1000 这等函数是具有高度复用性，否者的话也是无用。
 	}
 
+	//研究案例3_3: 继续优化
+	//上面那个，数据是包含在obj中，不是很灵活，是不是拿出来更加的灵活呢？
+	//其实很简单的了，只有小小的改变了
+	bee.caseN3_3 = function(){
+
+		//这里处理成闭包函数，就可以了
+		function originData(data){
+			return {
+				data:data,
+				pipe:function(fn){
+					this.data = fn(this.data);
+					return this;
+				},
+				tap:function(fn){
+					fn(this.data);
+					return this;
+				}
+			}
+		}
+		function add100(data){
+			return data.map(function(a){
+				return a+100;
+			})
+		}
+		function less1000(data){
+			return data.filter(function(a){
+				return a<1000;
+			})
+		}
+		function log(data){
+			console.log('现在的结果是:'+data);
+		}
+		var arr = [10000,11,22];
+		originData(arr).pipe(add100).tap(log).pipe(less1000).tap(log);
+		var arr2 = [111,222,333];
+		originData(arr2).pipe(add100).tap(log);
+	}
+
+	//研究案例3_4: 继续优化
+	//之前的操作中都没有出现异步的情况，如果出现了，怎么办呢！ 
+	//其实在这种模式下，中间出现异步这个本身就没有任何意义的。
+	//因为根本就无法将异步操作的值作为返回值返回！！！
+	bee.caseN3_4 = function(){
+
+		function originData(data){
+			return {
+				data:data,
+				pipe:function(fn){
+					this.data = fn(this.data);
+					return this;
+				},
+				tap:function(fn){
+					fn(this.data);
+					return this;
+				}
+			}
+		}
+		function add100(data){
+			return data.map(function(a){
+				return a+100;
+			})
+		}
+		function add10(data){
+
+			//这个异步行为是无力的，以为在里面的内容执行的时候
+			//下面的return就已经完毕了...
+			//所以说这种模式本来就不应该出现异步的东西。
+			window.setTimeout(function(){
+				data = [9999,9999,9999];
+				l('我是异步的行为，但是没用啥用');
+			},1000);
+			
+			return data.map(function(a){
+				return a+10;
+			})
+		}
+		function log(data){
+			console.log('现在的结果是:'+data);
+		}
+		var arr2 = [1,2,3];
+		originData(arr2).pipe(add10).tap(log).pipe(add100).tap(log);
+	}
+
+	//研究案例3_5: 链式中出现异步的模式
+	//（要求先输出1，然后是2，也就是说，then这个函数要保证执行的顺序）
+	//本例先抛出没有解决顺序的。
+	bee.caseN3_5 = function(){
+		var obj ={
+			then:function(fun){
+				fun();
+				return this;
+			}
+		}
+		function asyncfun(){
+			window.setTimeout(function(){
+				console.log(1);
+			},500)
+		}
+		function syncfun(){
+			console.log(2);
+		}
+		obj.then(asyncfun).then(syncfun);
+	}
+
+	//研究案例3_6: 链式中出现异步的模式
+	//obj.then(asyncfun).then(syncfun);
+	//这里就和数据没有关系了(相比3_4)，这里链式，仅仅是梳顺函数调用的顺序。
+	//这里其实是在处理流式函数调动。
+	bee.caseN3_6 = function(){
+		function obj(){
+			var arr = [];
+			return {
+				then:function(fun){
+
+					arr.push(fun);
+					if(arr.length>1){
+						return this;
+					}
+
+					//第一次，无论是同步代码还是异步都执行了。
+					(function next(){
+						if(arr.length==0)return;
+						arr[0](function(){
+							arr.shift();
+							next();
+						});
+					})();
+
+					return this;
+				}
+			}
+		}
+		function wait1000(next){
+			window.setTimeout(function(){
+				l('（我是异步任务，这里啥也没有做，只用作延时1000）')
+				next();
+			},1000)
+		}
+		function wait3000(next){
+			window.setTimeout(function(){
+				l('（我是异步任务，这里啥也没有做，只用作延时3000）')
+				next();
+			},3000)
+		}
+		function log(next){
+			console.log('一开始就出现啦');
+			next();
+		}
+		function log1(next){
+			console.log('间隔一段时间');
+			next();
+		}
+		function log2(next){
+			console.log('间隔较长一段时间');
+			next();
+		}
+		obj().then(log).then(wait1000).then(log1).then(wait3000).then(log2);
+
+		//其实在本例子中，所有要执行的函数都被放置到一个数组中去了。
+		//然后一个个根据回调进行串联。
+		//这里的例子还不够精妙，以为传入的函数中被耦合了 next 参数，这样子就不方便复用。
+		//另外这个实现其实就是 async.js 中 parallel函数。parallel中使用的函数也是和我一样需要有参数的，耦合度也是很高的。
+	}
+
+
 
 
 	/*******************************
@@ -227,7 +392,6 @@ var bee = (function(bee){
 })(bee || {});
 
 //bee.caseN5_2();
-
 
 
 

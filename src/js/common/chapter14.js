@@ -107,7 +107,7 @@ var bee = (function(bee){
 
 	//研究案例3_4: 继续优化
 	//之前的操作中都没有出现异步的情况，如果出现了，怎么办呢！ 
-	//其实在这种模式下，中间出现异步这个本身就没有任何意义的。
+	//其实在那种模式下，中间出现异步这个本身就没有任何意义的。
 	//因为根本就无法将异步操作的值作为返回值返回！！！
 	bee.caseN3_4 = function(){
 
@@ -187,11 +187,11 @@ var bee = (function(bee){
 					}
 
 					//第一次，无论是同步代码还是异步都执行了。
-					(function next(){
+					(function dealWithNextFunInArray(){
 						if(arr.length==0)return;
 						arr[0](function(){
 							arr.shift();
-							next();
+							dealWithNextFunInArray();
 						});
 					})();
 
@@ -232,6 +232,31 @@ var bee = (function(bee){
 	}
 
 
+	//研究案例3_7: 继续深入
+	//上面的链式的then函数是高阶，需要参入一个函数，但是函数中需要有这个next这个才行
+	//能不能把这个给省略了呢？岂不是更加的好。
+	//我们看看一种现成的：（书上看到的）
+	bee.caseN3_7 = function(){
+
+		$.when('').then(function(){
+			setTimeout(function(){
+				l('1秒后出现');
+			},1000)
+		}).then(function(){
+			setTimeout(function(){
+				l('2秒后出现');
+			},2000)
+		}).then(function(){
+			setTimeout(function(){
+				l('3秒后出现');
+			},3000)
+		})
+
+		//这种模式下，这些异步行为其实是并行的！
+		//虽然省略了函数中的参数next，但是功能并不相同。
+		//所以说，既然async.js 封装的时候，有next，肯定是最精简了的，要是可以再简化的话
+		//这个库的作者早就想到了，还用我去质疑？
+	}
 
 
 	/*******************************
@@ -392,7 +417,6 @@ var bee = (function(bee){
 })(bee || {});
 
 //bee.caseN5_2();
-
 
 
 

@@ -1352,11 +1352,119 @@ var bee = (function(bee){
 		c.increment();
 	}
 
+	/* 
+	 * 研究案例38: 继续深入 promise 模式
+	 * 在之前的案例中（bee.caseH8），我们已经实现了如下模式：
+	 * 
+	 * promise(异步获取数据).then(处理数据函数)
+	 *
+	 * 这里的技术核心是在promise传入的函数的参数cb，呼起了回调的作用。
+	 * 这个思路是参照 async.js 中的思想
+	 *
+	 * 那么我能不能做的更加的优秀呢？即上面说的cb，不是固定的参数。是不是更加的灵活呢？我们来试一试吧~
+	 */
+	bee.caseH38 = function(){
+
+		function yanshiFactory(){
+
+			var callback = function(){
+				l('数据还没有呢~');
+				return;
+			};
+
+			return {
+				resolve:function(myData){
+					setTimeout(function(){
+						callback(myData);
+					},0);
+				},
+				promise:function(){
+					return {
+						done:function(fun){
+							callback = fun;	
+						}
+					}
+				}
+			};
+		}
+
+		var yanshi = yanshiFactory();
+
+		setTimeout(function(){
+			//模拟异步获取数据
+			var myAjaxData = 'ajax数据';
+			yanshi.resolve( myAjaxData );
+		},2000);
+		
+		var promise = yanshi.promise();
+		promise.done(function(data){
+			l('获取延时数据成功:'+data);
+		});
+
+		//完美实现~
+		//其实这就是和jquery中的deffer延时对象是一样的用法。
+	}
+
+	/* 
+	 * 研究案例39: 继续深入 promise 模式
+	 * 这里我优化下调用结构，这样子看上去比较好理解。
+	 */
+	bee.caseH39 = function(){
+
+		//这部分保持不变
+		function yanshiFactory(){
+
+			var callback = function(){
+				l('数据还没有呢~');
+				return;
+			};
+
+			return {
+				resolve:function(myData){
+					setTimeout(function(){
+						callback(myData);
+					},0);
+				},
+				promise:function(){
+					return {
+						done:function(fun){
+							callback = fun;	
+						}
+					}
+				}
+			};
+		}
+
+		//一个被包装了的异步行为
+		//返回promise
+		function go(){
+			var yanshi = yanshiFactory();
+			setTimeout(function(){
+				//模拟异步获取数据
+				var myAjaxData = 'ajax数据';
+				yanshi.resolve( myAjaxData );
+			},2000);
+			return yanshi.promise();
+		}
+		var myGo = go();
+		myGo.done(function(data){
+			l('获取延时数据成功:'+data);
+		});
+
+		//这种模式其实在jquery中非常常见
+		//比如 $.get('...').done(function(){...});
+		//这个例子做完之后，我连对jquery中的所谓的promise对象也认识很深刻了！！所以基础真的很重要
+	}
+
+
+
+
+
 	return bee;
 })(bee || {});
 
-//bee.caseH34();
-//bee.caseH37();
+
+
 
 
 

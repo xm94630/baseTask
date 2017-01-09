@@ -1462,12 +1462,6 @@ var bee = (function(bee){
 
 
 
-
-
-<<<<<<< HEAD
-
-=======
->>>>>>> 37a6eca61883dc8050487e393b5addef8d8fb1bd
 	return bee;
 })(bee || {});
 

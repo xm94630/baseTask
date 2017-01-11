@@ -412,11 +412,59 @@ var bee = (function(bee){
 		curry(fun)(2,1000)();
 	}
 
+	//研究案例6: 惰性链
+	//今天看到react项目中有使用一个叫做 d3-scale 
+	//发现它的使用，基本就是惰性链的模式
+	//之前的函数的调用，仅仅是在内部闭包中做了一些配置
+	//这种模式基本上就是利用函数式编程
+	//
+	// 模式如下：
+	// var fun = obj.xxx(配置a).yyy(配置b)
+	// fun();
+	//
+	//我也来实现一个比例因子的功能
+	bee.caseN6 = function(){
+
+		var obj = (function(){
+			var scale;
+			var a1,b1,c1,a2,b2,c2;
+			return {	
+				domain:function(arr1){
+					a1 = arr1[0];
+					b1 = arr1[1];
+					c1 = b1-a1; 
+					return this;
+				},
+				range:function(arr2){	
+					a2 = arr2[0];
+					b2 = arr2[1];
+					c2 = b2-a2; 
+					
+					//计算比例因子
+					scale = c1/c2;
+
+					return function(x){
+						return a2+(x-a1)/scale ;
+					}
+				}
+			}
+		})();
+
+		//这里就是将百分制，转化为五颗星制度的一个用法：
+		var x = obj.domain([0,100]).range([0,5]);
+		l(x(10));
+		l(x(50));
+		l(x(100));
+
+		var x = obj.domain([-10,10]).range([1,2]);
+		l(x(0));
+	}
+
 
 	return bee;
 })(bee || {});
 
-//bee.caseN5_2();
+bee.caseN6();
 
 
 

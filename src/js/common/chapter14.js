@@ -458,13 +458,132 @@ var bee = (function(bee){
 
 		var x = obj.domain([-10,10]).range([1,2]);
 		l(x(0));
+
+		//小结
+		//其实这里的比例因子就是我们高中学的函数是一样的，这里的是一次函数。
+		//也就是是说domain中的数组和range中的数组，正好满足了一次函数的关系。前者是x轴的取值范围，后者是y轴的取值范围。
+		//
+		//那么，我现在想把一次函数这个部分抽象出来。改如何做呢？
 	}
 
+	//比例因子 高级 一次函数
+	bee.caseN6_2 = function(){
+
+		var obj = (function(){
+			var x1,y1,x2,y2;
+			var scaleFun;
+
+			//把比例因子抽象出来
+			
+			//一次函数（线性比例变化）
+			function scaleLinear(x){
+				//该公式可以用，相似三角形来推出，也可以使用一次函数的y=kx+b，进行处理。
+				return y1+(x-x1)*(y2-y1)/(x2-x1); 
+			}
+
+			return {
+				scaleLinear:function(x){
+					scaleFun = scaleLinear;
+					return this;
+				},	
+				domain:function(arr1){
+					x1 = arr1[0];
+					x2 = arr1[1];
+					return this;
+				},
+				range:function(arr2){	
+					y1 = arr2[0];
+					y2 = arr2[1];
+					return scaleFun;
+				}
+			}
+		})();
+
+		var x = obj.scaleLinear().domain([0,100]).range([0,5]);
+		l(x(50));
+	};
+
+	//比例因子 高级 二次函数 【BOSS】可用来实现animate中缓动之类的~
+	bee.caseN6_2 = function(){
+
+		var obj = (function(){
+			var x1,y1,x2,y2;
+			var scaleFun;
+
+			//把比例因子抽象出来
+			
+			//一次函数（线性比例变化）
+			function scaleLinear(x){
+				return y1+(x-x1)*(y2-y1)/(x2-x1); 
+			}
+
+			//二次函数（曲线比例）定点在x1的情况
+			//解方程
+			//式子1 ax1*x1+b*x2+c=y1
+			//式子2 a21*21+b*22+c=y2
+			//式子3 -b/2a=x1 (定点在x1)
+			//式子1-式子2 可消去c，再结合式子3，可以解a
+			//接着求解b,求解c 
+			function scaleCurveApexLeft(x){
+				var a = (y2-y1)/(x1-x2)/(x1-x2);
+				var b = -2*a*x1;
+				var c = y1-a*x1*x1-b*x1;
+				return a*x*x+b*x+c;
+			}
+
+			return {
+				scaleLinear:function(x){
+					scaleFun = scaleLinear;
+					return this;
+				},	
+				scaleCurveApexLeft:function(){
+					scaleFun = scaleCurveApexLeft;
+					return this;
+				},
+				domain:function(arr1){
+					x1 = arr1[0];
+					x2 = arr1[1];
+					return this;
+				},
+				range:function(arr2){	
+					y1 = arr2[0];
+					y2 = arr2[1];
+					return scaleFun;
+				}
+			}
+		})();
+
+		var x = obj.scaleCurveApexLeft().domain([0,100]).range([0,100]);
+		l(x(0));
+		l(x(10));
+		l(x(20));
+		l(x(30));
+		l(x(40));
+		l(x(50));
+		l(x(60));
+		l(x(70));
+		l(x(80));
+		l(x(90));
+		l(x(100));
+		//从结果观察可以发现，在x平均递增的时候，y的值急剧递增。
+		//此曲线可以用来描述，一辆正在加速的汽车，跑过的路程距离的变化。
+		//也可以用来描述，在重力作用下，下落的距离变化。
+		//无论这个抛物线开口向上还是向下，总是表示了结果变化越来越剧烈，即急剧递增或者急剧递减。
+		//
+		//和 scaleCurveApexLeft 对应的是 scaleCurveApexRight。
+		//用来描述，类似刹车的效果、阻力效果。
+		//或者想动画中的缓动，慢慢静止的效果。
+		//这里就不再实现了。
+		//
+		//另外这个例子，其实也是解决了，我当前一直迷惑的第一点。就是那些anmite中的缓动是如何实现的。
+		//包括模拟cavas中的重力加速度。
+		//都可以从这个例子中得到解答！
+	}()
 
 	return bee;
 })(bee || {});
 
-bee.caseN6();
+//bee.caseN6();
 
 
 

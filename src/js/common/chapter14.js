@@ -580,6 +580,67 @@ var bee = (function(bee){
 		//都可以从这个例子中得到解答！
 	}
 
+	//比例因子 继续优化 实现逆过程
+	bee.caseN6_2 = function(){
+
+		var obj = (function(){
+			var x1,y1,x2,y2;
+			var scaleFun;
+
+			function scaleLinear(x){
+				return y1+(x-x1)*(y2-y1)/(x2-x1); 
+			}
+			//这个很有意思，是反求y值，和上面正好相反的操作！
+			scaleLinear.invert = function(y){
+				return (y-y1)*(x2-x1)/(y2-y1)+x1;
+			}
+
+			function scaleCurveApexLeft(x){
+				var a = (y2-y1)/(x1-x2)/(x1-x2);
+				var b = -2*a*x1;
+				var c = y1-a*x1*x1-b*x1;
+				return a*x*x+b*x+c;
+			}
+			scaleCurveApexLeft.invert = function(y){
+				//求 a*x*x+b*x+c-y = 0 的根
+				var a = (y2-y1)/(x1-x2)/(x1-x2);
+				var b = -2*a*x1;
+				var c = y1-a*x1*x1-b*x1;
+				c = y1-a*x1*x1-b*x1-y;
+				return (-b+Math.sqrt(b*b-4*a*c))/2/a ;
+			}
+
+			return {
+				scaleLinear:function(x){
+					scaleFun = scaleLinear;
+					return this;
+				},	
+				scaleCurveApexLeft:function(){
+					scaleFun = scaleCurveApexLeft;
+					return this;
+				},
+				domain:function(arr1){
+					x1 = arr1[0];
+					x2 = arr1[1];
+					return this;
+				},
+				range:function(arr2){	
+					y1 = arr2[0];
+					y2 = arr2[1];
+					return scaleFun;
+				}
+			}
+		})();
+
+		var x = obj.scaleCurveApexLeft().domain([0,100]).range([0,100]);
+		l(x(20));
+		l(x.invert(4)); 
+		l(x.invert(x(20))); 
+		l(x(x.invert(4)));
+
+		//这里实现了 x.invert() 操作,和 x() 正好是反操作
+	}
+
 	return bee;
 })(bee || {});
 

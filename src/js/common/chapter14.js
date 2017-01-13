@@ -648,9 +648,16 @@ var bee = (function(bee){
 			var x1,y1,x2,y2;
 			var scaleFun;
 			var arr1,arr2;
+			var len1,len2;
 
 			//这个是决定是在哪个区间，用来配置x1,y1,x2,y2的具体取值
 			function assignment(n,array){
+
+				//例因子的区段应该一一对应
+				if(len1!==len2){
+					throw new Error('比例因子的区段应该一一对应');
+				}
+
 				var i;
 				var arr = array.slice(0);
 				arr.push(n);
@@ -658,6 +665,14 @@ var bee = (function(bee){
 					return x>y;
 				})
 				i = arr.indexOf(n);
+
+				//这里要做极限的判断（也就是在数据范围之外）
+				if(i>=len1){
+					i--;
+				}
+				else if(i<0){
+					i=0;
+				}
 
 				x1 = arr1[i-1];
 				x2 = arr1[i];
@@ -701,10 +716,12 @@ var bee = (function(bee){
 				},
 				domain:function(arr){
 					arr1 = arr;
+					len1 = arr.length;
 					return this;
 				},
 				range:function(arr){	
 					arr2 = arr;
+					len2 = arr.length;
 					return scaleFun;
 				}
 			}
@@ -719,9 +736,22 @@ var bee = (function(bee){
 		l(x(5000));
 		l(x(10000.5));
 		l(x(10001.5));
+		l(x(20000));
 
 		//这里 scaleLinear 的多段变化其实好比是个折线图。
 		//关于 scaleCurveApexLeft 的多段变化，我觉得是没有意义的。
+	
+		//动画实例（加速）
+		$(function(){
+			var s = 1;
+			var x = obj.scaleCurveApexLeft().domain([0,100]).range([0,1200]);
+			$('body').append('<div class="myBox bg5" id="myBox"></div>');
+			window.setInterval(function(){
+				s = s+1;
+				if(s>100)return;
+				$('#myBox').css('left',x(s));
+			},20);
+		})
 	}
 
 

@@ -641,6 +641,90 @@ var bee = (function(bee){
 		//这里实现了 x.invert() 操作,和 x() 正好是反操作
 	}
 
+	//比例因子 继续优化 实现多段变化
+	bee.caseN6_3 = function(){
+
+		var obj = (function(){
+			var x1,y1,x2,y2;
+			var scaleFun;
+			var arr1,arr2;
+
+			//这个是决定是在哪个区间，用来配置x1,y1,x2,y2的具体取值
+			function assignment(n,array){
+				var i;
+				var arr = array.slice(0);
+				arr.push(n);
+				arr.sort(function(x,y){
+					return x>y;
+				})
+				i = arr.indexOf(n);
+
+				x1 = arr1[i-1];
+				x2 = arr1[i];
+				y1 = arr2[i-1];
+				y2 = arr2[i];
+			}
+
+			function scaleLinear(x){
+				assignment(x,arr1);
+				return y1+(x-x1)*(y2-y1)/(x2-x1); 
+			}
+			scaleLinear.invert = function(y){
+				assignment(y,arr2);
+				return (y-y1)*(x2-x1)/(y2-y1)+x1;
+			}
+
+			function scaleCurveApexLeft(x){
+				assignment(x,arr1);
+				var a = (y2-y1)/(x1-x2)/(x1-x2);
+				var b = -2*a*x1;
+				var c = y1-a*x1*x1-b*x1;
+				return a*x*x+b*x+c;
+			}
+			scaleCurveApexLeft.invert = function(y){
+				assignment(y,arr2);
+				var a = (y2-y1)/(x1-x2)/(x1-x2);
+				var b = -2*a*x1;
+				var c = y1-a*x1*x1-b*x1;
+				c = y1-a*x1*x1-b*x1-y;
+				return (-b+Math.sqrt(b*b-4*a*c))/2/a ;
+			}
+
+			return {
+				scaleLinear:function(x){
+					scaleFun = scaleLinear;
+					return this;
+				},	
+				scaleCurveApexLeft:function(){
+					scaleFun = scaleCurveApexLeft;
+					return this;
+				},
+				domain:function(arr){
+					arr1 = arr;
+					return this;
+				},
+				range:function(arr){	
+					arr2 = arr;
+					return scaleFun;
+				}
+			}
+		})();
+
+		var x = obj.scaleLinear().domain([0,100,600]).range([0,5,15]);
+		l(x(100));
+		l(x(350));
+		l(x.invert(x(350)));
+
+		var x = obj.scaleLinear().domain([0,10000,10001,10002]).range([0,1,11,10011]);
+		l(x(5000));
+		l(x(10000.5));
+		l(x(10001.5));
+
+		//这里 scaleLinear 的多段变化其实好比是个折线图。
+		//关于 scaleCurveApexLeft 的多段变化，我觉得是没有意义的。
+	}
+
+
 	return bee;
 })(bee || {});
 

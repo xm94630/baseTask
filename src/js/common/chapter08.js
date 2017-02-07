@@ -1457,6 +1457,32 @@ var bee = (function(bee){
 	}
 
 
+	/* 
+	 * 研究案例40: 包装模式
+	 * 不知道如何命名，就暂时如此称呼吧。
+	 * 这种模式是在我常用的模式上（包括本项目本身就是如此），进行深入。
+	 * 这种模式在 什么CMD、AMD 的模块的兼容中非常常见。
+	 * 另外，使用webpack，进行包装一些代码的时候，也常常会有这样子的模式。
+	 * 并且，在极端的情况下，这种嵌套的层次可能还会更加的深。
+	 * 这里主要是掌握它的思路。以后遇到这种类似的嵌套，要能快速的辨别和使用。
+	 */
+	bee.caseH40 = function(){
+
+		;(function(root,module){
+			//这样子就在全局中创建了一个bee2
+			l('add bee2 to window');
+			root.bee2 = module;
+		})(window,(function(global){
+			var bee = (function(bee){
+				bee.xxx={a:123}
+				return bee;
+			})(bee||{});
+			return bee;
+		})(window))
+
+	}
+	
+
 
 
 
@@ -1466,8 +1492,8 @@ var bee = (function(bee){
 })(bee || {});
 
 
-//
 
+//bee.caseH40();
 
 
 

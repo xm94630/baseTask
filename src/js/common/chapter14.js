@@ -843,7 +843,7 @@ var bee = (function(bee){
 
 		var x = obj.scaleLinear().domain([0,100]).range([0,5]);
 		l(x(100));
-	}()
+	}
 
 
 	return bee;

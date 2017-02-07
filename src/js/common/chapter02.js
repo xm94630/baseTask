@@ -451,7 +451,6 @@ var bee = (function(bee){
 		document.registerElement('my-fish', {prototype: fish});
 	}
 
-
 	//案例23: 巧妙利用数组做映射
 	bee.caseB23 = function(){
 		let months = ['1月份', '2月份', '3月份', '4月份', '5月份', '6月份',
@@ -459,6 +458,47 @@ var bee = (function(bee){
 		var m = months[new Date().getMonth()];
 		l(m);
 	}
+
+	//案例24: Object.defineProperty
+	//这个defineProperty其实就是给对象添加属性。相对于直接用点符号添加属性而言，它具有更多的控制权。
+	bee.caseB24 = function(){
+		var obj = {}
+		Object.defineProperty(obj,'xm',{
+			//writable:false, //比如这样子的控制
+			value:997788
+		})
+		l(obj)
+	}
+
+	//案例24_2: Object.defineProperty 中的 set 和 get
+	//set 和 get 好像是我之前一直搞不明白的，这次是要把他消化了！
+	//get会在 'xm' 被读取的时候执行，return 会覆盖原来的值作为最终的值。
+	//set会在 'xm' 被赋值的时候执行，这里的return是没有意义的，不过，我们能获取那个值用来干点别的（比如这里更新了jy这个值）
+	//千万注意的是：set函数内部不要在给'xm'赋值，否者就是死循环了！！
+	bee.caseB24_2 = function(){
+
+		function Test(){
+			Object.defineProperty(this,'xm',{
+				get: function () {
+				    return '无论如何复制，都是返回这个~';
+				},
+				set: function (v) {
+				    this.jy = 'set 被调用了('+v+')';
+				}
+			})
+		}
+
+		var obj = new Test();
+		obj.xm = 997788;
+		l(obj.xm)
+		l(obj.jy)
+	}
+
+
+
+
+
+
 
 
 	return bee;

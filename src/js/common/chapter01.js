@@ -1,5 +1,6 @@
 /*******************************
 * 第一章 
+* this、闭包、apply、call、bind等
 ********************************/
 
 var bee = (function(bee){
@@ -669,6 +670,7 @@ var bee = (function(bee){
 
 	return bee;
 })(bee || {});
+
 
 
 

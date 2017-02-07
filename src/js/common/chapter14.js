@@ -755,10 +755,102 @@ var bee = (function(bee){
 	}
 
 
+
+	bee.caseN6_4 = function(){
+
+		var obj = (function(){
+			var x1,y1,x2,y2;
+			var scaleFun;
+			var arr1,arr2;
+			var len1,len2;
+
+			//这个是决定是在哪个区间，用来配置x1,y1,x2,y2的具体取值
+			function assignment(n,array){
+
+				//例因子的区段应该一一对应
+				if(len1!==len2){
+					throw new Error('比例因子的区段应该一一对应');
+				}
+
+				var i;
+				var arr = array.slice(0);
+				arr.push(n);
+				arr.sort(function(x,y){
+					return x>y;
+				})
+				i = arr.indexOf(n);
+
+				//这里要做极限的判断（也就是在数据范围之外）
+				if(i>=len1){
+					i--;
+				}
+				else if(i<0){
+					i=0;
+				}
+
+				x1 = arr1[i-1];
+				x2 = arr1[i];
+				y1 = arr2[i-1];
+				y2 = arr2[i];
+			}
+
+			function scaleLinear(x){
+				assignment(x,arr1);
+				return y1+(x-x1)*(y2-y1)/(x2-x1); 
+			}
+			scaleLinear.invert = function(y){
+				assignment(y,arr2);
+				return (y-y1)*(x2-x1)/(y2-y1)+x1;
+			}
+
+			function scaleCurveApexLeft(x){
+				assignment(x,arr1);
+				var a = (y2-y1)/(x1-x2)/(x1-x2);
+				var b = -2*a*x1;
+				var c = y1-a*x1*x1-b*x1;
+				return a*x*x+b*x+c;
+			}
+			scaleCurveApexLeft.invert = function(y){
+				assignment(y,arr2);
+				var a = (y2-y1)/(x1-x2)/(x1-x2);
+				var b = -2*a*x1;
+				var c = y1-a*x1*x1-b*x1;
+				c = y1-a*x1*x1-b*x1-y;
+				return (-b+Math.sqrt(b*b-4*a*c))/2/a ;
+			}
+
+			return {
+				scaleLinear:function(x){
+					scaleFun = scaleLinear;
+					return this;
+				},	
+				scaleCurveApexLeft:function(){
+					scaleFun = scaleCurveApexLeft;
+					return this;
+				},
+				domain:function(arr){
+					arr1 = arr;
+					len1 = arr.length;
+					return this;
+				},
+				range:function(arr){	
+					arr2 = arr;
+					len2 = arr.length;
+					return scaleFun;
+				}
+			}
+		})();
+
+		var x = obj.scaleLinear().domain([0,100]).range([0,5]);
+		l(x(100));
+	}()
+
+
 	return bee;
 })(bee || {});
 
 //bee.caseN6();
+
 
 
 

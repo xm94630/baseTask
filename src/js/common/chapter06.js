@@ -662,6 +662,90 @@ var bee = (function(bee){
 		la2.trigger('click');
 	}
 
+	/*
+	 * 研究案例17: 模拟事件（优化版本4）
+	 * 这种模式使用了“工厂模式”，工厂相对之前的模式而言，具有更多的抽象层次，也就有了更多的控制。
+	 * 比如这里的实例的编号、实例总数的统计。这就是工厂的好处。
+	 * 我之前就有专门将“工厂模式”的。
+	 */
+	bee.caseF16 = function(){
+		var EventEmitor = (function(){
+			var id = 0;
+			var gen = function(id){
+				this.obj = {};
+				this.id = id
+			};
+			gen.prototype.on = function(k,v){
+				this.obj[k]  = this.obj[k] || [];
+				var stack    = this.obj[k];
+				var stackLen = stack.length;
+				for(var i=0;i<stackLen;i++){
+					if(stack[i]===v) return;
+				}
+				stack.push(v);
+			}
+			gen.prototype.off = function(k,v){
+
+				if(v===undefined){
+					delete this.obj[k];
+					return;
+				} 
+
+				var stack    = this.obj[k];
+				var stackLen = stack.length;
+				for(var i=0;i<stackLen;i++){
+					if(stack[i]===v){
+						stack.splice(i,1);
+					};
+				}
+				stack.length || delete this.obj[k];
+			}
+			gen.prototype.trigger = function(k){
+				var stack = this.obj[k];
+				if(!stack) return;
+				var stackLen = stack.length;
+				for(var i=0;i<stackLen;i++){
+					l(stack[i]+"执行了！")
+				}
+			}
+			gen.prototype.getRelationship = function(k,v){
+				return this.obj;
+			}
+			gen.prototype.getID = function(k,v){
+				return '本实例的id是：'+this.id;
+			}
+
+			return {
+				create:function(){
+					return new gen(++id);
+				},
+				getNum:function(){
+					return 'EventEmitor 一共有'+ id +'个实例';
+				}
+			};
+		})();
+
+		var la = EventEmitor.create();
+		la.on('click','fun1');
+		la.on('click','fun2');
+		la.on('mouseover','fun3');
+		la.on('focus','fun4');
+		la.on('focus','fun5');
+		la.off('focus');
+		l(la.getRelationship())
+		la.trigger('click');
+		l(la.getID());
+
+		var la2 = EventEmitor.create();
+		la2.on('click','fun1');
+		la2.on('click','fun2');
+		la2.off('click','fun1');
+		l(la2.getRelationship())
+		la2.trigger('click');
+		l(la2.getID());
+
+		l(EventEmitor.getNum());
+	}
 
 
 

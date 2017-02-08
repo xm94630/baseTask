@@ -127,6 +127,7 @@ var bee = (function(bee){
 		}
 
 		function bind(stack,v){
+
 			for(var i=0;i<stack.length;i++){
 				if(stack[i]==v) return;
 			}
@@ -136,7 +137,7 @@ var bee = (function(bee){
 		function unbind(stack,v){
 			for(var i=0;i<stack.length;i++){
 				if(stack[i]==v){
-					//注意，这里用的是splice（从数组中添加删除）,会改变原数组，而slice（从数组中提取）不会
+					//注意，这里用的是 splice（从数组中添加删除）,会改变原数组，而slice（从数组中提取）不会
 					stack.splice(i,1);
 					return;
 				}
@@ -594,9 +595,84 @@ var bee = (function(bee){
 		 */
 	}
 
+	/*
+	 * 研究案例16: 模拟事件（优化版本3）
+	 * 这个版本更加的整合，所有的功能都集合到EventEmitor中，而且可以实例化。
+	 */
+	bee.caseF16 = function(){
+		var EventEmitor = (function(){
+			var gen = function(){
+				this.obj = {};
+			};
+			gen.prototype.on = function(k,v){
+				this.obj[k]  = this.obj[k] || [];
+				var stack    = this.obj[k];
+				var stackLen = stack.length;
+				for(var i=0;i<stackLen;i++){
+					if(stack[i]===v) return;
+				}
+				stack.push(v);
+			}
+			gen.prototype.off = function(k,v){
+
+				if(v===undefined){
+					delete this.obj[k];
+					return;
+				} 
+
+				var stack    = this.obj[k];
+				var stackLen = stack.length;
+				for(var i=0;i<stackLen;i++){
+					if(stack[i]===v){
+						stack.splice(i,1);
+					};
+				}
+				stack.length || delete this.obj[k];
+			}
+			gen.prototype.trigger = function(k){
+				var stack = this.obj[k];
+				if(!stack) return;
+				var stackLen = stack.length;
+				for(var i=0;i<stackLen;i++){
+					l(stack[i]+"执行了！")
+				}
+			}
+			gen.prototype.getRelationship = function(k,v){
+				return this.obj;
+			}
+
+			return gen;
+		})();
+
+		var la = new EventEmitor();
+		la.on('click','fun1');
+		la.on('click','fun2');
+		la.on('mouseover','fun3');
+		la.on('focus','fun4');
+		la.on('focus','fun5');
+		la.off('focus');
+		l(la.getRelationship())
+		la.trigger('click');
+
+		var la2 = new EventEmitor();
+		la2.on('click','fun1');
+		la2.on('click','fun2');
+		la2.off('click','fun1');
+		l(la2.getRelationship())
+		la2.trigger('click');
+	}
+
+
+
+
+
+
+
+
 	return bee;
 })(bee || {});
 
+//bee.caseF16();
 
 
 

@@ -846,12 +846,51 @@ var bee = (function(bee){
 	}
 
 
+	/*
+	 * 研究案例7: 管道 pipe
+	 * 这个是管道中最最简单的例子：直接把数据传入，然后把数据传给另外一个函数~
+	 */
+	bee.caseN7 = function(){
+		
+		var fun = function(data){
+			var value = data;
+			return {
+				pipe:function(fun){
+					fun(value)
+				}
+			}
+		}
+		fun('我是数据').pipe(console.log)
+	}
+
+	/*
+	 * 研究案例7_2: 管道 pipe
+	 * 这个和7_1其实是完全一样的！
+	 */
+	bee.caseN7_2 = function(){
+		
+		var fun = (function(_global){
+			//这里可以别样的内容~
+			l(_global)
+			return function(data){
+				var value = data;
+				return {
+					pipe:function(fun){
+						fun(value)
+					}
+				}
+			}
+		})(window);
+		fun('我是数据').pipe(console.log)
+	}
+
 	return bee;
 })(bee || {});
 
-//bee.caseN6();
 
 
+//bee.caseN7();
+//bee.caseN7_2();
 
 
 

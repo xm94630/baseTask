@@ -668,7 +668,7 @@ var bee = (function(bee){
 	 * 比如这里的实例的编号、实例总数的统计。这就是工厂的好处。
 	 * 我之前就有专门将“工厂模式”的。
 	 */
-	bee.caseF16 = function(){
+	bee.caseF17 = function(){
 		var EventEmitor = (function(){
 			var id = 0;
 			var gen = function(id){
@@ -747,7 +747,14 @@ var bee = (function(bee){
 		l(EventEmitor.getNum());
 	}
 
+	/*
+	 * 研究案例18:
+	 */
+	bee.caseF18 = function(){
 
+
+
+	}
 
 
 
@@ -756,7 +763,7 @@ var bee = (function(bee){
 	return bee;
 })(bee || {});
 
-//bee.caseF16();
+//bee.caseF18();
 
 
 

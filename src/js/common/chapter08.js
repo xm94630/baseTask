@@ -1480,6 +1480,56 @@ var bee = (function(bee){
 		})(window))
 
 	}
+
+	/*
+	 * 研究案例41: 工厂 类工厂
+	 * 这个例子是 Eric Elliott 写的，我来学习下。
+	 */
+	bee.caseH41 = function(){
+
+		//这里的AutoMaker，是汽车制造商的意思（就是"工厂"）
+		//auto 这个词汇在易车公司中不是经常出现么~
+		const AutoMaker = {
+			Fish(myBundle){
+				return Object.create(this.bundle[myBundle]);
+			},
+			bundle:{
+				shark:{
+					width: 9,
+					eat:function(fishName){
+						l("鲨鱼吃了："+fishName)
+					}
+				},
+				whale:{
+					width: 20,
+					eat:function(fishName){
+						l("鲸鱼吃了："+fishName)
+					}
+				}
+			}
+		}
+
+		const shark = AutoMaker.Fish('shark');
+		const whale = AutoMaker.Fish('whale');
+		shark.eat('章鱼');
+		whale.eat('小虾米');
+
+		//作者说，这种工厂，在很多人调用的时候，都会写成下面这样子的。作者的观点是：
+		//Unfortunately, in JavaScript, switching from a constructor or class to a factory is a breaking change
+		//但是我没有觉得，我之前也罗列了不少的工厂，我觉得没有他说的那么严重吧？
+		//另外在这种工厂中，鱼的宽度不能设置吧？
+		
+		//const shark = new AutoMaker.Fish();
+		
+		//Eric Elliott 的文章中也列出了不少工厂的好处：
+		//1） Return any arbitrary object and use any arbitrary prototype
+		//2） No refactoring worries
+		//3） No `new`
+		//4） Standard `this` behavior
+		//5） No deceptive `instanceof`
+		//4） Some people like the way `myFoo = createFoo()` reads
+		//这这些可以作为我自己总结的补充吧。
+	}
 	
 
 
@@ -1492,7 +1542,7 @@ var bee = (function(bee){
 
 
 
-//bee.caseH40();
+bee.caseH41();
 
 
 

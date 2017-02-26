@@ -279,6 +279,15 @@ var bee = (function(bee){
 		}).then(function(data){
 			console.log('获取异步数据：'+ data);
 		});
+
+		//这个promise的实现还不够完美，比如，promise函数中传入的异步的到没有啥，如果是同步代码的话，
+		//then中的函数就没有意义了。因为同步代码会先执行，那个myFun,还是个空函数呢~
+		//优化的方法很简单：
+		//上面的 fn(callback); 改写成：
+		//setTimeout(function(){
+		//	fn(callback);
+		//},0);
+		//caseH39中就由此优化
 	}
 
 
@@ -686,6 +695,11 @@ var bee = (function(bee){
 		hold(false);
 		hold(false);
 		promiseFun();
+
+		//第一次，在学习jquery源码的时候，看到这个$.holdReady的时候，惊呆了。
+		//现在看来其实就是 promise 的应用吧
+		//hold函数中的计数器，其实就是为了满足“d.resolveWith();”这个（和异步的执行是同样的道理。那个是通过延时，这个是通过计数。）
+		//最后都是执行done中的那个函数。（done就好比我H8中实现的then）
 	}
 
 	/* 
@@ -1361,6 +1375,8 @@ var bee = (function(bee){
 	 * 这个思路是参照 async.js 中的思想
 	 *
 	 * 那么我能不能做的更加的优秀呢？即上面说的cb，不是固定的参数。是不是更加的灵活呢？我们来试一试吧~
+
+	 * caseH24中和这个很类似了。
 	 */
 	bee.caseH38 = function(){
 
@@ -1452,7 +1468,17 @@ var bee = (function(bee){
 
 		//这种模式其实在jquery中非常常见
 		//比如 $.get('...').done(function(){...});
-		//这个例子做完之后，我连对jquery中的所谓的promise对象也认识很深刻了！！所以基础真的很重要
+		//这个例子做完之后，我连对jquery中的所谓的promise对象也认识很深刻了！！所以基础真的很重要。
+
+		//这里函数的结构是：
+		//go().done();
+
+		//其实和我H8中自己实现的promise的调用结构是一致的，只是包装的略有不同：
+		//promise(xxx).then();  
+		//这里 异步函数xxx 通过传入 promise 中这种方法。go函数那个是，直接把异步函数放在 go 函数体内。
+		//两者的关系就好比：
+		//(function go(){alert(1)})()
+		//(function promise(fun){fun()})(function(){alert(1)})
 	}
 
 
@@ -1542,7 +1568,7 @@ var bee = (function(bee){
 
 
 
-bee.caseH41();
+//bee.caseH41();
 
 
 

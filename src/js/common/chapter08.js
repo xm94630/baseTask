@@ -1558,6 +1558,44 @@ var bee = (function(bee){
 	}
 	
 
+	/*
+	 * 研究案例42: Rx.Observable.fromEvent
+	 * 这个模式从结构上比较接近 promise：都是把回调处理成链式
+	 */
+	bee.caseH42 = function(){
+
+		window.onload=function(){
+			var button = document.createElement('button');
+			button.innerText = '按钮';
+			document.body.append(button);
+			var button = document.querySelector('button');
+
+			//常规时间绑定写法：
+			/*
+			button.onclick = function(){
+				alert('按钮被点击了');
+			}*/
+
+			//模拟 Rx.Observable.fromEvent 的写法：
+			function fromEvent(element,eventName){
+				return{
+					subscribe:function(fun){
+						button['on'+eventName] = function(e){
+							fun(e);
+						}
+					}
+				}
+			}
+			fromEvent(button,'click').subscribe(function(e){
+				alert('按钮被点击了~~');
+			});
+
+			//目前还不是很明白，这样子的写法，优点在哪里？
+			//另外 window.onload 的写法看上去很蹩脚，很多高级框架中，都没有看到这样子的写法了..
+
+		}
+
+	}
 
 
 
@@ -1565,6 +1603,9 @@ var bee = (function(bee){
 
 	return bee;
 })(bee || {});
+
+
+
 
 
 

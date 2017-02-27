@@ -4,6 +4,11 @@
 
 var bee = (function(bee){
 
+
+	/*******************************
+	* 非惰性链
+	********************************/
+
 	//研究案例1: 链式 最简单的开始
 	bee.caseM1 = function(){
 		var obj = {
@@ -164,6 +169,155 @@ var bee = (function(bee){
 	}
 
 
+	/*******************************
+	* 惰性链 
+	********************************/
+
+	//研究案例7: 尚未被调用的函数的形式（1） 
+	//在学习惰性链之前要知道这个概念——就是那些迟迟没有执行的函数
+	bee.caseM7 = function(){
+
+		//1）最基础的，就是函数表达式，只有被调用了里边的内容才执行。
+		var fun1 = function(){
+			l('啦啦啦');
+		};
+
+		//2）数组中的函数
+		//这个就很少用了。但是非常有意义。
+		//rxjs中的 observable 这个定义，就要数组、异步函数队列的概念，大概也可以从这里延伸开来
+		var arr = [fun1];
+
+		//3) 闭包
+		var fun2 = function(){
+			var text = "嘻嘻"
+			return function(){
+				l(text);
+			}
+		}
+		//这里就保存了一个为执行的函数，其实是一个闭包。
+		//fun2()还是一个函数~
+		fun2();
+	}
+
+	//研究案例8: 尚未被调用的函数的形式（2）
+	bee.caseM8 = function(){
+		
+		var obj = {king:'程咬金'}
+		var fun = function(){
+			return this.king;
+		}
+
+		//这里的fun2也是未调用的状态
+		var fun2 = fun.bind(0);
+		l(fun2());
+	}
+
+	//研究案例9: 数组中的函数(1)
+	bee.caseM9 = function(){
+
+		function fun(a){
+			return a;
+		}
+
+		var arr = [fun];
+		l(arr)
+		l(arr[0])
+		//本例子的数组中，包含着一个非常简单的一个函数
+	}
+
+	//研究案例10: 数组中的函数(2)
+	bee.caseM10 = function(){
+
+		function fun(){
+			a = '这里可以是非常复杂的配置'
+			return function(){
+				return a;
+			}
+		}
+
+		var fun2 = fun();
+		var arr = [fun2];
+		l(arr);
+		l(arr[0]);
+		//本例子的数组中，包含着一个函数，乍眼看，输出的和上例一样
+		//但是这个函数是个闭包，隐藏着更多的信息
+	}
+
+	//研究案例11: 数组中的函数（3）
+	bee.caseM11 = function(){
+
+		//初始值
+		var i = 1;
+		//各种用来操作的函数
+		var add5 = function(n){return n+5};
+		var add2 = function(n){return n+2};
+		var mul10 = function(n){return n*10};
+		//放在数组中
+		var arr=[];
+		arr.push(add5)
+		arr.push(add2)
+		arr.push(mul10)
+		
+		//延迟到某个特定时刻，让他们依次调用
+		setTimeout(function(){
+			var r = arr[2](arr[1](arr[0](i)));
+			l(r);
+		},2000);
+
+		//这个例子其实可以解释"惰性"了。
+		//add5、add2等函数，没有直接对初始值 i 进行操作。而是将操作的函数放置到数组中
+		//等待某个时刻（异步回调、延时回调、被指定调用）来使用
+
+		//它已经是"惰性"的了，但是，这个不是链式的，没有流畅的api
+		//如果基于这个做修改，我们就能得到惰性链
+	}
+
+
+	//研究案例12: 最简单的惰性链
+	//这个是最能说明其本质的，只是api非常的简陋
+	bee.caseM12 = function(){
+
+		//这个是要对数据进行操作的函数
+		function do1(s){return s+'很肉';}
+
+		function kingCreate(name){
+			//初始数据（这里为了简单，就用了字符串，要复杂点的话，就是对象啊、数组啊）
+			var name = name || '程咬金';
+			//一个空数组，用来保存，需要的操作队列的！
+			var arr = [];
+			return {
+				//这个函数把操作函数放到数组中，到未来才被执行（要么被回调、要么被指定调用，这里是后者。）。
+				invoke:function(fun){
+					arr.push(fun);
+					return this;
+				},
+				arr:arr,
+				name:name
+			}
+
+		}
+		//这里看到的是一个对象
+		var n1 = kingCreate('兰陵王').invoke(do1);
+		l(n1)
+		//这里看到的是讲被操作的函数序列（数组形式）
+		var n2 = kingCreate('兰陵王').invoke(do1).arr;
+		l(n2)
+		//这里看到的是原始数据，可见 do1 函数其实并没有生效！
+		var n3 = kingCreate('兰陵王').invoke(do1).name;
+		l(n3)
+		//这里我手动调用了那个 do1 函数。
+		//最悲惨的是，'兰陵王'这个又被传递了一次，真是丑爆了的链式api。
+		var n4 = kingCreate('兰陵王').invoke(do1).arr[0]('兰陵王');
+		l(n4)
+
+		//不过输出结果对就好了~
+		//所以这是非常简单的、丑陋的惰性链
+		
+		//它还有一个很大的缺点，这里只调用了一次 invoke （言外之意，数组中只有一个操作函数）
+		//如何提供一个借口，能够让这些操作，按次序作用在初始值之上，最后输出我们想要的结构呢？？？？
+	}
+
+
 
 
 
@@ -174,11 +328,6 @@ var bee = (function(bee){
 })(bee || {});
 
 //bee.caseM4();
-
-
-
-
-
 
 
 

@@ -273,11 +273,11 @@ var bee = (function(bee){
 	}
 
 
-	//研究案例12: 最简单的惰性链
-	//这个是最能说明其本质的，只是api非常的简陋
+	//研究案例12: 最简单的惰性链 和 thunk函数
 	bee.caseM12 = function(){
 
 		//这个是要对数据进行操作的函数
+		//被保存到数组中，等待执行的时候，这个函数也被称之为 thunk函数
 		function do1(s){return s+'很肉';}
 
 		function kingCreate(name){
@@ -346,6 +346,40 @@ var bee = (function(bee){
 	}
 
 
+	//研究案例14: 一个较为完整的惰性链
+	bee.caseM14 = function(){
+
+		function do1(s){return s+'很肉';}
+		function do2(s){return s+'很坦克';}
+		function do3(s){return s+'很厉害';}
+
+		function kingCreate(name){
+			var name = name || '程咬金';
+			var arr = [];
+			return {
+				invoke:function(fun){
+					arr.push(fun);
+					return this;
+				},
+				arr:arr,
+				name:name,
+
+				//其他部分和上例一样，这里额外添加了一个force函数，来输出最后的结果
+				force:function(){
+					return this.arr.reduce(function(text,thunk){
+						return thunk(text);
+					},this.name);
+				}
+			}
+		}
+
+		var n = kingCreate()
+					.invoke(do1)
+					.invoke(do2)
+					.invoke(do3)
+					.force();
+		l(n);
+	}
 
 
 

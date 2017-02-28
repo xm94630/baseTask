@@ -311,8 +311,36 @@ var bee = (function(bee){
 		l(n4)
 
 		//不过输出结果对就好了~
-		//所以这是非常简单的、丑陋的惰性链
-		
+		//所以这是非常简单的、丑陋的惰性链。我们是否可以提供统一的接口来输出最后的值。
+	}
+
+
+	//研究案例13: 惰性链 输出最后结果
+	bee.caseM13 = function(){
+
+		function do1(s){return s+'很肉';}
+		function kingCreate(name){
+			var name = name || '程咬金';
+			var arr = [];
+			return {
+				invoke:function(fun){
+					arr.push(fun);
+					return this;
+				},
+				arr:arr,
+				name:name,
+
+				//其他部分和上例一样，这里额外添加了一个force函数，来输出最后的结果
+				force:function(){
+					return this.arr[0](this.name)
+				}
+			}
+
+		}
+
+		var n = kingCreate('兰陵王').invoke(do1).force();
+		l(n)
+
 		//它还有一个很大的缺点，这里只调用了一次 invoke （言外之意，数组中只有一个操作函数）
 		//如何提供一个借口，能够让这些操作，按次序作用在初始值之上，最后输出我们想要的结构呢？？？？
 	}

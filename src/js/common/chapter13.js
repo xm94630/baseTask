@@ -382,6 +382,56 @@ var bee = (function(bee){
 	}
 
 
+	//研究案例15: 惰性链 中也需要tap函数
+	bee.caseM15 = function(){
+
+		function do1(s){return s+'很肉';}
+		function do2(s){return s+'很坦克';}
+		function do3(s){return s+'很厉害';}
+
+		function kingCreate(name){
+			var name = name || '程咬金';
+			var arr = [];
+			return {
+				invoke:function(fun){
+					arr.push(fun);
+					return this;
+				},
+				arr:arr,
+				name:name,
+				force:function(){
+					return this.arr.reduce(function(text,thunk){
+						return thunk(text);
+					},this.name);
+				},
+				//在上例子基础上新增
+				tap:function(fun){
+					this.arr.push(function(name){
+						//处理回调函数
+						fun(name);
+						//这个确保初始值能够在reduce中进行传递
+						return name;
+					});
+					//这个this是确保链式调用
+					return this;
+				}
+
+			}
+		}
+
+		var n = kingCreate()
+					.invoke(do1)
+					.tap(function(name){
+						l('我是tap函数，来看看，现在初始值被处理成什么了 ===> '+name);
+					})
+					.invoke(do2)
+					.invoke(do3)
+					.force();    //如果没有这个函数的调用，tap中函数是不会被执行的。这点来看，也足见其“惰性”。
+		l(n);
+
+		//惰性链，某种程度上和 promise 是一样的。promise（caseH24）中done函数中的内容，也是没有立即执行的，等待异步回调完成之后，才进行的！
+	}
+
 
 
 

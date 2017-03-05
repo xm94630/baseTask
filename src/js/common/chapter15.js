@@ -181,7 +181,7 @@ var bee = (function(bee){
 	}
 
 
-	//研究案例6: 【BOSS】 星形拓扑借结构
+	//研究案例6: 【BOSS】 星形拓扑结构
 	//即是信息的发布者，也是订阅者
 	//这种模式我在项目中的需求中悟出来的，就是有一个互斥的实例。
 	//要做到这个一点的话，实例之间一定能够相互通信才行！
@@ -189,7 +189,7 @@ var bee = (function(bee){
 	bee.caseO6 = function(){
 
 		//工厂的工厂，可以生成多个工厂实例，在一个工厂中能够维护一个 kingLists。
-		function KingFactoryFactory(){
+		function KingGropFactory(){
 			var kingLists = {};
 			var id = 0;
 
@@ -228,7 +228,7 @@ var bee = (function(bee){
 				return king;
 			}
 		}
-		var KingFactory = KingFactoryFactory();
+		var KingFactory = KingGropFactory();
 
 		var k1 = KingFactory('兰陵王',function(msg,from,my){
 			l(my.name+' 接收到来自 '+ from.name+'的消息：'+msg);
@@ -250,6 +250,76 @@ var bee = (function(bee){
 		k3.loginIn();
 		k3.send('不好意思，刚才接了个电话')	
 	}
+
+	//研究案例7:  星形拓扑结构 优化
+	bee.caseO7 = function(){
+		function KingGropFactory(){
+			var kingLists = {};
+			var id = 0;
+			return function KingFactory(callback){
+				id++;
+				var king = {
+					id:id,
+					doSomething:callback||function(){},
+					getAllkings:function(){
+						return kingLists;
+					},
+					getInfo:function(msg,fromId){
+						this.doSomething(msg,kingLists[fromId],kingLists[this.id]);
+					},
+					send:function(msg){
+						for(var k in kingLists){
+							if(parseInt(k)!==this.id)
+								kingLists[k].getInfo(msg,this.id);
+						}
+					},
+					loginIn:function(){
+						kingLists[this.id] = this;
+					},
+					loginOut:function(){
+						delete kingLists[this.id];
+					},
+					//新增一个扩展的方法
+					//目的就是把，该模模式变得纯粹，可以复用。
+					extend:function(obj){
+						var that = this;
+						//扩展中，原来的属性是不允许被覆盖的！这个很关键。
+						//言外之意，如果Hero实例中，也有loginIn方法就无效了。
+						//我觉的吧，这个设计有点问题，万一用户正好使用了loginIn，那就对他造成困扰了。
+						//这个问题可以先放着。
+						that = $.extend(true,that,obj);//true表示不允许覆盖
+					}
+				};
+				kingLists[id] = king;
+				return king;
+			}
+		}
+		var KingFactory = KingGropFactory();
+
+		var k1 = KingFactory(function(msg,from,my){
+			l(my.name+' 接收到来自 '+ from.name+'的消息：'+msg);
+		});
+		var k2 = KingFactory(function(msg,from,my){
+			l(my.name+' 接收到来自 '+ from.name+'的消息：'+msg);
+		});
+		var k3 = KingFactory(function(msg,from,my){
+			l(my.name+' 接收到来自 '+ from.name+'的消息：'+msg);
+		});
+
+		//具体角色信息，抽离到这里。最后被extend扩展。
+		function Hero(name){
+			this.name = name;
+		}
+
+		k1.extend(new Hero('程咬金'));
+		k2.extend(new Hero('兰陵王'));
+		k3.extend(new Hero('孙悟空'));
+
+		k1.send('进攻地方高地');
+	}
+
+
+
 
 
 
@@ -402,6 +472,142 @@ l('==== 同步代码 ====');*/
 	}
 }
 observer.next('你好');*/
+
+
+
+
+
+
+$(function(){
+	$('body').append([
+		'<select node-type="s1">',
+			'<option>请选择</option>',
+			'<option value="11">11</option>',
+			'<option value="22">22</option>',
+			'<option value="33">33</option>',
+			'<option value="44">44</option>',
+		'</select>',
+		'<select node-type="s2">',
+			'<option>请选择</option>',
+			'<option value="11">11</option>',
+			'<option value="22">22</option>',
+			'<option value="33">33</option>',
+			'<option value="44">44</option>',
+		'</select>',
+		'<select node-type="s3">',
+			'<option>请选择</option>',
+			'<option value="11">11</option>',
+			'<option value="22">22</option>',
+			'<option value="33">33</option>',
+			'<option value="44">44</option>',
+		'</select>'
+	].join(''));
+
+	function KingGropFactory(){
+		var kingLists = {};
+		var id = 0;
+		return function KingFactory(callback){
+			id++;
+			var king = {
+				id:id,
+				allInfo:[],
+				doSomething:callback||function(){},
+				getAllkings:function(){
+					return kingLists;
+				},
+				getInfo:function(msg,fromId){
+					this.doSomething(msg,kingLists[fromId],kingLists[this.id]);
+				},
+				send:function(msg){
+					this.allInfo.push(msg);
+					for(var k in kingLists){
+						if(parseInt(k)!==this.id)
+							kingLists[k].getInfo(msg,this.id);
+					}
+				},
+				loginIn:function(){
+					kingLists[this.id] = this;
+				},
+				loginOut:function(){
+					delete kingLists[this.id];
+				},
+				extend:function(obj){
+					var that = this;
+					that = $.extend(true,that,obj);
+				},
+				getAllInfo:function(){
+					return this.allInfo;
+				},
+				getLastInfo:function(){
+					return this.allInfo[this.allInfo.length-1];
+				}
+			};
+			kingLists[id] = king;
+			return king;
+		}
+	}
+	var KingFactory = KingGropFactory();
+
+	function dealWith(msg,from,my){
+		
+		//一些log输出
+		l(my.id+' 接收到来自 '+ from.id+'的消息：'+msg);
+
+		//清楚原来的标记
+		$(this).find('option[usedBy='+from.id+']').removeAttr('usedBy disabled');
+		$(this).find('option').each(function(){
+			if($(this).val()==msg){
+				$(this).attr('disabled','disabled');
+				//标记被谁占用
+				$(this).attr('usedBy',from.id);
+			}
+		});
+	}
+
+	var k1 = KingFactory(dealWith);
+	var k2 = KingFactory(dealWith);
+	var k3 = KingFactory(dealWith);
+
+	var s1 = $('[node-type="s1"]');
+	var s2 = $('[node-type="s2"]');
+	var s3 = $('[node-type="s3"]');
+
+	k1.extend(s1);
+	k2.extend(s2);
+	k3.extend(s3);
+
+	k1.on('change',function(){
+		var v = $(this).val();
+		k1.send(v);
+		//l('['+k1.id+' 最新一次发送的数据是'+k1.getLastInfo()+']');
+		//l('['+k1.id+' 全部发送的数据是'+k1.getAllInfo()+']');
+	})
+	k2.on('change',function(){
+		var v = $(this).val();
+		k2.send(v);
+	})
+	k3.on('change',function(){
+		var v = $(this).val();
+		k3.send(v);
+	})
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

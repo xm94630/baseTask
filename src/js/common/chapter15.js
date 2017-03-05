@@ -76,7 +76,7 @@ var bee = (function(bee){
 	//
 	//这里使用了 Function.prototype 这样子的扩展，不是很好的做法
 	//另外 observers 也变成了透明的了，可以直接修改，没有上一种模式优秀。
-	bee.caseO5 = function(){
+	bee.caseO4 = function(){
 
 		//这里的工厂，其实可以用构造函数来替换~
 		/*function King(){this.observers=[];}
@@ -178,6 +178,77 @@ var bee = (function(bee){
 		//这里，中间又做了一个层次的抽象。就是所谓的“频道”，如此一来：
 		//一个频道中可以有多个观察者。
 		//一个观察者可以去接受多个频道。
+	}
+
+
+	//研究案例6: 【BOSS】 星形拓扑借结构
+	//即是信息的发布者，也是订阅者
+	//这种模式我在项目中的需求中悟出来的，就是有一个互斥的实例。
+	//要做到这个一点的话，实例之间一定能够相互通信才行！
+	//于是实现了这个简单的模型
+	bee.caseO6 = function(){
+
+		//工厂的工厂，可以生成多个工厂实例，在一个工厂中能够维护一个 kingLists。
+		function KingFactoryFactory(){
+			var kingLists = {};
+			var id = 0;
+
+			//这部分是实例生成的部分
+			return function KingFactory(name,callback){
+				id++;
+				var king = {
+					id:id,
+					name:name||'无名'+id,
+					doSomething:callback||function(){},
+					getAllkings:function(){
+						return kingLists;
+					},
+					//接收信息
+					//具体操作是交了 doSomething，来自实例化时候的回调！
+					getInfo:function(msg,fromId){
+						this.doSomething(msg,kingLists[fromId],kingLists[this.id]);
+					},
+					//发送信息
+					send:function(msg){
+						for(var k in kingLists){
+							if(kingLists[k]!==this)
+								kingLists[k].getInfo(msg,this.id);
+						}
+					},
+					//进入队列
+					loginIn:function(){
+						kingLists[this.id] = this;
+					},
+					//退出队列
+					loginOut:function(){
+						delete kingLists[this.id];
+					}
+				};
+				kingLists[id] = king;
+				return king;
+			}
+		}
+		var KingFactory = KingFactoryFactory();
+
+		var k1 = KingFactory('兰陵王',function(msg,from,my){
+			l(my.name+' 接收到来自 '+ from.name+'的消息：'+msg);
+		});
+		var k2 = KingFactory('程咬金',function(msg,from,my){
+			l(my.name+' 接收到来自 '+ from.name+'的消息：'+msg);
+		});
+		var k3 = KingFactory('孙悟空',function(msg,from,my){
+			l(my.name+' 接收到来自 '+ from.name+'的消息：'+msg);
+		});
+
+		k2.send('大家都很给力哦！')
+		l('=====')
+		k1.send('等等我')
+		l('=== 孙悟空退出 ===')
+		k3.loginOut();
+		k1.send('孙悟空退出了...一会举报')
+		l('=== 孙悟空上线 ===')
+		k3.loginIn();
+		k3.send('不好意思，刚才接了个电话')	
 	}
 
 

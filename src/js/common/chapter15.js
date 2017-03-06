@@ -576,35 +576,58 @@ var bee = (function(bee){
 	}
 
 
-	//研究案例13: 和 Promise 区别
-	//这个是 bee.caseH8 原样拿过来的
+	//研究案例13: 完美的 promise !
+	//在第八章节中，我们实现了很多的promise，但是，都有一个问题就是不支持同步代码。
+	//于是我开始从 caseO10 例子中悟出道理，觉得于是可以支持同步的，只要利用惰性。
+	//然后我就改造了一番，得出完美的promise！
 	bee.caseO13 = function(){
-		function promise(fn){
-			var myFun = function(){};
-			var callback = function(data){
-				myFun(data);
-			};
-			fn(callback);
-			var promiseObject = {
-				then:function(dealFun){
-					myFun = dealFun;
+
+		var myPromise = {
+			create:function(fun){
+				return {
+					then:function(cb){
+						fun(cb);
+					}
 				}
 			}
-			return promiseObject;
 		}
-		promise(function(cb){
-			l('等待1秒...');
+
+		function container(cb){
 			setTimeout(function(){
+				l('1秒之后...');
 				cb('xm94630');
-			},1000);
-		}).then(function(data){
-			console.log('获取异步数据：'+ data);
+			},1000)
+		}
+
+		var promise = myPromise.create(container);
+
+		promise.then(function(data){
+			l('异步获取的数据是：'+data);
 		});
 
-		//上例和它的区别在于：
-		//1）promise 处理的是，异步事件执行完毕之后，对回调的处理！而“异步观察者”是对异步事件本身的触发。
-		//2) promise 值能处理一个异步事件，回调同样也是对应的一个（then方法中的函数），“异步观察者”模式中，也许要n多个异步事件！！！
+		//这样子结构的封装，比我之前的更加的好！！
+		//
+		//最令人惊讶的是！改例子和上面的案例居然一模一样！！！！！
+		//这个真是所谓殊途同归啊！
+		//原来“异步的事件观察者模式”，居然就等效于“Promise”!!!!!!
+		//
+		//如此，反过来，我对promise的理解更加深刻了：
+		//异步的行为被promise封装了，而且是“惰性”的，只有指定了“观察者”，异步行为才会触发，然后再触发回调！
+		//then方法中的函数，其实就是“订阅者”。
+
 	}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

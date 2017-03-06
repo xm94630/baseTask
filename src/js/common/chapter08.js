@@ -1604,7 +1604,13 @@ var bee = (function(bee){
 			//另外 window.onload 的写法看上去很蹩脚，很多高级框架中，都没有看到这样子的写法了..
 
 		}
+	}
 
+	/*
+	 * 研究案例43: 完美的 promise !
+	 */
+	bee.caseH43 = function(){
+		//参见 caseO13 案例
 	}
 
 

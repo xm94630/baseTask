@@ -319,6 +319,139 @@ var bee = (function(bee){
 	}
 
 
+	//研究案例8:  星形拓扑结构 应用 互斥的下拉框！
+	//这个应用就是来自于实际!这里已经实现的比较完整了。
+	bee.caseO8 = function(){
+		
+		$(function(){
+			$('body').append([
+				'<select node-type="s1">',
+					'<option value="-1">请选择</option>',
+					'<option value="11">11</option>',
+					'<option value="22">22</option>',
+					'<option value="33">33</option>',
+					'<option value="44">44</option>',
+				'</select>',
+				'<select node-type="s2">',
+					'<option value="-1">请选择</option>',
+					'<option value="11">11</option>',
+					'<option value="22">22</option>',
+					'<option value="33">33</option>',
+					'<option value="44">44</option>',
+				'</select>',
+				'<select node-type="s3">',
+					'<option value="-1">请选择</option>',
+					'<option value="11">11</option>',
+					'<option value="22">22</option>',
+					'<option value="33">33</option>',
+					'<option value="44">44</option>',
+				'</select>'
+			].join(''));
+
+			function KingGropFactory(){
+				var kingLists = {};
+				var id = 0;
+				return function KingFactory(callback){
+					id++;
+					var king = {
+						id:id,
+						allInfo:[],
+						doSomething:callback||function(){},
+						getAllkings:function(){
+							return kingLists;
+						},
+						getInfo:function(msg,fromId){
+							this.doSomething(msg,kingLists[fromId],kingLists[this.id]);
+						},
+						send:function(msg){
+							this.allInfo.push(msg);
+							for(var k in kingLists){
+								if(parseInt(k)!==this.id)
+									kingLists[k].getInfo(msg,this.id);
+							}
+						},
+						loginIn:function(){
+							kingLists[this.id] = this;
+						},
+						loginOut:function(){
+							delete kingLists[this.id];
+						},
+						extend:function(obj){
+							var that = this;
+							that = $.extend(true,that,obj);
+						},
+						//这个是新增的功能，发布信息的栈
+						//某些场合的时候会用到
+						getAllInfo:function(){
+							return this.allInfo;
+						},
+						//这个是新增的功能，发布信息的栈，获取最顶层的元素
+						getLastInfo:function(){
+							return this.allInfo[this.allInfo.length-1];
+						}
+					};
+					kingLists[id] = king;
+					return king;
+				}
+			}
+			var KingFactory = KingGropFactory();
+
+			function dealWith(msg,from,my){
+
+				//不处理为-1时候的信息响应
+				if(msg=='-1')return;
+				
+				//一些log输出
+				l(my.id+' 接收到来自 '+ from.id+'的消息：'+msg);
+
+				//清楚原来的标记
+				$(this).find('option[usedBy='+from.id+']').removeAttr('usedBy disabled');
+				$(this).find('option').each(function(){
+					if($(this).val()==msg){
+						$(this).attr('disabled','disabled');
+						//标记被谁占用
+						$(this).attr('usedBy',from.id);
+					}
+				});
+			}
+
+			var k1 = KingFactory(dealWith);
+			var k2 = KingFactory(dealWith);
+			var k3 = KingFactory(dealWith);
+
+			var s1 = $('[node-type="s1"]');
+			var s2 = $('[node-type="s2"]');
+			var s3 = $('[node-type="s3"]');
+
+			k1.extend(s1);
+			k2.extend(s2);
+			k3.extend(s3);
+
+			k1.on('change',function(){
+				var v = $(this).val();
+				k1.send(v);
+				//l('['+k1.id+' 最新一次发送的数据是'+k1.getLastInfo()+']');
+				//l('['+k1.id+' 全部发送的数据是'+k1.getAllInfo()+']');
+			})
+			k2.on('change',function(){
+				var v = $(this).val();
+				k2.send(v);
+			})
+			k3.on('change',function(){
+				var v = $(this).val();
+				k3.send(v);
+			})
+		});
+
+		//其实这个问题还是扩展的：
+		//1 如果这里的下拉框不是一开始的时候就有的，是动态添加的。那么动态添加的禁用选项就会使用到 getLastInfo 函数来知道兄弟们的选择情况。
+		//2 再如果，把多个下拉最为一个组，组内互斥，组与组织之间没有任何关系。这种情况，KingGropFactory有帮助了。
+		//所以目前的模型还是可以应对这两种的。
+	}
+
+
+
+
 
 
 
@@ -478,120 +611,7 @@ observer.next('你好');*/
 
 
 
-$(function(){
-	$('body').append([
-		'<select node-type="s1">',
-			'<option>请选择</option>',
-			'<option value="11">11</option>',
-			'<option value="22">22</option>',
-			'<option value="33">33</option>',
-			'<option value="44">44</option>',
-		'</select>',
-		'<select node-type="s2">',
-			'<option>请选择</option>',
-			'<option value="11">11</option>',
-			'<option value="22">22</option>',
-			'<option value="33">33</option>',
-			'<option value="44">44</option>',
-		'</select>',
-		'<select node-type="s3">',
-			'<option>请选择</option>',
-			'<option value="11">11</option>',
-			'<option value="22">22</option>',
-			'<option value="33">33</option>',
-			'<option value="44">44</option>',
-		'</select>'
-	].join(''));
 
-	function KingGropFactory(){
-		var kingLists = {};
-		var id = 0;
-		return function KingFactory(callback){
-			id++;
-			var king = {
-				id:id,
-				allInfo:[],
-				doSomething:callback||function(){},
-				getAllkings:function(){
-					return kingLists;
-				},
-				getInfo:function(msg,fromId){
-					this.doSomething(msg,kingLists[fromId],kingLists[this.id]);
-				},
-				send:function(msg){
-					this.allInfo.push(msg);
-					for(var k in kingLists){
-						if(parseInt(k)!==this.id)
-							kingLists[k].getInfo(msg,this.id);
-					}
-				},
-				loginIn:function(){
-					kingLists[this.id] = this;
-				},
-				loginOut:function(){
-					delete kingLists[this.id];
-				},
-				extend:function(obj){
-					var that = this;
-					that = $.extend(true,that,obj);
-				},
-				getAllInfo:function(){
-					return this.allInfo;
-				},
-				getLastInfo:function(){
-					return this.allInfo[this.allInfo.length-1];
-				}
-			};
-			kingLists[id] = king;
-			return king;
-		}
-	}
-	var KingFactory = KingGropFactory();
-
-	function dealWith(msg,from,my){
-		
-		//一些log输出
-		l(my.id+' 接收到来自 '+ from.id+'的消息：'+msg);
-
-		//清楚原来的标记
-		$(this).find('option[usedBy='+from.id+']').removeAttr('usedBy disabled');
-		$(this).find('option').each(function(){
-			if($(this).val()==msg){
-				$(this).attr('disabled','disabled');
-				//标记被谁占用
-				$(this).attr('usedBy',from.id);
-			}
-		});
-	}
-
-	var k1 = KingFactory(dealWith);
-	var k2 = KingFactory(dealWith);
-	var k3 = KingFactory(dealWith);
-
-	var s1 = $('[node-type="s1"]');
-	var s2 = $('[node-type="s2"]');
-	var s3 = $('[node-type="s3"]');
-
-	k1.extend(s1);
-	k2.extend(s2);
-	k3.extend(s3);
-
-	k1.on('change',function(){
-		var v = $(this).val();
-		k1.send(v);
-		//l('['+k1.id+' 最新一次发送的数据是'+k1.getLastInfo()+']');
-		//l('['+k1.id+' 全部发送的数据是'+k1.getAllInfo()+']');
-	})
-	k2.on('change',function(){
-		var v = $(this).val();
-		k2.send(v);
-	})
-	k3.on('change',function(){
-		var v = $(this).val();
-		k3.send(v);
-	})
-
-});
 
 
 

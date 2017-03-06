@@ -577,8 +577,33 @@ var bee = (function(bee){
 
 
 	//研究案例13: 和 Promise 区别
+	//这个是 bee.caseH8 原样拿过来的
 	bee.caseO13 = function(){
+		function promise(fn){
+			var myFun = function(){};
+			var callback = function(data){
+				myFun(data);
+			};
+			fn(callback);
+			var promiseObject = {
+				then:function(dealFun){
+					myFun = dealFun;
+				}
+			}
+			return promiseObject;
+		}
+		promise(function(cb){
+			l('等待1秒...');
+			setTimeout(function(){
+				cb('xm94630');
+			},1000);
+		}).then(function(data){
+			console.log('获取异步数据：'+ data);
+		});
 
+		//上例和它的区别在于：
+		//1）promise 处理的是，异步事件执行完毕之后，对回调的处理！而“异步观察者”是对异步事件本身的触发。
+		//2) promise 值能处理一个异步事件，回调同样也是对应的一个（then方法中的函数），“异步观察者”模式中，也许要n多个异步事件！！！
 	}
 
 

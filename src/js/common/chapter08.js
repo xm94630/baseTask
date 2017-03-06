@@ -1442,6 +1442,10 @@ var bee = (function(bee){
 
 			return {
 				resolve:function(myData){
+					//2017-03-06注释：这里使用了setTimeout，导致，所有的行为都变成了异步的。
+					//话说回来，promise本来就是异步。
+					//如果把setTimeout去了，支持同步代码的时候，就会出现问题的！
+					//能否出一个支持同步行为的呢？也许caseO10能给点提示
 					setTimeout(function(){
 						callback(myData);
 					},0);

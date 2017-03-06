@@ -1,6 +1,15 @@
 /*******************************
-* 第十四章 observer模式
+* 第十五章 observer模式
+*
+* 注意，其实observer模式和发布订阅模式，都是很类似的。
+* 所以在不同实现中，有的人，会把发布订阅模式中的“发布者”、”订阅者“这样子的说法，也用在 observer模式 中。
+* 而observer模式中，其实对应的是“主体”、“观察者”。
+*
+* 所以在我下面的案例中，不区分这些概念。
+* 总的来说：一个发，一个收。
+* 
 ********************************/
+
 
 var bee = (function(bee){
 
@@ -450,16 +459,127 @@ var bee = (function(bee){
 	}
 
 
+	//研究案例9: 异步的观察者 最简单的例子
+	bee.caseO9 = function(){
+		//观察者
+		function fun(info){l('王者荣耀：'+info);}
+		//发布者（异步）
+		setTimeout(function(){
+			fun('敌人5秒钟后达到战场，请做好准备');
+		},0);
+	}
 
 
+	//研究案例10: 异步的观察者 惰性
+	//上例的变换
+	bee.caseO10 = function(){
+		//观察者 保持不变
+		function fun(info){l('王者荣耀：'+info);}
+		//发布者 
+		//异步的发布信息的行为被一个容器函数包装了，于是这个异步行为，处于等待的状态。（”惰性“、”懒“相关的观念多数使用这样子的包装行为）
+		function container(fun){
+			setTimeout(function(){
+				fun('敌人5秒钟后达到战场，请做好准备');
+			},0);
+		}
+		//订阅行为
+		function subscribe(dealWith){
+			container(dealWith);
+		}
+		//只有在订阅行为发生的时候，即指定了具体的观察者，发布者的发布行为才开启。
+		subscribe(fun);
+
+		//本例子，虽然简单，但是蕴含一个极其重要的“惰性”的概念！
+		//相比案例9而言：
+		//案例9，发布者直接发布
+		//案例10，发布者发布前，必须指定观察者。这种缓冲的行为，让用户使用接口的时候，更加的 flexible ！
+		
+		//为了证明灵活性，我们看下面的例子
+		//非常方便的制定了例外一个订阅者（一旦指定了，分布者马上给他发布！）
+		function fun2(info){l('全名超神：'+info);}
+		subscribe(fun2);
+	}
 
 
+	//研究案例11: 异步的观察者 优化/封装
+	//上例只是为了说明原理，并没有结构化的代码
+	bee.caseO11 = function(){
+
+		//封装到 Observable
+		var Observable ={
+			create:function(fun){
+				return {
+					subscribe:function(cb){
+						fun(cb);
+					}
+				}
+			}
+		}
+
+		//观察者
+		function fun(data){
+			console.log('红方 => '+data);
+		}
+
+		//发布行为 : 无论是同步的、异步的行为，都包装到一个函数中去。
+		function container(cb){
+			cb('程咬金');
+			setTimeout(() => cb('兰陵王'), 1000);
+		}
+
+		//Observable.create 方法，相当于创建了一个发布者
+		var myObservable = Observable.create(container);
+
+		//发布者的选择订阅的函数，并触发“发布”行为
+		myObservable.subscribe(fun);
+	
+	}
 
 
+	//研究案例12: 异步的观察者 上例子的不同用法
+	bee.caseO12 = function(){
+
+		var Observable ={
+			create:function(fun){
+				return {
+					subscribe:function(cb){
+						fun(cb);
+					}
+				}
+			}
+		}
+
+		function fun(data){
+			console.log('红方 => '+data);
+		}
+
+		//原来的发布行为也可以一拆为二
+		//发布行为1（同步）
+		function container(cb){
+			cb('程咬金');
+		}
+		//发布行为2（异步）
+		function container2(cb){
+			setTimeout(() => cb('兰陵王'), 1000);
+		}
+
+		//创建2个分布者
+		var myObservable  = Observable.create(container);
+		var myObservable2 = Observable.create(container2);
+
+		//两个发布者可以指定相同或者不同的订阅者，这里使用的是相同的fun函数
+		myObservable .subscribe(fun);
+		myObservable2.subscribe(fun);
+
+		l('=== 同步代码 ===')
+
+	}
 
 
+	//研究案例13: 和 Promise 区别
+	bee.caseO13 = function(){
 
-
+	}
 
 
 
@@ -561,35 +681,6 @@ l(123)*/
 
 
 
-
-/*var Observable ={
-	create:function(fun){
-		return {
-			subscribe:function(cb){
-				fun(cb);
-			}
-		}
-	}
-}
-
-var myObservable = Observable.create(function(cb){
-	cb('程咬金');
-	setTimeout(() => cb('兰陵王'), 1000);
-})
-myObservable.subscribe(function(data){
-	console.log('红方 => '+data);
-});
-
-
-var myObservable2 = Observable.create(function(cb){
-	cb('荆轲');
-	setTimeout(() => cb('后羿'), 500);
-})
-myObservable2.subscribe(function(data){
-	console.log('蓝方 => '+data);
-});
-
-l('==== 同步代码 ====');*/
 
 
 

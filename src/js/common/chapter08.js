@@ -783,19 +783,25 @@ var bee = (function(bee){
 						}
 					}
 				},
-				resolveWith:function(){
-					dealWithFun();
+				resolveWith:function(data){ //2017-03-06补充：添加了data
+					dealWithFun(data);
 				}
 			}
 		}
 
 		//应用
 		var d = Deferred();
+
+		//2017-03-06补充：这个异步的时候是对的，当为同步的时候，执行的函数是 dealWithFun 默认的那个空函数
+		//所以还是有缺陷的。合理的话，应该还是能正常调用我指定的回调的！
+		//我现在思路是有的：可以参考 bee.caseO10 案例中的 ‘惰性’的 概念！
 		setTimeout(function(){
 			l('延时1000，执行');
-			d.resolveWith();
+			d.resolveWith(123);
 		},1000);
-		d.promise().done(function(){
+
+		d.promise().done(function(data){
+			l(data)
 			setTimeout(function(){
 				l('延时500，执行');
 			},500);

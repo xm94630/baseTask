@@ -13,7 +13,7 @@
 
 var bee = (function(bee){
 
-	//研究案例1:我认为，函数其实是一个最最简单的观察者模式。
+	//研究案例1:我认为，函数其实是一个最最简单的观察者模式。 (利用函数)
 	bee.caseO1 = function(){
 		function fun(info){l('王者荣耀：'+info);}
 		fun('敌人5秒钟后达到战场，请做好准备');
@@ -23,14 +23,14 @@ var bee = (function(bee){
 	}
 
 
-	//研究案例2:简单的观察者模式
+	//研究案例2:简单的观察者模式  (利用数组)
 	//这里例子的基础原理其实还是案例1中的那个。
 	//不同的是，这里一旦发布信息，有多个函数会被调用，并接受相同的讯息。
 	bee.caseO2 = function(){
 		var fun1 = function(info){l('程咬金收到信息：'+info);}
 		var fun2 = function(info){l('兰陵王收到信息：'+info);}
 		var king = {
-			observers : [fun1,fun2],
+			observers : [fun1,fun2],    //(利用数组)
 			sendInfo  : function(info){
 				this.observers.forEach(function(fun){
 					fun(info);
@@ -40,6 +40,19 @@ var bee = (function(bee){
 		king.sendInfo('准备团战！');
 		l('20秒之后...')
 		king.sendInfo('进攻敌方高地！');
+	}
+
+	//研究案例2_2:简单的观察者模式 (利用对象)
+	bee.caseO2_2 = function(){
+		var observer = {
+			fun:function(info){
+				console.log('程咬金收到信息：'+info);
+			},
+			next:function(x){
+				this.fun(x);
+			}
+		}
+		observer.next('暂时撤退！');
 	}
 
 
@@ -619,6 +632,41 @@ var bee = (function(bee){
 	}
 
 
+	/*
+	 * 研究案例14: 模拟实现 Rx.Observable.fromEvent [利用异步的观察者模式]
+	 */
+	bee.caseO14 = function(){
+
+		window.onload=function(){
+
+			//创建元素
+			var button = document.createElement('button');
+			button.innerText = '按钮';
+			document.body.append(button);
+			
+			//引用
+			var button = document.querySelector('button');
+
+			//fromEvent 实现
+			function fromEvent(element,eventName){
+				return{
+					subscribe:function(fun){
+						button['on'+eventName] = function(e){
+							fun(e);
+						}
+					}
+				}
+			}
+			fromEvent(button,'click').subscribe(function(e){
+				l('按钮被点击了~~');
+			});
+
+			//仔细观察可以发现，其实这个案例就等同于 caseO12 ！！！！
+			//不同的是subscribe中的内容，一个是直接调用（异步），一个是利用事件的回调（异步），其实本质上还是一模一样的！！
+			//另外层也略有不同，这里是函数的形式，主要原因是，为了方便配置事件！
+		}
+	}
+
 
 
 
@@ -637,135 +685,6 @@ var bee = (function(bee){
 
 	return bee;
 })(bee || {});
-
-
-
-
-
-/*
-var myObservable = Rx.Observable.create(observer => {
-  observer.next('foo');
-  setTimeout(() => observer.next('bar'), 1000);
-});
-myObservable.subscribe(value => l('===>'+value));
-*/
-
-
-
-/*var xxx;
-
-var Observable ={
-	observer:{
-		next:function(x){
-			xxx(x)
-		}
-	},
-	create:function(fun){
-
-		var that = this;
-		setTimeout(function(){
-			fun(that.observer);
-		},0);
-
-		return {
-			subscribe:function(cb){
-				//cb('xxx')
-				xxx =cb;
-			}
-		}
-
-
-	}
-}
-
-var myObservable = Observable.create(function(obs){
-	obs.next('程咬金');
-	setTimeout(() => obs.next('兰陵王'), 1000);
-})
-myObservable.subscribe(function(data){
-	console.log(data);
-});
-
-l(123)
-*/
-
-
-
-/*var xxx;
-
-var Observable ={
-	observer:{
-		next:function(x){
-			xxx(x)
-		}
-	},
-	create:function(fun){
-
-		var that = this;
-		
-
-
-		return {
-			subscribe:function(cb){
-				//cb('xxx')
-				xxx =cb;
-
-				fun(that.observer);
-			}
-		}
-
-
-	}
-}
-
-var myObservable = Observable.create(function(obs){
-	obs.next('程咬金');
-	setTimeout(() => obs.next('兰陵王'), 1000);
-})
-myObservable.subscribe(function(data){
-	console.log(data);
-});
-
-l(123)*/
-
-
-
-
-
-
-
-
-
-/*var observer = {
-	fun:function(info){
-		console.log(info);
-	},
-	next:function(x){
-		this.fun(x);
-	}
-}
-observer.next('你好');*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

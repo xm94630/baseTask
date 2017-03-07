@@ -200,6 +200,8 @@ var bee = (function(bee){
 		//这里，中间又做了一个层次的抽象。就是所谓的“频道”，如此一来：
 		//一个频道中可以有多个观察者。
 		//一个观察者可以去接受多个频道。
+
+		//这个例子可以再好好的封装~ 
 	}
 
 
@@ -230,6 +232,37 @@ var bee = (function(bee){
 			})
 			$('div').trigger('king/red','准备团战！');
 		})*/
+	}
+
+
+	//研究案例5_3: 发布订阅模式 的真正作用！
+	//下面用的是伪代码。
+	bee.caseO5_3 = function(){
+
+		/* 最差劲的模式
+		 $.get('/xxx/xxx').then(data){
+			//一堆逻辑，很难解耦
+			xxxxxx
+			xxxxx
+			xxxxxxxxx
+			xxxx
+		} */
+
+		/* 不错，是我经常处理的
+		 $.get('/xxx/xxx').then(data){
+			fun1(data);
+			fun2(data);
+			fun3(data);
+		} */
+
+		/* 更好些吧
+		 $.get('/xxx/xxx').then(data){
+			publish('getData',data)
+		 } 
+		 subscribe('getData',fun1);
+		 subscribe('getData',fun2);
+		 subscribe('getData',fun3);
+		*/
 	}
 
 

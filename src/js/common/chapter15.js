@@ -203,6 +203,36 @@ var bee = (function(bee){
 	}
 
 
+	//研究案例5_2: 发布订阅模式 jquery版本
+	bee.caseO5_2 = function(){
+
+		$(function(){
+			var ele = $(document);
+			//等同于订阅者
+			ele.on('king/red',function(e,info){
+				l('程咬金收到消息:'+info);
+			})
+			ele.on('king/red',function(e,info){
+				l('兰陵王收到消息:'+info);
+			})
+			//等同于发布者
+			ele.trigger('king/red','准备团战！');
+		})
+
+		//注意：这里的ele必须是选中有效的元素。$('')、$([]),虽然也是有on、trigger，但无效。原因参见下面的1）。
+		//另外，下面这个例子说明了几个有趣的现象：
+		//1）document、div是存在层级结构的，只有在其路径下才能触发。
+		//2）如果页面中有4个div元素，就意味着，会触发四次！
+
+		/*$(function(){
+			$(document).on('king/red',function(e,info){
+				l('程咬金收到消息:'+info);
+			})
+			$('div').trigger('king/red','准备团战！');
+		})*/
+	}
+
+
 	//研究案例6: 【BOSS】 星形拓扑结构
 	//即是信息的发布者，也是订阅者
 	//这种模式我在项目中的需求中悟出来的，就是有一个互斥的实例。

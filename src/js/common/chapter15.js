@@ -13,7 +13,8 @@
 
 var bee = (function(bee){
 
-	//研究案例1:我认为，函数其实是一个最最简单的观察者模式。 (利用函数)
+	//研究案例1: 观察者模式 最简单 (函数形式)
+	//我认为，函数其实是一个最最简单的观察者模式。 
 	bee.caseO1 = function(){
 		function fun(info){l('王者荣耀：'+info);}
 		fun('敌人5秒钟后达到战场，请做好准备');
@@ -23,7 +24,7 @@ var bee = (function(bee){
 	}
 
 
-	//研究案例2:简单的观察者模式  (利用数组)
+	//研究案例2:观察者模式 变化 (数组形式)
 	//这里例子的基础原理其实还是案例1中的那个。
 	//不同的是，这里一旦发布信息，有多个函数会被调用，并接受相同的讯息。
 	bee.caseO2 = function(){
@@ -42,7 +43,7 @@ var bee = (function(bee){
 		king.sendInfo('进攻敌方高地！');
 	}
 
-	//研究案例2_2:简单的观察者模式 (利用对象)
+	//研究案例2_2:观察者模式 变化 (对象形式)
 	bee.caseO2_2 = function(){
 		var observer = {
 			fun:function(info){
@@ -56,8 +57,8 @@ var bee = (function(bee){
 	}
 
 
-	//研究案例3:观察者模式 + 工厂
-	bee.caseO3 = function(){
+	//研究案例2_3:观察者模式 变化（使用工厂）
+	bee.caseO2_3 = function(){
 		var fun1 = function(info){l('程咬金收到信息：'+info);}
 		var fun2 = function(info){l('兰陵王收到信息：'+info);}
 		function kingFactory(){
@@ -92,13 +93,13 @@ var bee = (function(bee){
 	}
 
 
-	//研究案例4:观察者模式
+	//研究案例2_4:观察者模式 变化（使用工厂）
 	//上例中，是发布者在对观察者进行维护（增加、删除）
 	//本例中，正好相反，是订阅者，自己主动来执行。（入帮、退帮）（如果比喻成加入黑社会的话）
 	//
 	//这里使用了 Function.prototype 这样子的扩展，不是很好的做法
 	//另外 observers 也变成了透明的了，可以直接修改，没有上一种模式优秀。
-	bee.caseO4 = function(){
+	bee.caseO2_4 = function(){
 
 		//这里的工厂，其实可以用构造函数来替换~
 		/*function King(){this.observers=[];}
@@ -149,8 +150,8 @@ var bee = (function(bee){
 	}
 
 
-	//研究案例5: 发布订阅模式 （观察者 的特殊形式）
-	bee.caseO5 = function(){
+	//研究案例3: 发布订阅模式 （观察者 的特殊形式）
+	bee.caseO3 = function(){
 
 		//存储 信道和回调的数组
 		var arr = [];
@@ -205,8 +206,8 @@ var bee = (function(bee){
 	}
 
 
-	//研究案例5_2: 发布订阅模式 jquery版本
-	bee.caseO5_2 = function(){
+	//研究案例3_2: 发布订阅模式 jquery版本
+	bee.caseO3_2 = function(){
 
 		$(function(){
 			var ele = $(document);
@@ -235,9 +236,9 @@ var bee = (function(bee){
 	}
 
 
-	//研究案例5_3: 发布订阅模式 的真正作用！
-	//下面用的是伪代码。
-	bee.caseO5_3 = function(){
+	//研究案例3_3: 发布订阅模式 
+	//下面用的是伪代码，展示其作用：
+	bee.caseO3_3 = function(){
 
 		/* 最差劲的模式
 		 $.get('/xxx/xxx').then(data){
@@ -263,6 +264,75 @@ var bee = (function(bee){
 		 subscribe('getData',fun2);
 		 subscribe('getData',fun3);
 		*/
+	}
+
+
+	//研究案例4: 中介者模式
+	bee.caseO4 = function(){
+
+		//中介者工厂
+		function MediatorFactory(){
+			var components = {};
+			function addComponent(name, component) {
+			    components[name] = component;
+			};
+			function broadcast(event,info) {
+			    if (!event) return;
+			    for (var c in components) {
+			    	var fun = components[c]["on" + event];
+			    	if(typeof fun ==='function'){
+			    		fun(info);
+			    	}
+			    }
+			};  
+			function removeComponent(name) {
+			    if (name in components) delete components[name];
+			};
+			function getAllComponents(){return components;}
+
+			return {
+			    broadcast        : broadcast,
+			    addComponent     : addComponent,
+			    removeComponent  : removeComponent,
+			    getAllComponents : getAllComponents
+			};
+		}
+
+		//中介实例
+		var Mediator = MediatorFactory();
+		var king1 = {
+			onattack : function(info) {l("程咬金 进攻 "+(info||''))},
+			ondefense: function(info) {l("程咬金 防御 "+(info||''))}
+		}
+		var king2 = {
+			onattack : function(info) {l("兰陵王 进攻 "+(info||''))}
+		}
+
+		Mediator.addComponent('cyj', king1);
+		Mediator.addComponent('llw', king2);
+		Mediator.broadcast("attack",'地方高地');                
+		Mediator.broadcast('defense');           
+
+		l('=== 程咬金 下线 ===')
+		Mediator.removeComponent('cyj');           
+		Mediator.broadcast("attack");   
+
+		var Mediator2 = MediatorFactory();
+		Mediator2.addComponent('cyj', king1);
+		Mediator2.broadcast("attack"); 
+
+		//《js设计模式》一书中的中介者模式其实和发布订阅是一样的。
+		//我这个例子是参考了网上的例子，结合自己的风格写的。
+		//其实我认为，中介者模式还是“观察者模式”的变形。
+		//
+		//【BOSS】观察者，发布订阅模式，中介者模式的异同
+		//观察者，是直接对订阅他的函数进行处理
+		//发布订阅模式，抽象出“channel”概念，内部通过一个数组，维系了channel和函数的关系，使得channel和函数有了多对多的映射关系。
+		//中介者模式，内部也有一个数组，只是存放的不再是函数，而是对象。中介者发布一个通知的时候，列表中所有对象中包含这个对应的通知的方法都会被调用！
+		//
+		//【本例子可以优化的地方】
+		//1 列表中对象函数调用的时候，最好外层有绑定对象传入，这样子可以正确解析this。
+		//2 addComponent的第一个参数其实是内部对象的键值，可以考虑如何去重，或者同名方法的覆盖的问题！
 	}
 
 
@@ -748,6 +818,11 @@ var bee = (function(bee){
 
 	return bee;
 })(bee || {});
+
+
+
+
+
 
 
 

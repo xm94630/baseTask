@@ -936,6 +936,30 @@ function Mediator() {
 };
 
 Mediator.prototype = {
+	//订阅
+	Subscribe: function(topicName, fn, options, context) {
+		var options = options || {},
+			context = context || {},
+			topic = this.GetTopic(topicName),
+			sub = topic.AddSubscriber(fn, options, context);
+		return sub;
+	},
+	//发布
+	Publish: function(topicName) {
+		var args = Array.prototype.slice.call(arguments, 1),
+			topic = this.GetTopic(topicName);
+		args.push(topic);
+		this.GetTopic(topicName).Publish(args);
+	},
+	//移除订阅者
+	Remove: function(topicName, identifier) {
+		this.GetTopic(topicName).RemoveSubscriber(identifier);
+	},
+	//获取订阅者
+	GetSubscriber: function(identifier, topic) {
+		return this.GetTopic(topic || "").GetSubscriber(identifier);
+	},
+	//获取主题
 	GetTopic: function(namespace) {
 		var topic = this._topics,
 			namespaceHierarchy = namespace.split(":");
@@ -951,38 +975,11 @@ Mediator.prototype = {
 			}
 		}
 		return topic;
-	},
-
-	//订阅
-	Subscribe: function(topicName, fn, options, context) {
-		var options = options || {},
-			context = context || {},
-			topic = this.GetTopic(topicName),
-			sub = topic.AddSubscriber(fn, options, context);
-		return sub;
-	},
-
-	//获取订阅者
-	GetSubscriber: function(identifier, topic) {
-		return this.GetTopic(topic || "").GetSubscriber(identifier);
-	},
-
-	//移除订阅者
-	Remove: function(topicName, identifier) {
-		this.GetTopic(topicName).RemoveSubscriber(identifier);
-	},
-
-	//发布
-	Publish: function(topicName) {
-		var args = Array.prototype.slice.call(arguments, 1),
-			topic = this.GetTopic(topicName);
-		args.push(topic);
-		this.GetTopic(topicName).Publish(args);
 	}
 };
 
 
-var m = new Mediator()
+var m = new Mediator();
 m.Subscribe("inbox:messages:new",function(){l(111)});
 m.Subscribe("inbox:messages:new",function(){l(222)});
 m.Publish( "inbox");

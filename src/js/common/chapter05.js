@@ -57,8 +57,11 @@ var bee = (function(bee){
 		l(arr[0]);
 
 		l(this.toString());
+		
 		//+操作其实就是字符串的合并，默认也执行了this.toString()
+		//"[object Window]0"
 		l(this+0);
+
 		//除了+之外的运算，得到的结果为NaN
 		l(this/0);
 	}
@@ -440,7 +443,7 @@ var bee = (function(bee){
 	 * 研究案例21:字符串的乘法
 	 * 最后一例是比较奇葩的
 	 */
-	bee.caseE20 = function(){
+	bee.caseE21 = function(){
 		
 		l(10*10);
 		l(10*'10');
@@ -451,6 +454,106 @@ var bee = (function(bee){
 		l(''*'');
 	};
 
+	/* 
+	 * 研究案例22: this 指的是谁？
+	 */
+	bee.caseE22 = function(){
+		
+		function fun(){
+			var obj = {a:this};
+			l(obj.a);
+		}
+		fun();
+
+		//我们说，this指代的是谁，关键看的是外层的函数如何使用，
+		//fun是直接被调用的，那么this就是fun所在的作用域，也就是会fun所在的this
+		//fun所在的this,取决于fun外层的函数：这是一个被直接调用的函数，this指向window
+		//所以这里的this还是指向的是window!
+	};
+
+	/* 
+	 * 研究案例23: this 指的是谁？
+	 */
+	bee.caseE23 = function(){
+		
+		var arr = [];
+		arr.push({content:this});
+		l(arr[0].content)
+
+		//这里的this，在一个对象呢中，然后被作为参数传入到了arr中去。
+		//其实原则还是很简单，不过上面的例子确实很容易被push函数混淆。我们改成下面这个：
+		/*
+		var arr = [];
+		var obj = {content:this}; 
+		arr.push(obj);
+		l(arr[0].content)
+		*/
+		//这样子是不是比较明了了。this引用只取决于外层函数的使用！
+	};
+
+	/* 
+	 * 研究案例24: this 指的是谁？
+	 */
+	bee.caseE24 = function(){
+
+		function fun(){
+			var arr = [];
+			arr.push({content:this});
+			l(arr[0].content)
+			return {
+				xx:arr
+			}
+		}
+		
+		//这样子使用的话，this就是window，不管是不是在数组中，还是对象中！
+		var o = fun();
+
+		//当fun方法作为对象“方法”存在的时候
+		var yyy = {
+			key:fun
+		}
+		//方法被调用，this就是指该对象！
+		yyy.key();
+
+		//所以，无论this是被放到数组中，还是对象中，其值的特点是：
+		//1.依旧是动态的
+		//2.只取决于外层函数的使用形式
+	};
+
+	/* 
+	 * 研究案例25: this 指的是谁？
+	 * 很简单，不再细说
+	 */
+	bee.caseE25 = function(){
+
+		function fun(){
+			return [this];
+		}
+		l(fun())
+		l(fun.call('123'));
+	};
+
+
+	/* 
+	 * 研究案例26: this 指的是谁？【BOSS】
+	 */
+	bee.caseE26 = function(){
+		
+		var obj = (function(){
+			var topics = {}
+			function fun(key){
+				topics[key] = [{a:this}];
+				l('==>')
+				l(topics[key][0].a)
+				return this;
+			}
+			return {
+				fun:fun
+			}
+		})()
+		
+		l(obj.fun())
+	};
 
 	return bee;
 })(bee || {});

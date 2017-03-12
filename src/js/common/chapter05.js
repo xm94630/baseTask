@@ -535,7 +535,7 @@ var bee = (function(bee){
 
 
 	/* 
-	 * 研究案例26: this 指的是谁？【BOSS】
+	 * 研究案例26: this 指的是谁？
 	 */
 	bee.caseE26 = function(){
 		
@@ -555,8 +555,143 @@ var bee = (function(bee){
 		l(obj.fun())
 	};
 
+
+	/* 
+	 * 研究案例27: 构造函数中的行为
+	 */
+	bee.caseE27 = function(){
+	
+		function Shark(){
+			this.superclass = {a:111};
+			this.superclass.a = 222;
+		}
+		var s = new Shark;
+		l(s);
+		l(s.superclass.a);
+
+		//this指代实例本身，this.superclass是添加了属性（是一个对象）。
+		//this.superclass.a 是对这个属性（是一个对象）的属性，进行了值的设置。
+	}
+
+	/* 
+	 * 研究案例27_2: 上例变化
+	 */
+	bee.caseE27_2 = function(){
+
+		function xxx(){
+			this.superclass = {a:111};
+			this.superclass.a = 222;
+		}
+		var Shark=function(){
+			xxx();
+		}
+		var s = new Shark;
+		l(s);
+		l(window.superclass.a)
+
+		//如果构造函数中出现函数的调用，xxx函数中的this指代什么，只取决于xxx的使用方式。
+		//直接调用的话，就是window(关于这个点以后还需要讨论)
+	}
+
+	/* 
+	 * 研究案例27_3: 上例变化
+	 */
+	bee.caseE27_3 = function(){
+
+		function xxx(){
+			this.superclass = {a:111};
+			this.superclass.a = 222;
+		}
+		var Shark=function(){
+			xxx.call(this);
+		}
+		var s = new Shark;
+		l(s);
+		l(s.superclass.a);
+
+		//这个中模式下，等同于caseE27
+		//上例中出现问题是因为this,解析出了问题
+		//这里通过call传入了当前的函数作用域。当前函数作用域this，取决于所在函数的调用形式
+		//因为是new，所以就是指实例本身。
+	}
+
+	/* 
+	 * 研究案例27_4: 继续 （研究this） 【BOSS】
+	 */
+	bee.caseE27_4 = function(){
+
+		//注意本案例使用的使用，请 bee.caseE27_4() 这样子调用。
+		l('bee.caseE27_4 所在作用域的 this ===>');
+		//这样子，this就是指的是bee
+		l(this);
+
+		var kee = {};
+		kee.case = function(){
+
+			l('kee.case 所在作用域的 this ===>');
+			//这样子，this就是指的是kee
+			l(this);
+
+			function xx(){
+				l('xx 所在作用域的 this ===>');
+				l(this);
+			}
+
+			xx();
+			//xx.call(this);
+
+		}
+
+		kee.case();
+
+		//这个案例中，有函数的层层嵌套的结构：bee.caseE27_4 中有 kee.case， kee.case中有 xx函数
+		//虽然可有结构关系，但是，不代表this，也会有类似的继承关系，这个就大错特错了。
+		//我以前也得出一个this绑定策略的研究，结论是：
+		//它就是一个堆栈，首先入栈的是window，然后如果是“对象.方法”调用，则再次入栈这个“对象”，如果有new，再入栈“实例对象”，有call\apply，入栈它们的“指定对象”。
+		//
+		//这个结论是没有错的，但是还有一点最重要的，我要在这里补充！
+		//就是上面的这个堆栈，会止于“下一个函数”的出现！！！
+		//另外之意是：“下一个函数”的this，并不会继承“上个函数”中所绑定的this
+		//“下个函数”的this策略，依旧从一个全新的堆栈开始！！也就是栈底依然是：“window”!!
+	}
+
+
+
+	/* 
+	 * 研究案例28: this 指的是谁？
+	 */
+	/*bee.caseE28 = function(){
+		
+
+		function Shark(){
+			this.superclass.constructor(200);
+		}
+		function Fish(age){
+			this.age = age;
+		}
+		var fish = new Fish(100)
+		Shark.prototype.superclass = fish;
+		
+		var s = new Shark();
+		l(s);
+		l(s.age);
+		l(s.superclass.age);
+		l(fish)
+
+		function Shark(){
+			this.superclass = {a:111};
+			this.superclass.a = 222;
+		}
+	}*/
+
+
+
 	return bee;
 })(bee || {});
+
+
+
+
 
 
 

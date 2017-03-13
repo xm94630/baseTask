@@ -8,18 +8,11 @@ var bee = (function(bee){
 	//研究案例1: 装饰者 最简单
 	bee.caseP1 = function(){
 		l(2323)
-	}()
-
-
+	}
 
 
 	return bee;
 })(bee || {});
-
-
-
-
-
 
 
 

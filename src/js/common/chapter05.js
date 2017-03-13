@@ -718,30 +718,94 @@ var bee = (function(bee){
 		}*/
 	}
 
+	/* 
+	 * 研究案例27_5: this 是谁？
+	 */
+	bee.caseE27_5 = function(){
 
+		function xxx(){
+			return function yyy(){
+				l(this);
+			}
+		}
+
+		//等价于 (new xxx())();
+		//看样子new和函数的结合优先级很高哟~
+		//首先执行的是 (new xxx()) ，注意，通常，new Fish 和 new Fish() 是一样的，运算结合的时候，默认会带上后面那对括号
+		//如果有return 对象的行为，构造函数就会返回这个对象，而不是新建一个实例。
+		//这里返回的是一个函数，然后被调用了。根据我们之前的法则，一个新的函数执行的时候，
+		//都会从一个新的堆栈开始，栈底就是window，所以这个时候this就是window
+		new xxx()();
+		
+		//这个this是 yyy的实例。
+		//因为现在是（）中的表达式先执行，最后执行的是new 操作，故而this是实例。
+		new (xxx.apply({a:123}))();
+	}
+
+
+	// 研究案例29: this，简单的开始
+	// 这个例子是常见的构造函数，this当然就是实例本身啦~~
+	bee.caseE29 = function(){
+		function Fish(age){
+			this.age = age;
+			l(this);
+		}
+		var fish = new Fish(100);
+	}
+	
+	// 研究案例29_2: 变化
+	bee.caseE29 = function(){
+		function Fish(age){
+			this.age = age;
+			l(this);
+		}
+		var fish = new Fish(100);
+		//我们知道实例中有一个constructor属性，保持了对构造函数的引用
+		//如果我如下使用：
+		//这个构造函数Fish，其实并没有起到“构造新实例”的作用。
+		//为什么呢？因为这个构造函数并没有被new，而且是以对象的方法的形式被使用的
+		//所以函数中的this指的就是对象fish本身了！恰好这个对象就是实例本身
+		//所以这样子的写法，其实就是在处理实例本身。（这里修改了对象的age）
+		fish.constructor(200)
+	}
+
+	// 研究案例29_3: 变化
+	bee.caseE29 = function(){
+		function Fish(age){
+			this.age = age;
+			l(this);
+		}
+		var fish = new Fish(100);
+		//这里对构造函数使用了，new，所以产生一个新的实例fish2
+		//而fish实例本身没有发生变化~
+		var fish2 = new fish.constructor(200);
+		l(fish)
+		l(fish2)
+
+		//这系列的例子，还是印证了之前说的结论。
+		//关键看如何使用函数。
+	}
+
+
+	// 研究案例30: this
+	bee.caseE30 = function(){
+		var obj ={
+			obj2:{
+				obj3:{
+					fun:function(){
+						l(this===obj.obj2.obj3);
+					}
+				}
+			}
+		};
+		obj.obj2.obj3.fun();
+
+		//这里的用法，是对象方法的使用。
+		//this指代的就是离它最近的那个对象，这里就是指的是 obj.obj2.obj3。
+	}
 
 	return bee;
 })(bee || {});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

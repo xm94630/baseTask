@@ -273,36 +273,40 @@ var bee = (function(bee){
 		function Fish (){
 			this.a = 123;
 		}
+		var fish = new Fish();
 
-		var obj1= Object.create(new Fish());  //使用Fish的实例
+		var obj1= Object.create(fish);
 		var obj2= {a:123};
 
-		l(obj1.__proto__.__proto__);
-		l(obj2.__proto__);
+		l(obj1);
+		l(obj1.__proto__.__proto__.__proto__.__proto__ === null); //原型链的尽头
+		l(obj2.__proto__.__proto__ === null);  //原型链的尽头
 
-		l(obj1.constructor); //构造器使用是Fish
-		l(obj2.constructor);
+		l(obj1.constructor===Fish);    //构造器使用是Fish
+		l(obj2.constructor===Object);  //构造器使用是Object
+
+	}
+
+	/* 
+	 * 研究案例10:同上
+	 */
+	bee.caseF10_2 = function(){
 
 		function Fish (){
 			this.a = 123;
 		}
 
-		l('');
-		l('===>等效于');
-		l('');
-
 		function Jing (){}
 		Jing.prototype = new Fish();
+		var obj1= new Jing();  
 
-		var obj1= new Jing();  //使用Jing的实例
-		var obj2= {a:123};
-
-		l(obj1.__proto__.__proto__);
-		l(obj2.__proto__);
-
-		l(obj1.constructor); //构造器使用是Fish
-		l(obj2.constructor);
+		l(obj1.constructor===Fish);    //构造器使用是Fish
+	
+		//这个例子其实就是对 Object.create 原理的解释。
+		//不过自己在使用这个模式的时候，最好把构造函数调整过来。因为在这里其实应该是 Jing才是实例最直接的构造函数。
+		//然而对于上式子而言，确实是可以的，以为上式子没有这个Jing这个中间者出现。
 	}
+
 
 	/* 
 	 * 研究案例11:封装一个和 Object.create 等效的函数 createObject

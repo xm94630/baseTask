@@ -639,7 +639,6 @@ var bee = (function(bee){
 
 			xx();
 			//xx.call(this);
-
 		}
 
 		kee.case();
@@ -688,9 +687,15 @@ var bee = (function(bee){
 	/* 
 	 * 研究案例28: this 指的是谁？
 	 */
-	/*bee.caseE28 = function(){
+	bee.caseE28 = function(){
 		
-
+		//本案例主要是对 this.superclass.constructor 的理解
+		//通常构造函数中的内容会像：this.age = 123； 这样子的
+		//所以在这个例子中我就对使用 this.superclass 的方法 constructor 有点蒙圈。
+		//其实后来有对构造函数的原型进行扩展： Shark.prototype.superclass = fish;
+		//所以实例中是包含 superclass 属性的
+		//因为有new 操作，this 指代的是 实例。
+		//所以 this.superclass.constructor(200); 就是对实例对象的操作（函数调用）而已。
 		function Shark(){
 			this.superclass.constructor(200);
 		}
@@ -706,11 +711,12 @@ var bee = (function(bee){
 		l(s.superclass.age);
 		l(fish)
 
-		function Shark(){
-			this.superclass = {a:111};
-			this.superclass.a = 222;
-		}
-	}*/
+		//上式子简化下，其实就是类型下面：
+		/*function Shark(){
+			this.superclass = {a:111};  //这个是构造函数的通用写法
+			this.superclass.a = 222;    //这个就是给我困扰的地方，其实我应该要很熟悉这个样子的写法！
+		}*/
+	}
 
 
 

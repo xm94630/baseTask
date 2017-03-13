@@ -396,11 +396,12 @@ var bee = (function(bee){
 		var fish = new Fish('小鱼');
 
 		var Fish2 = function(){}
-		Fish2.prototype = Object.create(fish);
+		Fish2.prototype = Object.create(fish);  //这里使用 Fish2.prototype = fish; 也是可以的（这个还简单点）。
 		Fish2.prototype.constructor = Fish2;
 
 		var f = new Fish2();
-		l(f.constructor);
+		l(f)
+		l(f.constructor===Fish2);
 
 		//没错这个确实属于原型继承。但是并不是真正的意义上的继承！
 		//而我却一直以为这样子的写法就是所谓“继承了”
@@ -408,6 +409,11 @@ var bee = (function(bee){
 		//其实没有，这里只完成对Fish的实例的继承，并不是真正对“类”的继承啊！！！！
 		//这个我也是看 Object.create 文档的时候发现的！！！
 		//请看下一个案例！！
+		//
+		//2017-3-13 补充
+		//这里虽然继承了父级的一些内容，但是作为 Fish2 构造函数本身，并不具备个性化的实例的能力，也就是说
+		//下面这个的参数并不能生效...所以这样子是有问题的
+		l(new Fish2('我是一条全新的鱼'))
 	}
 
 	/* 

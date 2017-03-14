@@ -24,6 +24,8 @@ var bee = (function(bee){
         Fish.prototype.constructor = Fish;
         var f = new Fish(100);
         l(f);
+
+        //此案例原型链共有节点 3+1（后一个是null）
     }
 
 
@@ -45,6 +47,8 @@ var bee = (function(bee){
         Fish.prototype.constructor = Fish;
         var f = new Fish(100);
         l(f);
+
+        //此案例原型链共有节点 2+1（后一个是null）
     }
 
 
@@ -68,12 +72,15 @@ var bee = (function(bee){
         Fish.prototype.constructor = Fish;
         var f = new Fish(100,9);
         l(f);
+
+        //同上
     }
 
 
     /* 
      * 研究案例1_4: 标准原型继承 
      * 使用 Object.create + mixin 官方推荐
+     * 当然，这里还可以优化的是，比如，改函数如果调用的时候，忘记了new的处理。为了展示核心，其他细节都不处理了。
      */
     bee.caseP1_4 = function(){
         
@@ -92,7 +99,7 @@ var bee = (function(bee){
         var f = new Fish(100,9);
         l(f);
 
-        //当然，这里还可以优化的是，比如，改函数如果调用的时候，忘记了new的处理。为了展示核心，其他细节都不处理了。
+        //此案例原型链共有节点 3+1（后一个是null）
     }
 
 
@@ -120,6 +127,8 @@ var bee = (function(bee){
         Fish.prototype.constructor = Fish;
         var f = new Fish(100,9);
         l(f);
+
+        //此案例原型链共有节点 4+1（后一个是null）
     }
 
 
@@ -152,6 +161,8 @@ var bee = (function(bee){
         //为何它没有成为最好的继承方式呢？
         //原因就在于：
         //“f.constructor = Fish;”这个！因为如果我每次实例之后，需要调整其构造函数，这个是非常蠢的做法...
+        
+        //此案例原型链共有节点 2+1（后一个是null）
     }
 
 
@@ -216,7 +227,61 @@ var bee = (function(bee){
         //这个只是小问题啦~~
         //
         //而且接下来我们马上就会解决这个问题！
+        
+        //此案例原型链共有节点 3+1（后一个是null）
     }()
+
+
+    /* 
+     * 研究案例3_2: 上例变化
+     */
+    /*bee.caseP3_2 = function(){
+        
+        var Animal = function(age){
+            this.age = age;
+        }
+
+        Animal.prototype.run = function(){
+            l('run');
+        }
+
+        function extend(parentClass,options){
+            var fn = function(){
+                if(!(this instanceof fn)){throw new Error('missing new');}
+                var args = Array.prototype.slice.call(arguments,0);
+                args.unshift(parentClass.bind(this));
+                options.constructor.apply(this,args);
+            };
+            fn.prototype = Object.create(parentClass.prototype);
+            fn.prototype.constructor = fn;
+            
+            for(k in options){
+                if(k!=='constructor' && typeof options[k]==='function'){
+                    fn.prototype[k] = options[k];
+                }
+            }
+            return fn;
+        }
+
+        var Fish = extend(Animal,{
+            constructor:function(superClass,width){
+                superClass(9);
+                this.width = width;
+            },
+            swim:function(){
+                l('swimming');
+            }
+        });
+
+        var f = new Fish(100);
+
+        l(f)
+        l(f.age)
+        l(f.width)
+        l(f.constructor===Fish)
+
+
+    }*/
 
 
 

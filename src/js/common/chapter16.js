@@ -91,6 +91,8 @@ var bee = (function(bee){
         Fish.prototype.constructor = Fish;
         var f = new Fish(100,9);
         l(f);
+
+        //当然，这里还可以优化的是，比如，改函数如果调用的时候，忘记了new的处理。为了展示核心，其他细节都不处理了。
     }
 
 
@@ -154,44 +156,80 @@ var bee = (function(bee){
 
 
     /* 
-     * 研究案例3: 
+     * 研究案例3: 继承封装 【BOSS】
+     * 如何将1_4案例中经典继承封装成通用函数呢？
      */
     bee.caseP3 = function(){
-        
-
-    }()
-
-
-
-    /* 
-     * 研究案例1_6: 再变化 
-     */
-    /*bee.caseP1_6 = function(){
         
         var Animal = function(age){
             this.age = age;
         }
+
         Animal.prototype.run = function(){
             l('run');
         }
-        var Fish = function(width,age){
-            Animal.call(this,age)           //mixin
-            this.width = width;
+
+        function extend(parentClass,options){
+            var fn = function(){
+                if(!(this instanceof fn)){throw new Error('missing new');}
+                var args = Array.prototype.slice.call(arguments,0);
+                args.unshift(parentClass.bind(this));
+                options.constructor.apply(this,args);
+            };
+            fn.prototype = Object.create(parentClass.prototype);
+            fn.prototype.constructor = fn;
+            
+            for(k in options){
+                if(k!=='constructor' && typeof options[k]==='function'){
+                    fn.prototype[k] = options[k];
+                }
+            }
+            return fn;
         }
 
-        Object.setPrototype(Fish,);
+        var Fish = extend(Animal,{
+            //本来以为这个没有constructor会报错，但是意外的发现没有事！
+            //因为，这里 options 作为为一个对象，其默认的constructor就是 Object
+            //这个 options.constructor.apply(this,args); 执行的时候，等效于：
+            //Object.apply(this,args);
+            //这个调用的时候，会实例化一个新的对象，因为也没有赋值给别的变量，并没有什么副作用！
+            //因为这个话题，我还研究了 Object.apply 的用法，非常有意思，我会在别的地方列出来。
+            constructor:function(superClass,width){
+                superClass(9);
+                this.width = width;
+            },
+            swim:function(){
+                l('swimming');
+            }
+        });
 
-        Fish.prototype = Object.create(new Animal(88));  
-        Fish.prototype.constructor = Fish;
-        var f = new Fish(100,9);
-        l(f);
-    }()*/
+        var f = new Fish(100);
+
+        l(f)
+        l(f.age)
+        l(f.width)
+        l(f.constructor===Fish)
+
+        //这个案例非常有趣！！是对通用继承的优秀封装！
+        //唯一的缺憾就是：
+        //Fish 是对 extend中的 fn的引用，也就是log出来的时候，函数的name却还是fn。
+        //这个只是小问题啦~~
+        //
+        //而且接下来我们马上就会解决这个问题！
+    }()
+
 
 
 
 
 	return bee;
 })(bee || {});
+
+
+
+
+
+
 
 
 

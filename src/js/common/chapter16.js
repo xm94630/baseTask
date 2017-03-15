@@ -27,6 +27,7 @@ var bee = (function(bee){
         }
         Fish.prototype = new Animal(2);  //这里是Animal实例，Fish实例中含有父级的全部属性
         Fish.prototype.constructor = Fish;
+        Fish.prototype.swim = function(){l('swimming');}
         var f = new Fish(100);
         l(f);
 
@@ -48,8 +49,9 @@ var bee = (function(bee){
         var Fish = function(width){
             this.width = width;
         }
-        Fish.prototype = Animal.prototype;  //这里是Object实例，Fish实例中只含有父级“原型”上的全部属性（所以不包含age）
+        Fish.prototype = Animal.prototype;  //这里是Object实例，Fish实例中只含有父级“原型”上的全部属性（因此不包含age，所以这个继承有点问题）
         Fish.prototype.constructor = Fish;
+        Fish.prototype.swim = function(){l('swimming');}
         var f = new Fish(100);
         l(f);
 
@@ -73,12 +75,13 @@ var bee = (function(bee){
             Animal.call(this,age)           //mixin
             this.width = width;
         }
-        Fish.prototype = Animal.prototype;  //这里是Object实例，Fish实例中只含有父级“原型”上的全部属性（所以不包含age）
+        Fish.prototype = Animal.prototype;  //这里是Object实例，Fish实例中只含有父级“原型”上的全部属性（所以不包含age，这里ages属性是通过mixin进来的）
         Fish.prototype.constructor = Fish;
+        Fish.prototype.swim = function(){l('swimming');}
         var f = new Fish(100,9);
         l(f);
 
-        //同上
+        //同上例
     }
 
 
@@ -101,6 +104,7 @@ var bee = (function(bee){
         }
         Fish.prototype = Object.create(Animal.prototype);  //这样子和1_3已经非常类似了，只是在原型链上要多出 Animal实例 这个节点！
         Fish.prototype.constructor = Fish;
+        Fish.prototype.swim = function(){l('swimming');}
         var f = new Fish(100,9);
         l(f);
 
@@ -130,6 +134,7 @@ var bee = (function(bee){
         //2）既然已经有mixin了，age属性可以直接给出，完全没有必要去“new Animal(88)”一下，而且这个88的参数也显得有点多余。
         Fish.prototype = Object.create(new Animal(88));  
         Fish.prototype.constructor = Fish;
+        Fish.prototype.swim = function(){l('swimming');}
         var f = new Fish(100,9);
         l(f);
 
@@ -152,6 +157,7 @@ var bee = (function(bee){
             Animal.call(this,age)           //mixin
             this.width = width;
         }
+        Fish.prototype.swim = function(){l('swimming');}  //这个不会在log中出现！因为原型链被改变了。
 
         var f = new Fish(100,9);
         Object.setPrototypeOf(f,Animal.prototype);
@@ -193,13 +199,10 @@ var bee = (function(bee){
                 options.constructor.apply(this,args);
             };
             fn.prototype = Object.create(parentClass.prototype);
-            fn.prototype.constructor = fn;
-            
             for(k in options){
-                if(k!=='constructor' && typeof options[k]==='function'){
-                    fn.prototype[k] = options[k];
-                }
+                fn.prototype[k] = options[k];
             }
+            fn.prototype.constructor = fn;
             return fn;
         }
 
@@ -439,16 +442,27 @@ x.doThing()*/
 
 
 
+/*var King = function(age){
+    this.age = age;
+}
+King.prototype.run =function () {
+    console.log("run");
+}
 
-/*
-function baseClass(options) {
+
+l(new King(4));
+
+
+
+
+function defClass(options) {
     var fn = options.constructor;
     fn.prototype = options;
     return fn;
 }
 
-var Animal = baseClass({
-    constructor: function fn(age) {
+var Animal = defClass({
+    constructor: function(age) {
         this.age = age;
     },
     run: function () {

@@ -6,6 +6,11 @@
 
 var bee = (function(bee){
 
+
+    /**************************************************************
+    * 第一节 原型继承 
+    ***************************************************************/
+
     /* 
      * 研究案例1: 最简单的原型继承
      */
@@ -168,7 +173,7 @@ var bee = (function(bee){
 
     /* 
      * 研究案例3: 继承封装 【BOSS】
-     * 如何将1_4案例中经典继承封装成通用函数呢？
+     * 如何将1_4案例中经典继承封装成通用函数呢？见下：
      */
     bee.caseP3 = function(){
         
@@ -217,27 +222,27 @@ var bee = (function(bee){
         var f = new Fish(100);
 
         l(f)
-        l(f.age)
-        l(f.width)
-        l(f.constructor===Fish)
+        //l(f.age)
+        //l(f.width)
+        //l(f.constructor===Fish)
 
         //这个案例非常有趣！！是对通用继承的优秀封装！
         //唯一的缺憾就是：
         //Fish 是对 extend中的 fn的引用，也就是log出来的时候，函数的name却还是fn。
-        //这个只是小问题啦~~
+        //这个不算是问题啦~~
         //
-        //而且接下来我们马上就会解决这个问题！
+        //接下来我们来试着用另外的方法来解决这个问题
         
         //此案例原型链共有节点 3+1（后一个是null）
-    }()
+    }
 
 
     /* 
-     * 研究案例3_2: 上例变化
+     * 研究案例3_2: 上例变化 【失败】
      */
-    /*bee.caseP3_2 = function(){
+    bee.caseP3_2 = function(){
         
-        var Animal = function(age){
+        /*var Animal = function(age){
             this.age = age;
         }
 
@@ -245,25 +250,28 @@ var bee = (function(bee){
             l('run');
         }
 
-        function extend(parentClass,options){
-            var fn = function(){
-                if(!(this instanceof fn)){throw new Error('missing new');}
+        Function.prototype.extend = function (parentClass,options){
+            var that = this;
+
+            l('== 这里会报错，因为this不能被改变 ==')
+            this = function(){
+                if(!(this instanceof that)){throw new Error('missing new');}
                 var args = Array.prototype.slice.call(arguments,0);
                 args.unshift(parentClass.bind(this));
                 options.constructor.apply(this,args);
             };
-            fn.prototype = Object.create(parentClass.prototype);
-            fn.prototype.constructor = fn;
+            this.prototype = Object.create(parentClass.prototype);
+            this.prototype.constructor = this;
             
             for(k in options){
                 if(k!=='constructor' && typeof options[k]==='function'){
-                    fn.prototype[k] = options[k];
+                    this.prototype[k] = options[k];
                 }
             }
-            return fn;
         }
 
-        var Fish = extend(Animal,{
+        var Fish = function Fish(){};
+        Fish.extend(Animal,{
             constructor:function(superClass,width){
                 superClass(9);
                 this.width = width;
@@ -278,21 +286,75 @@ var bee = (function(bee){
         l(f)
         l(f.age)
         l(f.width)
-        l(f.constructor===Fish)
+        l(f.constructor===Fish)*/
+
+        //这个案例视图在Function的原型上啦扩展extend的方法，其实是不可行的。
+        //是因为我不了解this不可写这个特性。
+        //见下：
+    }
 
 
-    }*/
+    /* 
+     * 研究案例3_3: 不可改变的this
+     */
+    bee.caseP3_3 = function(){
+        /*function a(){
+            function b(){
+                function c(){
+                    this=1;
+                }
+            }
+        }*/
 
+        //这里改变this的引用就会出错。（在this上添加属性进行扩展是可以的）
+        //而且这个错误还不是运行时的，行为同语法错误，哪怕外层函数都还没有被调用，就会被报错。
+        //所以这里需要把代码注释起来。
+    }
+
+
+    /* 
+     * 研究案例4: es6 标准继承
+     */
+    bee.caseP4 = function(){
+
+        class Animal {
+          constructor(age) {
+            this.age = age;
+          }  
+          run() {
+            l('run')
+          }
+        }
+
+        class Fish extends Animal {
+          constructor(age,width) {
+            super(3);
+            this.age = age;
+            this.width = width;
+          } 
+          swim(){
+            l('swim')
+          }
+        }
+
+        var f = new Fish(9,100);
+        l(f);
+
+        //比较案例3，发现log得到的结构是完全一样的。差异很细微。
+    }
+
+
+
+
+    /**************************************************************
+    * 第二节 构造函数 
+    ***************************************************************/
 
 
 
 
 	return bee;
 })(bee || {});
-
-
-
-
 
 
 
@@ -331,8 +393,8 @@ l(f.constructor)
 
 
 
-/*
-function defclass(prototype) {
+
+/*function defclass(prototype) {
     var constructor = prototype.constructor;
     constructor.prototype = prototype;
     return constructor;
@@ -372,8 +434,29 @@ var SubClass = extend(BaseClass, {
 
 var x =   new BaseClass('xm')
 l(x)
-x.doThing()
+x.doThing()*/
 
-*/
+
+
+
+
+/*
+function baseClass(options) {
+    var fn = options.constructor;
+    fn.prototype = options;
+    return fn;
+}
+
+var Animal = baseClass({
+    constructor: function fn(age) {
+        this.age = age;
+    },
+    run: function () {
+        console.log("run");
+    }
+});
+
+var a = new Animal(4);
+l(a)*/
 
 

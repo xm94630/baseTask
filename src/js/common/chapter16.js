@@ -471,46 +471,55 @@ var bee = (function(bee){
     }
 
 
+    /* 
+     * 研究案例9: 类的继承【失败】【BOSS】
+     * 这个案例是我最初的设计思想，现在看上去非常的蠢。
+     * 不过介于失败的案例能够让我有更好的认知，也列于此
+     */
+    bee.caseP9 = function(){
+
+        //父级构造函数，这个没有问题
+        function Animal(age){
+            this.age = age;
+        }
+        Animal.prototype.run = function(){
+            l('run');
+        }
+
+        //这里问题大的去了。
+        //1）传入Fun1希望是在其函数体内mixin父级，但是其实我们不能在传入的函数体内做处理。所以 Fun1 传入是没有用的。
+        //2）如果 这个子类的函数，我们完全在 extend 内部构造（即这里的fn），那么 Fun1 自身的那些属性，方法如何配置？
+        //
+        //这个是我当时面临的问题。当然，这些问题都可以转换思路解决的。
+        //正确的解决方法，其实之前的案例中已经有了：
+        //Fun1的一些构造的信息，其实我们可以通过options配置对象传入！然后在内部组装这个函数。这是一个绝妙的思想！【BOSS】 
+        function extend(Fun1,Fun2){
+            var fn = function(){
+                var args = Array.prototype.slice.call(arguments,0);
+                Fun2.apply(this,args);
+            };
+            fn.prototype = Object.create(Fun2.prototype);
+            fn.prototype.constructor = fn;
+            fn.prototype.parent = Fun2;
+            return fn;
+        }
+
+        var Fish = function(width){
+            this.width = width;
+        };
+        Fish = extend(Fish,Animal);
+        //非常有趣的是，我当时其实已经孕育出，再传入第三个、第四个参数的思想，比如这里注释中的三个参数fun。
+        //只是我为何没有想到直接用一个对象呢？所以，后来我确实又进步了。
+        //Fish = extend(Fish,Animal,fun); 
+        var f = new Fish(100);
+        l(f)
+    }
+
 
 
 
 	return bee;
 })(bee || {});
-
-
-
-
-
-
-
-
-
-/*
-function extend(Fun1,Fun2){
-	Fun1 = function(){
-		var args = Array.prototype.slice.call(arguments,0);
-    Fun2.apply(this,args);
-	};
-	Fun1.prototype = Object.create(Fun2.prototype);
-	Fun1.prototype.constructor = Fun1;
-	Fun1.prototype.parent = Fun2;
-	return Fun1;
-}
-function Animal(height,weight){
-	this.height = height;
-	this.weight = weight;
-}
-Animal.prototype.run = function(){
-	l('running!');
-}
-var Fish;
-var Fish = extend(Fish,Animal,fun);
-var f = new Fish(100,200);
-l(f.height)
-l(f.weight)
-f.run()
-l(f.constructor)
-*/
 
 
 

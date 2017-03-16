@@ -1,5 +1,5 @@
 /*******************************
-* 第十六章 原型继承、mixin模式、装饰者模式
+* 第十六章 类的继承、类、mixin模式、装饰者模式
 * 这个三者其实关系还是比较紧密的，所以组合在一起处理
 * 之前已经对原型继承有不少案例了，这里还是会回顾一些
 ********************************/
@@ -8,11 +8,11 @@ var bee = (function(bee){
 
 
     /**************************************************************
-    * 第一节 原型继承 
+    * 第一节 类的继承 
     ***************************************************************/
 
     /* 
-     * 研究案例1: 最简单的原型继承
+     * 研究案例1: 最简单的 类的继承
      */
     bee.caseP1 = function(){
         
@@ -86,7 +86,7 @@ var bee = (function(bee){
 
 
     /* 
-     * 研究案例1_4: 标准原型继承 
+     * 研究案例1_4: 标准 类继承 
      * 使用 Object.create + mixin 官方推荐
      * 当然，这里还可以优化的是，比如，改函数如果调用的时候，忘记了new的处理。为了展示核心，其他细节都不处理了。
      */
@@ -178,7 +178,7 @@ var bee = (function(bee){
 
 
     /* 
-     * 研究案例3: 继承封装 【BOSS】
+     * 研究案例3: 类继承 封装 【BOSS】
      * 如何将1_4案例中经典继承封装成通用函数呢？见下：
      */
     bee.caseP3 = function(){
@@ -316,7 +316,7 @@ var bee = (function(bee){
 
 
     /* 
-     * 研究案例4: es6 标准继承
+     * 研究案例4: es6 标准 类的继承
      */
     bee.caseP4 = function(){
 
@@ -350,8 +350,77 @@ var bee = (function(bee){
 
 
     /**************************************************************
-    * 第二节 构造函数 
+    * 第二节 类、构造函数
     ***************************************************************/
+
+    /* 
+     * 研究案例5: 构造函数（类）
+     * 这个案例就是最简单的构造函数。
+     * 构造函数利用了原型继承的原理。注意，“原型继承”不代表就是“类的继承”。
+     * 当然，类、类的继承是以原型继承为基础基础的。
+     */
+    bee.caseP5 = function(){
+
+        var Animal = function(age){
+            this.age = age;
+        }
+        Animal.prototype.run =function () {
+            console.log("run");
+        }
+        var a = new Animal(4);
+        l(a);
+    }
+
+
+    /* 
+     * 研究案例6: 模拟es6 的class
+     */
+    bee.caseP6 = function(){
+
+        function defClass(options) {
+            var fn = options.constructor;
+            fn.prototype = options;
+            return fn;
+        }
+
+        var Animal = defClass({
+            constructor: function(age) {
+                this.age = age;
+            },
+            run: function () {
+                console.log("run");
+            }
+        });
+
+        var a = new Animal(4);
+        l(a)
+
+        //生成实例的结构和上例是完全一样的。只是构造函数的名字依旧是“constructor”，上例子中是“Animal”
+        //这个原因和 caseP3 是一样的。
+    }
+
+    /* 
+     * 研究案例7:es6 class
+     */
+    bee.caseP7 = function(){
+
+        class Animal {
+          constructor(age) {
+            this.age = age;
+          }  
+          run() {
+            l('run')
+          }
+        }
+
+        var a = new Animal(4);
+        l(a)
+    }
+
+
+
+
+
 
 
 
@@ -441,36 +510,5 @@ x.doThing()*/
 
 
 
-
-/*var King = function(age){
-    this.age = age;
-}
-King.prototype.run =function () {
-    console.log("run");
-}
-
-
-l(new King(4));
-
-
-
-
-function defClass(options) {
-    var fn = options.constructor;
-    fn.prototype = options;
-    return fn;
-}
-
-var Animal = defClass({
-    constructor: function(age) {
-        this.age = age;
-    },
-    run: function () {
-        console.log("run");
-    }
-});
-
-var a = new Animal(4);
-l(a)*/
 
 

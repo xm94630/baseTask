@@ -517,6 +517,145 @@ var bee = (function(bee){
 
 
 
+    /**************************************************************
+    * 第三节 mixin 模式
+    ***************************************************************/
+
+    /* 
+     * 研究案例10: mixin模式1
+     * 通过简单的属性复制
+     */
+    bee.caseP10 = function(){
+
+        var animal = {
+            age:4,
+            run:function(){l('run')},
+            eat:function(){l('eat')}
+        }
+        var fish = {
+            width:100
+        }
+        //通过属性复制，获取了animal的全部属性
+        for(var i in animal){
+            fish[i] = animal[i];
+        }
+        //使用extend 也是一样的道理
+        //$.extend(fish,animal);
+        l(fish);
+    }
+
+    /* 
+     * 研究案例11: mixin模式2
+     * 通过在构造函数中call另外一个构造函数
+     */
+    bee.caseP11 = function(){
+
+        function Animal(age){
+            this.age = age
+        }
+        function Fish(age,width){
+            Animal.call(this,age);
+            this.width = width;
+        }
+        var f = new Fish(4,100);
+        l(f);
+        //这个在之前的类的继承中已经多次出现了。
+    }
+
+
+    /* 
+     * 研究案例12: mixin模式3
+     * 通过在构造函数中call另外一个构造函数
+     */
+    bee.caseP11 = function(){
+
+        function Animal(age){
+            this.age = age
+        }
+        function Fish(age,width){
+            Animal.call(this,age);
+            this.width = width;
+        }
+        var f = new Fish(4,100);
+        l(f);
+        //这个在之前的类的继承中已经多次出现了。
+    }
+
+
+    /* 
+     * 研究案例12: mixin模式 
+     * 上面两个例子中的mixin模式都有使用
+     */
+    bee.caseP12 = function(){
+
+        var Animal = function(age){
+            this.age = age;
+        }
+        Animal.prototype.run = function(){
+            l('run');
+        }
+        var Fish = function(width,age){
+            Animal.call(this,age);        //混入1
+            this.width = width;
+        }
+        $.extend(Fish.prototype,Animal.prototype)   //混入2
+        Fish.prototype.constructor = Fish;
+        Fish.prototype.swim = function(){l('swimming');}
+        var f = new Fish(100,9);
+        l(f);
+
+        //这个案例虽然是讲 mixin 模式的
+        //但是同时也是 类的继承 的案例。同 caseP1_2 案例的结果是类似的。也就是说：
+        //$.extend(Fish.prototype,Animal.prototype) 和
+        //Fish.prototype = Animal.prototype;
+        //这两个行为是类似的
+    }
+
+    /* 
+     * 研究案例13: mixin模式 
+     * 控制混入的内容
+     */
+    bee.caseP13 = function(){
+
+        var Animal = function(age){this.age = age;}
+        Animal.prototype.run = function(){l('run');}
+        Animal.prototype.eat = function(){l('eat');}
+        var Fish = function(width,age){
+            Animal.call(this,age);        
+            this.width = width;
+        }
+
+        //自定义一个augment方法来进行 mixin
+        //augment的中文意思是补充、增强
+        function augment(obj1,obj2){
+            //如有第三个参数，说明是部分混入
+            if(arguments[2]){
+
+                for(var i=2;i<arguments.length;i++){
+                    obj1[arguments[i]] = obj2[arguments[i]]
+                }
+
+            //否则就是全部混入
+            }else{
+                $.extend(obj1,obj2);
+            }
+        }
+
+        //部分混入，这里只有混入eat这个属性
+        augment(Fish.prototype,Animal.prototype,'eat') 
+        //全部混入
+        //augment(Fish.prototype,Animal.prototype)   
+        
+        Fish.prototype.swim = function(){l('swimming');}
+        Fish.prototype.constructor = Fish;
+        var f = new Fish(100,9);
+        l(f);
+    }
+
+
+
+
+
 
 	return bee;
 })(bee || {});

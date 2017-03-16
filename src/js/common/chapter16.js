@@ -379,7 +379,11 @@ var bee = (function(bee){
 
         function defClass(options) {
             var fn = options.constructor;
-            fn.prototype = options;
+            //这里有一个妙处，就是这个options中的constructor，正好是我们想要的。
+            //话句话说，这个“constructor”属性的名字起的好~
+            //如果改成别的名字的，用法就没有那么巧妙了，所以，以后我的代码中也要有这样子的妙处！
+            //caseP3案例中的“constructor”也是一样的道理呢
+            fn.prototype = options;   
             return fn;
         }
 
@@ -400,7 +404,7 @@ var bee = (function(bee){
     }
 
     /* 
-     * 研究案例7:es6 class
+     * 研究案例7:es6 标准 class
      */
     bee.caseP7 = function(){
 
@@ -418,8 +422,53 @@ var bee = (function(bee){
     }
 
 
+    /* 
+     * 研究案例8: 类的继承
+     * 这个案例基于caseP6展开的。
+     */
+    bee.caseP8 = function(){
 
+        //caseP6 中已经讲解
+        function defclass(options) {
+            var constructor = options.constructor;
+            constructor.prototype = options;
+            return constructor;
+        }
 
+        function extend(superClass, options) {
+            var prototype = Object.create(superClass.prototype);
+            for (var key in options) prototype[key] = options[key];
+            //这里复用了defclass函数，比较巧妙
+            return defclass(prototype);
+        }
+
+        var Animal = defclass({
+            constructor: function (age) {
+                this.age = age;
+            },
+            run: function () {
+                l('run');
+            }
+        });
+
+        var Fish = extend(Animal, {
+            constructor: function (age,width) {
+                //mixin 父级的属性
+                //这里用法也是比较标准的做法，不过和案例 caseP3 相比，那个更加的巧妙些。
+                Animal.call(this, age);
+                //子类自己的属性
+                this.width = width;
+            },
+            swim:function(){
+                l('swim');
+            }
+        });
+
+        var f = new Fish(9,100);
+        l(f);
+
+        //这种写法，构造函数的名字，都是“constructor”，其他方面和 caseP3是一样的呢
+    }
 
 
 
@@ -466,47 +515,6 @@ l(f.constructor)
 
 
 
-/*function defclass(prototype) {
-    var constructor = prototype.constructor;
-    constructor.prototype = prototype;
-    return constructor;
-}
-
-function extend(constructor, keys) {
-    var prototype = Object.create(constructor.prototype);
-    for (var key in keys) prototype[key] = keys[key];
-    return defclass(prototype);
-}
-
-var BaseClass = defclass({
-    constructor: function (name) {
-        this.name = name;
-    },
-    doThing: function () {
-        console.log(this.name + " BaseClass doThing");
-    },
-    reportThing: function () {
-        console.log(this.name + " BaseClass reportThing");
-    }
-});
-
-var SubClass = extend(BaseClass, {
-    constructor: function (name) {
-        BaseClass.call(this, name);
-    },
-    doThing: function () {
-        console.log(this.name + " SubClass replacement doThing");
-    },
-    extraThing: function () {
-        console.log(this.name + " SubClass extraThing");
-    }
-});
-
-
-
-var x =   new BaseClass('xm')
-l(x)
-x.doThing()*/
 
 
 

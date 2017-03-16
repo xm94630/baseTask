@@ -611,6 +611,7 @@ var bee = (function(bee){
         //这两个行为是类似的
     }
 
+
     /* 
      * 研究案例13: mixin模式 
      * 控制混入的内容
@@ -651,6 +652,63 @@ var bee = (function(bee){
         var f = new Fish(100,9);
         l(f);
     }
+
+
+
+    /**************************************************************
+    * 第四节 装饰者 模式
+    ***************************************************************/
+
+    /* 
+     * 研究案例14: 最简单的装饰者
+     * 给一个对象添加一个属性，就是一种装饰行为~
+     * 装饰者和mixin，两者是非常类似的。
+     * 依我看来，我觉得 mixin 更加适合用在对 构造函数 的处理
+     * 而装饰者，就是对一个对象实例的修饰。
+     */
+    bee.caseP14 = function(){
+
+        var Animal = function(age){this.age = age;}
+        var animal = new Animal(4);
+        //装饰
+        animal.eat = function(){l('eat')}
+        l(animal)
+    }
+
+
+    /* 
+     * 研究案例15:装饰对象
+     */
+    bee.caseP15 = function(){
+
+        var Fish = function(age,width){
+            this.age = age;
+            this.width = width;
+        }
+        Fish.prototype.getAge = function(){
+            return this.age;
+        }
+        Fish.prototype.getWidth = function(){
+            return this.width;
+        }
+        var fish = new Fish(9,100);
+
+        //这个就是一个装饰者，会对一个对象进行装饰（新增属性、方法，修改属性和方法等等）
+        function modFishAge(fish){
+            var age = fish.getAge();
+            fish.getAge = function(){
+                return 100+age;
+            }
+        }
+
+        //装饰一次
+        modFishAge(fish);
+        //还可以继续装饰
+        modFishAge(fish);
+        //装饰之后的结果
+        l(fish.getAge());
+    }()
+
 
 
 

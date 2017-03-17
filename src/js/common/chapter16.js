@@ -707,8 +707,7 @@ var bee = (function(bee){
         modFishAge(fish);
         //装饰之后的结果
         l(fish.getAge());
-    }()
-
+    }
 
 
 

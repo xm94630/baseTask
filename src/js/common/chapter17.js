@@ -68,8 +68,28 @@ var bee = (function(bee){
         //不阻塞的行为发生在异步函数的使用
         //阻塞发生在回调函数触发的时候
         //了解这个对“异步”的掌握很是关键。
-    }()
+    }
 
+
+    /* 
+     * 研究案例3: 神奇！既有同步属性，又有异步属性的DOM操作
+     * DOM的操作，并不是异步的，而是即时生效的
+     * 但是，它在浏览器界面上的渲染，确实被延时了，为什么？这个机制主要是为了“渲染状态一致的DOM”
+     */
+    bee.caseQ3 = function(){
+
+        $(function(){
+            var div  = document.createElement('div');
+            var content = document.createTextNode('你好');
+            div.append(content);
+            document.body.append(div);
+            div.style.background = 'red';
+
+            var start = new Date;
+            //添加下面的语句会阻塞UI的渲染(延迟2秒)
+            //while(new Date - start<2000){}
+        });
+    }
 
 
 

@@ -548,172 +548,8 @@ var bee = (function(bee){
     }
 
 
-
-
     /**************************************************************
-    * 第三节 各种库中的 类的继承 的实现
-    * 到目前为止，我其实已经实现了自己的“类的继承”，那么是不是还有更加优秀的实现存在呢？
-    * 恰好，今天我在网上看到了一个名为 “fiber” 的继承库，它还拿很多实现进行了对比，所以我获得了很多的对比的素材
-    * 官网：https://github.com/linkedin/Fiber
-    * 对比：http://jsperf.com/js-inheritance-performance
-    * 在之后有空的时间里面，我会对“类的继承”进入深入的研究。
-    ***************************************************************/
-    /* 
-     * 研究案例9_1: fiber.js 类
-     */
-    bee.caseP9_1 = function(){
-
-        var Animal = Fiber.extend(function() {
-            return {
-                init: function(age) {
-                    this.age = age;
-
-                    /*****下面的这几个，不是这个fiber的特色，因为我之前的几个案例中，也完全可以加入这部分。****/
-                    //私有函数
-                    //function private(){l('myRun');};
-                    //特权函数（其实就是构造函数中的方法，通常的做法就是把这些函数外在原型上，比如这里的run函数）
-                    //this.myRun = private;
-                },
-                run: function(){
-                    l('run');
-                }
-            }
-        });
-        var animal = new Animal(4);
-        l(animal)
-
-        //相比 caseP8
-        //这里定义类的函数，传入的是一个函数，这个函数返回一个对象。
-        //其实目的都是类似的，略微觉得这里稍微麻烦了点。
-        //这里的 init 的功能和我之前的实现的 constructor 是一样的功能。似乎用 constructor 会更加巧妙点。
-        //init这个最后还会出现在实例上，不是很优雅的样子。
-        //
-        //另外，观察输出的结果，在原型链上会多一个层级
-    }
-
-    /* 
-     * 研究案例9_2: fiber.js 类的继承
-     */
-    bee.caseP9_2 = function(){
-
-        var Animal = Fiber.extend(function() {
-            return {
-                init: function(age) {
-                    this.age = age;
-                },
-                run: function(){
-                    l('run');
-                }
-            }
-        });
-        
-        var Fish = Animal.extend(function(superClass) {
-            return {
-                init: function(width,age) {
-
-                    //这个是调用父级的
-                    superClass.init(age);
-                    //可以使用call来绑定this
-                    //superClass.init.call(this,age);
-                    //也可以使用 Fiber.proxy 这个来完成 this 的绑定
-                    //Fiber.proxy(superClass, this).init();
-                    
-                    this.width = width;
-                },
-                run:function(){
-                    //调用父级的run;
-                    superClass.run.call(this);
-                    //自己的
-                    l('小鱼跑啊跑');
-                },
-                swim:function(){
-                    l('swim');
-                }
-            }
-        });
-
-        var f = new Fish(100,4);
-        l(f); 
-        //l(f.age)
-        //f.run() 
-        
-        //fiber 继承就显得有点怪怪的了。用了extend之后，对方法的继承确实做的不错。
-        //属性的继承是通过调用 superClass.init 这个方法。
-    }()
-
-
-    /* 
-     * 研究案例9_3: fiber.js 混入
-     */
-    bee.caseP9_3 = function(){
-
-        var Animal = Fiber.extend(function() {
-            return {
-                init: function(age) {
-                    this.age = age;
-                },
-                run: function(){
-                    l('run');
-                }
-            }
-        });
-
-        var animal = new Animal(4);        
-        l(animal)
-
-        //混入
-        Fiber.mixin(Animal, function(xxx) {
-            return  {
-                run: function() {
-                    //l(animal.__proto__.__proto__==xxx);  ==>true
-                    l('小鱼跑啊跑！');
-                }
-            }
-        });
-
-        animal.run();
-
-        //这里 mixin 这个单独的方法还是不错的，我之前的混入都是内部的实现，这里单独在提供一个的思路很好。
-        //这样子可以继承多个了（多重继承）。
-        //另外还有值得注意的是，实例化在前，mixin在后，可见，内部的实现，其实是修改了原型中的内容。
-        //
-        //最后 这里还传入了一个xxx的参数，我测试了下，正好是 animal.__proto__.__proto__
-        //这个传进来，是不是意义很大呢？
-    }
-
-
-    /* 
-     * 研究案例9_4: fiber.js 装饰者
-     */
-    bee.caseP9_4 = function(){
-
-        function AnimalWithPowerRun(base) {
-            return {
-                run: function() {
-                    l('run <=== 这个是被装饰的功能')
-                }
-            }
-        }
-
-        var Animal = Fiber.extend(function() {
-            return {
-                init: function(age) {
-                    this.age = age;
-                }
-            }
-        });
-        var animal = new Animal(4);        
-
-        Fiber.decorate(animal, AnimalWithPowerRun);
-
-        l(animal)
-        animal.run();
-    }
-
-
-
-    /**************************************************************
-    * 第四节 mixin 模式
+    * 第三节 mixin 模式
     ***************************************************************/
 
     /* 
@@ -903,6 +739,170 @@ var bee = (function(bee){
         //装饰之后的结果
         l(fish.getAge());
     }
+
+
+    /**************************************************************
+    * 第五节 综合练习
+    * 到目前为止，我其实已经实现了自己的“类的继承”(包含“mixin”、“装饰者”)，那么是不是还有更加优秀的实现存在呢？
+    * 恰好，今天我在网上看到了一个名为 “fiber” 的继承库，它还拿很多实现进行了对比，所以我获得了很多的对比的素材
+    * 官网：https://github.com/linkedin/Fiber
+    * 对比：http://jsperf.com/js-inheritance-performance
+    ***************************************************************/
+    /* 
+     * 研究案例16: fiber.js 类
+     */
+    bee.caseP16 = function(){
+
+        var Animal = Fiber.extend(function() {
+            return {
+                init: function(age) {
+                    this.age = age;
+
+                    /*****下面的这几个，不是这个fiber的特色，因为我之前的几个案例中，也完全可以加入这部分。****/
+                    //私有函数
+                    //function private(){l('myRun');};
+                    //特权函数（其实就是构造函数中的方法，通常的做法就是把这些函数外在原型上，比如这里的run函数）
+                    //this.myRun = private;
+                },
+                run: function(){
+                    l('run');
+                }
+            }
+        });
+        var animal = new Animal(4);
+        l(animal)
+
+        //相比 caseP8
+        //这里定义类的函数，传入的是一个函数，这个函数返回一个对象。
+        //其实目的都是类似的，略微觉得这里稍微麻烦了点。
+        //这里的 init 的功能和我之前的实现的 constructor 是一样的功能。似乎用 constructor 会更加巧妙点。
+        //init这个最后还会出现在实例上，不是很优雅的样子。
+        //
+        //另外，观察输出的结果，在原型链上会多一个层级
+    }
+
+    /* 
+     * 研究案例17: fiber.js 类的继承
+     */
+    bee.caseP17 = function(){
+
+        var Animal = Fiber.extend(function() {
+            return {
+                init: function(age) {
+                    this.age = age;
+                },
+                run: function(){
+                    l('run');
+                }
+            }
+        });
+        
+        var Fish = Animal.extend(function(superClass) {
+            return {
+                init: function(width,age) {
+
+                    //这个是调用父级的
+                    superClass.init(age);
+                    //可以使用call来绑定this
+                    //superClass.init.call(this,age);
+                    //也可以使用 Fiber.proxy 这个来完成 this 的绑定
+                    //Fiber.proxy(superClass, this).init();
+                    
+                    this.width = width;
+                },
+                run:function(){
+                    //调用父级的run;
+                    superClass.run.call(this);
+                    //自己的
+                    l('小鱼跑啊跑');
+                },
+                swim:function(){
+                    l('swim');
+                }
+            }
+        });
+
+        var f = new Fish(100,4);
+        l(f); 
+        //l(f.age)
+        //f.run() 
+        
+        //fiber 继承就显得有点怪怪的了。用了extend之后，对方法的继承确实做的不错。
+        //属性的继承是通过调用 superClass.init 这个方法。
+    }
+
+
+    /* 
+     * 研究案例18: fiber.js 混入
+     */
+    bee.caseP18 = function(){
+
+        var Animal = Fiber.extend(function() {
+            return {
+                init: function(age) {
+                    this.age = age;
+                },
+                run: function(){
+                    l('run');
+                }
+            }
+        });
+
+        var animal = new Animal(4);        
+        l(animal)
+
+        //混入
+        Fiber.mixin(Animal, function(xxx) {
+            return  {
+                run: function() {
+                    //l(animal.__proto__.__proto__==xxx);  ==>true
+                    l('小鱼跑啊跑！');
+                }
+            }
+        });
+
+        animal.run();
+
+        //这里 mixin 这个单独的方法还是不错的，我之前的混入都是内部的实现，这里单独在提供一个的思路很好。
+        //这样子可以继承多个了（多重继承）。
+        //另外还有值得注意的是，实例化在前，mixin在后，可见，内部的实现，其实是修改了原型中的内容。
+        //
+        //最后 这里还传入了一个xxx的参数，我测试了下，正好是 animal.__proto__.__proto__
+        //这个传进来，是不是意义很大呢？
+    }
+
+
+    /* 
+     * 研究案例19: fiber.js 装饰者
+     */
+    bee.caseP19 = function(){
+
+        function AnimalWithPowerRun(base) {
+            return {
+                run: function() {
+                    l('run <=== 这个是被装饰的功能')
+                }
+            }
+        }
+
+        var Animal = Fiber.extend(function() {
+            return {
+                init: function(age) {
+                    this.age = age;
+                }
+            }
+        });
+        var animal = new Animal(4);        
+
+        Fiber.decorate(animal, AnimalWithPowerRun);
+
+        l(animal)
+        animal.run();
+    }
+
+
+
+
 
 
 

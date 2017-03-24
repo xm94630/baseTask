@@ -610,6 +610,14 @@ var bee = (function(bee){
         var Fish = Animal.extend(function(superClass) {
             return {
                 init: function(width,age) {
+
+                    //这个是调用父级的
+                    superClass.init(age);
+                    //可以使用call来绑定this
+                    //superClass.init.call(this,age);
+                    //也可以使用 Fiber.proxy 这个来完成 this 的绑定
+                    //Fiber.proxy(superClass, this).init();
+                    
                     this.width = width;
                 },
                 run:function(){
@@ -626,16 +634,16 @@ var bee = (function(bee){
 
         var f = new Fish(100,4);
         l(f); 
+        //l(f.age)
         //f.run() 
         
         //fiber 继承就显得有点怪怪的了。用了extend之后，对方法的继承确实做的不错。
-        //但是属性呢？
-        //似乎无法通过 extend 来完成属性的继承。
-    }
+        //属性的继承是通过调用 superClass.init 这个方法。
+    }()
 
 
     /* 
-     * 研究案例9_3: 混入
+     * 研究案例9_3: fiber.js 混入
      */
     bee.caseP9_3 = function(){
 
@@ -673,6 +681,34 @@ var bee = (function(bee){
         //这个传进来，是不是意义很大呢？
     }
 
+
+    /* 
+     * 研究案例9_4: fiber.js 装饰者
+     */
+    bee.caseP9_4 = function(){
+
+        function AnimalWithPowerRun(base) {
+            return {
+                run: function() {
+                    l('run <=== 这个是被装饰的功能')
+                }
+            }
+        }
+
+        var Animal = Fiber.extend(function() {
+            return {
+                init: function(age) {
+                    this.age = age;
+                }
+            }
+        });
+        var animal = new Animal(4);        
+
+        Fiber.decorate(animal, AnimalWithPowerRun);
+
+        l(animal)
+        animal.run();
+    }
 
 
 

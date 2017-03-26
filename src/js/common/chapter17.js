@@ -119,6 +119,80 @@ var bee = (function(bee){
         });
     }
 
+    /* 
+     * 研究案例5: 嵌套异步（延时函数）的触发顺序（1）
+     * 这个比较简单
+     */
+    bee.caseQ5 = function(){
+        window.setTimeout(function(){      //a
+            l(1);
+            window.setTimeout(function(){  //c
+                l(3);
+            },0);
+        },0);
+        window.setTimeout(function(){      //b
+            l(2);
+            window.setTimeout(function(){  //d
+                l(4);
+            },0);
+        },0);
+        //先后输出1、2、3、4
+    }
+
+
+    /* 
+     * 研究案例6: 嵌套异步（延时函数）的触发顺序（2）
+     */
+    bee.caseQ6 = function(){
+        window.setTimeout(function(){      //a
+            l(1);
+            window.setTimeout(function(){  //c
+                l(3);
+            },1000);
+        },0);
+        window.setTimeout(function(){      //b
+            l(2);
+            window.setTimeout(function(){  //d
+                l(4);
+            },0);
+        },0);
+
+        //和上例相比，c中的延时变成一秒，这个时候，执行的顺序如何呢？
+        //其实就不好说了。
+        //这个就靠考虑，代码本身执行的时间了。
+        //如果本身运行很快（接近0），顺序是1、2、4、3
+        //如果很耗时，也许，这个1毫秒的延时已经进入触发状态，比d先触发。是1、2、3、4
+        //
+        //如何c中的1毫秒改成1000毫秒，目前这种情况下，代码本身执行的时间，一定是不会超过1000的
+        //所以结果必然是：1、2、4、3
+    }
+
+
+    /* 
+     * 研究案例7: 嵌套异步（延时函数）的触发顺序（3）
+     */
+    bee.caseQ7 = function(){
+        window.setTimeout(function(){      //a
+            l(1);
+            window.setTimeout(function(){  //c
+                l(3);
+            },1000);
+
+            //用于阻塞的循环
+            var s = new Date();
+            while(new Date - s<1100){}
+        },0);
+        window.setTimeout(function(){      //b
+            l(2);
+            window.setTimeout(function(){  //d
+                l(4);
+            },0);
+        },0);
+
+        //和上例相比，增加了阻塞部分，时间是1100毫秒，这样子c的触发依然会比d早。
+        //因为阻塞的作用“2”的输出也会被延后。
+    }
+
 
 
 

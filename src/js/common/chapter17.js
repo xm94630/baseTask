@@ -194,7 +194,59 @@ var bee = (function(bee){
     }
 
 
+    /* 
+     * 研究案例8: 何时称一个函数为异步的呢？
+     * 异步函数必然能通过以下测试
+     */
+    bee.caseQ8 = function(){
+        //异步函数
+        function fun (fn){
+            window.setTimeout(function(){
+                fn();
+            },0);
+        }
+        //同步函数
+        /*function fun (fn){
+            fn();
+        }*/
 
+        //测试
+        var a = 1;
+        fun(function(){
+            l(a==2);
+        });
+        a = 2;
+
+        //能通过这个测试的就是异步函数，否则就是同步函数。
+        //通常情况下我们的项目中没有这样子的测试案例让我们一目了然的知道，是不是异步函数。
+        //所以我们只有看看fun函数的源代码了。
+    }
+
+
+    /* 
+     * 研究案例9: 间或异步函数 
+     * 最简单的展示
+     */
+    bee.caseQ9 = function(){
+
+        function fun(a,fn){
+            if(a==1){
+                window.setTimeout(function(){
+                    fn();
+                },0)
+            }else{
+                fn();
+            }
+        }
+
+        //异步
+        fun(1,function(){l(111)});
+        //同步
+        fun(9,function(){l(222)});
+
+        //间或异步函数，就是有的时候表现为异步函数，有的时候表现为同步函数。
+        //取决于一些参数的变化啥的。
+    }
 
 
 
@@ -203,6 +255,25 @@ var bee = (function(bee){
 
     return bee;
 })(bee || {});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

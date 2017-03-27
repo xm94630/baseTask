@@ -282,6 +282,55 @@ var bee = (function(bee){
     }
 
 
+    /* 
+     * 研究案例10_2: “惰性”操作
+     * 实现类似的功能，如何替换上面的异步递归的反模式
+     * 答案就是“惰性”操作。
+     * “惰性”的概念，我们也不是一次出现了！
+     * 它的另外的作用，就是这里的应用场合。
+     */
+    bee.caseQ10_2 = function(){
+
+        var flag = 0,
+            n    = 0,
+            cbs  = [];
+
+        //模拟一个状态的改变
+        window.setTimeout(function(){
+            flag = 1;
+
+            //这个模拟的是，在flag状态改变之后，再次调用recursionFun
+            //这个时候，会把之前那些处理“惰性”状态的回调一次性全部都处理了。
+            recursionFun();
+        },3000);
+
+        //异步递归函数
+        function recursionFun(){
+            if(flag!==1){
+                ++n;
+                var cb = (function(n){
+                    return function(){
+                        l('递归循环发生'+n+'次')
+                    }
+                })(n);
+                cbs.push(cb);
+            }else{
+                cbs.forEach(function(v,i){
+                    v();
+                })
+                l('递归循环结束！')
+            }
+        } 
+
+        //这些调用的时候，flag的状态还没有被改变。
+        //但是即将处理的回调将被存到一个数组中。（这就是惰性的原理）
+        recursionFun();
+        recursionFun();
+        recursionFun();
+
+    }
+
+
 
 
 

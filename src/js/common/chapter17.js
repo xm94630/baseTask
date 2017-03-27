@@ -250,6 +250,38 @@ var bee = (function(bee){
 
 
 
+    /* 
+     * 研究案例10: 异步递归（反模式）
+     */
+    bee.caseQ10 = function(){
+
+        var flag = 0,
+            n    = 0;
+
+        //模拟一个状态的改变
+        window.setTimeout(function(){
+            flag = 1;
+        },3000);
+
+        //异步递归函数
+        function recursionFun(){
+            if(flag!==1){
+                l('递归循环发生'+(++n)+'次')
+                window.setTimeout(function(){
+                    recursionFun();
+                },1000);
+            }else{
+                l('递归循环结束！')
+            }
+        } 
+        recursionFun();
+
+        //这里递归函数，在等待（使用延时函数）一个异步状态的改变。
+        //延时函数的时间颗粒越小，得到改变信息更新的越精准。到时间设定为0的时候，状态的改变会马上得到通知。
+        //但是缺点也是非常明显的！这样子消耗的内存资源太大了。所以这个是一种反模式。
+    }
+
+
 
 
 

@@ -327,8 +327,81 @@ var bee = (function(bee){
         recursionFun();
         recursionFun();
         recursionFun();
-
     }
+
+
+    /* 
+     * 研究案例11: 异步回调中使用返回值 
+     */
+    bee.caseQ11 = function(){
+
+        function asyncFun(cb){
+
+            //这个是异步的，在回调中使用反值fish，没有问题
+            window.setTimeout(cb,10);
+            //这个是同步的，在回调中使用反值fish，就不行了，因为还没有return呢！
+            //cb();
+
+            return {
+                run:function(){
+                    l('run!');
+                }
+            }
+        }
+
+        var fish = asyncFun(function(){
+            fish.run();
+        });
+
+        //本例中，asyncFun中有 异步的行为，也有同步的返值行为。
+        //在异步函数的回调中使用返值，是没有什么问题的。为什么呢？
+        //因为同步行为比异步而言，总是要先发生的。所以，在异步回调中使用fish，没有啥问题！
+        //但是！但是！
+        //但是前提要件是 asyncFun 是一个完全的异步函数。
+        //因为有的时候，我们是会使用缓存技术的，也就是如果已经有过一次异步之后，之后就直接回使用缓存值。
+        //这个时候 asyncFun 就不是一个完全的异步函数了，而是一个间或异步函数（caseQ9 中提到了）
+        //读取缓存是一个同步的行为，这个时候回调就会出现问题！解决方案就是：
+        //即使是读取缓存这样子的同步行为，我也强制让他成为异步！
+        //window.setTimeout(function(){
+        //    cb();
+        //},0);
+    }
+
+
+
+
+
+    /*l('===>')
+
+    var chache = {}
+
+    function xxx(title,cb){
+        if(title in chache){
+            l('同步')
+            chache[title]();
+        }else{
+            chache[title] = cb;
+            setTimeout(function(){
+                l('异步')
+                cb();
+            },1000);
+        }
+    }
+
+    xxx('a',function(){
+        l('第一次调用');
+    })
+    xxx('a',function(){
+        l(123);
+    })*/
+
+
+
+
+
+
+
+
 
 
 

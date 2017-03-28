@@ -810,7 +810,42 @@ var bee = (function(bee){
 			    console.log('错误被捕获！')
 			})
 		}catch(e){console.log('xxx')}*/
+
+		//上面这些案例说明了，异步的函数的错误，通常只能在回调中进行处理。
+		//所以，在node中，异步回调函数中的第一个参数是一个错误的对象。
 	}
+
+
+	/* 
+	 * 研究案例31_3: 异步错误处理
+	 */
+	bee.caseD31_3 = function(){
+		
+		//上面caseD31_2说明了，异步的函数的错误，通常只能在回调中进行处理。
+		//所以，在node中，异步回调函数中的第一个参数是一个错误的对象。
+		//fs.readFile('xxx',function(err,data){})
+		//那么，在浏览器端如何处理？
+		
+		function $get(a,failureFun){
+			//模拟一个异步的错误
+			setTimeout(function(){
+				try{
+					throw new Error('服务器没有响应');
+				}catch(e){
+					failureFun(e);
+				}
+			},0);
+		}
+
+		$get('/data',function(e){
+			l('===>');
+			l(e);
+		});
+
+		//客户端的处理，其实是没像node那样子的统一。这是模拟jquery.get的做法。
+		//其实，其原理还是在异步函数的回调函数中处理错误。
+	}
+
 
 
 	return bee;
@@ -818,6 +853,10 @@ var bee = (function(bee){
 
 
 //bee.caseD27();
+
+
+
+
 
 
 

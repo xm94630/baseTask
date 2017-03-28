@@ -752,12 +752,76 @@ var bee = (function(bee){
 		//需要注意的是，catch(e) 中的e是不能缺省的。
 	}
 
+	/* 
+	 * 研究案例31: 异步错误
+	 */
+	bee.caseD31 = function(){
+		var xxx=  function (){
+		    return JSON.parse(',')
+		}
+		var yyy = function(){
+			
+		    //嵌套了几个异步的操作
+			window.setTimeout(function(){
+				window.setTimeout(function(){
+					window.setTimeout(function(){
+						xxx();
+					},0)
+				},0)
+			},0)
+
+		}
+		yyy();
+
+		//运行时错误中，有异步的内容的时候，抛出的堆栈是缺省的。
+		//只有从当前异步的错误触发，往后的才能被捕获。
+	}
+
+
+	/* 
+	 * 研究案例31_2: 异步错误 如何捕获？
+	 */
+	bee.caseD31_2 = function(){
+		
+		//对异步函数（window.setTimeout），进行捕获，是失败的。
+		try{
+			window.setTimeout(function(){
+				JSON.parse(',')
+			},0)
+		}catch(e){
+			l(e);
+		}
+
+		//还有在异步函数的回调中进行捕获才是可以的。
+		window.setTimeout(function(){
+			try{
+				JSON.parse(',')
+			}catch(e){
+				l(e);
+			}
+		},0)
+
+		//当然也不是所有的异步函数都是不能被捕获，也有特例。
+		//比如下面这个node的代码中的 fs.watch 本身是一个异步的。
+		//但是它也有同步的特性，比如第一个参数是不存在的文件，这个错误是同步的就能被捕获。
+		/*var fs = require('fs');
+		try{
+			fs.watch('不存在的文件.js',function(){
+			    console.log('错误被捕获！')
+			})
+		}catch(e){console.log('xxx')}*/
+	}
+
 
 	return bee;
 })(bee || {});
 
 
 //bee.caseD27();
+
+
+
+
 
 
 

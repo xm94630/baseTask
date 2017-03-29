@@ -211,9 +211,56 @@ var bee = (function(bee){
     }
 
 
+    /* 
+     * 研究案例9: 【BOSS】解决之前一直困扰我的一个重要问题！
+     * 这里将发布订阅模式和js的事件系统（其中addEventListener也是一个发布订阅模式）进行了结合。
+     * 发布订阅模式，其实是很简单的，我很久之前就已经明白这个道理。
+     * 当时，唯独让我困惑的是 jquery 的 triger:
+     * $ele.triger('click');
+     * 我一直想，为何能手动的触发click的事件呢？我一直怀疑，但是 triger 确实做到了。另一方面，
+     * 点击事件，确实也能触发回调。
+     *
+     * 到底是怎么回事呢？
+     *
+     * 如今，我才知道了原理：其实针对于浏览器的那种默认的事件（如click）,事件分发系统做了两手的准备，
+     * 一方面把回调放到 handler 中存储，另外用原生的 addEventListener 进行了代理！！
+     * 所以，emiter可以手动触发。而鼠标的点击事件，就可以触发addEventListener中的回调！
+     */
+    bee.caseR9 = function(){
+
+        //用发布订阅者模式实现的 事件分发系统
+        var Emiter = {
+            on : function(name,fun){
+                if(!this.handler[name]){
+                    this.handler[name] = [];
+                }
+                this.handler[name].push(fun);
+
+                //重点原理：
+                //如果是事件的名字是浏览器中的默认的事件，比如这里的click，需要使用默认的 addEventListener
+                if(name="click"){
+                    //相当于用 addEventListener 来代理 on：
+                    this.addEventListener(name,fun);
+                }
+            },
+            handler:{},
+            emiter:function(name){
+                this.handler[name].forEach(function(fn){
+                    fn();
+                }); 
+            }
+        };
+
+        window.onload = function() {
+            var ele = document.getElementById('myBtn');
+            ele = $.extend(ele,Emiter);
+            ele.on('click',function(){l('1')})
+            ele.on('click',function(){l('2')})
+            ele.emiter('click')
+        }
+    }
+
     
-
-
 
 
 

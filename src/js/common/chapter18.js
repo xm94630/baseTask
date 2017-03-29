@@ -60,6 +60,7 @@ var bee = (function(bee){
 
     /* 
      * 研究案例4:一个元素中绑定多个处理事件 [错误案例]
+     * onclick 是属性的形式，给他多次赋值的话，就会被覆盖。
      */
     bee.caseR4 = function(){
 
@@ -81,6 +82,7 @@ var bee = (function(bee){
 
     /* 
      * 研究案例5:一个元素中绑定多个处理事件 [正确案例]
+     * 上例要正确的运行，只能这样子处理。
      */
     bee.caseR5 = function(){
 
@@ -100,12 +102,116 @@ var bee = (function(bee){
                 l(this)
             }
         }
+
+        //这样子写的话，总归不是很美观，addEventListener 可以来优化
     }
 
 
+    /* 
+     * 研究案例6: ele.addEventListener VS ele.onclick  
+     */
+    bee.caseR6 = function(){
+
+        window.onload = function() {
+            var ele = document.getElementById('myBtn');
+            ele.addEventListener('click',fun1);
+            ele.addEventListener('click',fun2);
+            function fun1(){
+                l(111)
+                l(this)
+            }
+            function fun2(){
+                l(222)
+                l(this)
+            }
+        }
+
+        //addEventListener 就高级多了，允许绑定多个事件！
+        //它属于“分布式事件”的处理方式。说白了，就是发布订阅模式。（发布订阅模式也可能是“分布式事件”的处理方式之一）
+        //在发布订阅模式中，多个订阅者可以绑定同一个“信道”，比如这里的“click”。
+        //
+        //这里的是this是谁呢？关键看 fun1 函数在 addEventListener 中如何被使用的。
+        //addEventListener是系统默认的函数，不方便看源码了。不过从结果中，我们就可以知道，它被绑定到ele上了 ~
+    }
 
 
+    /* 
+     * 研究案例7: ele.addEventListener VS ele.onclick  
+     * 这个案例说明，两者都可以绑定行为，而且他们之前不会相互干涉和覆盖。
+     */
+    bee.caseR7 = function(){
 
+        window.onload = function() {
+            var ele = document.getElementById('myBtn');
+            ele.addEventListener('click',fun1);
+            ele.addEventListener('click',fun1);
+            ele.addEventListener('click',fun2);
+            function fun1(){
+                l(111)
+                l(this)
+            }
+            function fun2(){
+                l(222)
+                l(this)
+            }
+            ele.onclick = function(){
+                l(333)
+                l(this)
+            }
+        }
+
+        //那么原理是什么呢？
+        //我认为，addEventListener 和 onclick 都是纯js中 独立的事件处理器系统。
+        //当浏览器中有一个事件产生的时候，都会自动去调度这些处理器。
+    }
+
+
+    /* 
+     * 研究案例8: addEventListener 和 onclick 原理（模拟）
+     */
+    bee.caseR8 = function(){
+
+        ele = {
+            onclick : function(){},
+            addEventListener : function(name,fun){
+                if(!this.handler[name]){
+                    this.handler[name] = [];
+                }
+                this.handler[name].push(fun);
+            },
+            handler:{},
+            emiter:function(name){
+                this.handler[name].forEach(function(fn){
+                    fn();
+                }); 
+            }
+        };
+
+        //事件绑定1
+        ele.onclick = function(e){l('onclick!');}
+        //事件绑定2
+        ele.addEventListener('click',function(){l('addEventListener_1!')})
+        ele.addEventListener('click',function(){l('addEventListener_2!')})
+
+        //事件触发
+        //这个我们是手动触发的。对于浏览器的事件而言，浏览器在事件发生的时候，就会自动去调用。
+        l('==>');
+        window.setTimeout(function(){
+            ele.onclick();
+            ele.emiter('click');
+        },1000);
+
+        //这个只是一个实现机制的模拟，和真实实现肯定是不一样的，但是也能说明其原理。
+        //事件绑定的两种方法中，第一种是直接改变了方法的内容，第二种是调用其方法。
+        //从调用角度看，第一种对应的是“直接调用”，所以多次对 onclick 进行赋值的时候，以最后一次为准。
+        //第二种对应的是“调用了其他的函数”，比如这里的emiter。
+        //
+        //我也可以改变 addEventListener 这个函数！ 但是对用用户来说，它的实现就是个黑盒子。你不知道它内部的发布订阅系统的实现逻辑。
+        //比如把变量存到那个地方。
+    }
+
+
+    
 
 
 

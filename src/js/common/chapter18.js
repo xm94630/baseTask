@@ -5,6 +5,10 @@
 var bee = (function(bee){
 
 
+    /**************************************************************
+    * 第一节 浏览器的默认事件
+    ***************************************************************/
+
     /* 
      * 研究案例1: 最简单的事件
      * onload的事件是由浏览器自己触发的
@@ -166,12 +170,26 @@ var bee = (function(bee){
     }
 
 
+
+
+    /**************************************************************
+    * 第二节 事件化对象（原理：发布订阅模式）
+    * 结合浏览器的默认事件，使用发布订阅模式可以构建更加优雅的事件处理系统。
+    * 这里要知道几个概念
+    * 1）事件化对象：继承了“发布订阅模式的接口”的对象
+    * 2）module：一个储存数据的对象，在其内容发生改变的时候能够发布事件，这样子的对象
+    * 就是module。module是特殊的“事件化对象”。
+    * 3) MVC： module、view、control 构成了MVC。其中 module 更新的时候，发布事件，
+    * 通知view发生改变。
+    ***************************************************************/
+
     /* 
      * 研究案例8: addEventListener 和 onclick 原理（模拟）
      */
     bee.caseR8 = function(){
 
-        ele = {
+        //事件化对象
+        var ele = {
             onclick : function(){},
             addEventListener : function(name,fun){
                 if(!this.handler[name]){
@@ -229,6 +247,7 @@ var bee = (function(bee){
     bee.caseR9 = function(){
 
         //用发布订阅者模式实现的 事件分发系统
+        //当对象继承了它，就成为“事件化对象”
         var Emiter = {
             on : function(name,fun){
                 if(!this.handler[name]){
@@ -253,6 +272,7 @@ var bee = (function(bee){
 
         window.onload = function() {
             var ele = document.getElementById('myBtn');
+            //ele成为事件化对象
             ele = $.extend(ele,Emiter);
             ele.on('click',function(){l('1')})
             ele.on('click',function(){l('2')})

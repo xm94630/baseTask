@@ -403,7 +403,66 @@ var bee = (function(bee){
         //1）事件回调中，不是简单的一个回调，可以新增有用的参数，比如，对moudle本身的引用，改变的是哪个键值。
         //2）能否有嵌套的集合
         //3）如何规避“事件循环”的负面影响？这个也是需要思考的。
+        //4) 有命名空间的事件名称
+        //5) ...
+        
+        //完成上面这些，你就可以写一个库了
     }
+
+
+    /* 
+     * 研究案例10: 事件循环 
+     * 当事件循环是同步的时候，就是一个死循环。
+     * 不过，为了避免上述的噩耗，我这里用setTimeout走了异步，
+     * 这样子就避免了死循环。
+     */
+    bee.caseR10 = function(){
+
+        //这里将之前案例中的Emiter的实现，由简单的对象改成了工厂
+        //我的之前的章节中也讲了工厂。他能提供独立的一个新的实例。
+        var Emiter = {
+            create:function(){
+                return {
+                    on : function(name,fun){
+                        if(!this.handler[name]){
+                            this.handler[name] = [];
+                        }
+                        this.handler[name].push(fun);
+                    },
+                    handler:{},
+                    emiter:function(name){
+                        this.handler[name] && this.handler[name].forEach(function(fn){
+                            fn();
+                        }); 
+                    }
+                }
+            }
+        };
+
+        //生成一个事件化对象
+        var eModule = $.extend({},Emiter.create());
+
+        //绑定事件
+        eModule.on('xxx',function(){
+            l('触发一次');
+            setTimeout(function(){
+
+                //事件的回调中再次触发了事件，这样子就是“事件的循环”。
+                eModule.emiter('xxx');
+            },1000)
+        });
+
+        //启动
+        eModule.emiter('xxx');
+
+        //结论，同步的事件循环是一定要避免的，这个是事件循环的一个噩耗。
+        //异步的，就避免了这样子的噩耗。
+        //由此可见，处理成异步的，是解决“事件循环”负面影响的一个重要方法呢？
+        //当然还有更多的方法，需要思考的。
+        //这里为了展示，仅仅列出一种。
+    }
+
+
 
 
 

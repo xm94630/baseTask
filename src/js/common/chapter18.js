@@ -181,6 +181,7 @@ var bee = (function(bee){
     * 就是module。module是特殊的“事件化对象”。
     * 3) MVC： module、view、control 构成了MVC。其中 module 更新的时候，发布事件，
     * 通知view发生改变。
+    * 4）事件化集合（数组），由“事件化对象”集合组成的事件化对象。
     ***************************************************************/
 
     /* 
@@ -248,6 +249,7 @@ var bee = (function(bee){
 
         //用发布订阅者模式实现的 事件分发系统
         //当对象继承了它，就成为“事件化对象”
+        //这里只是简单的实现（事件取消啥的都没有实现，够说明就行）
         var Emiter = {
             on : function(name,fun){
                 if(!this.handler[name]){
@@ -281,6 +283,60 @@ var bee = (function(bee){
     }
 
     
+
+
+    /**************************************************************
+    * 第三节 Module
+    ***************************************************************/
+
+    /* 
+     * 研究案例10: 一个简单的 module
+     */
+    bee.caseR10 = function(){
+
+        var Emiter = {
+            on : function(name,fun){
+                if(!this.handler[name]){
+                    this.handler[name] = [];
+                }
+                this.handler[name].push(fun);
+            },
+            handler:{},
+            emiter:function(name){
+                this.handler[name].forEach(function(fn){
+                    fn();
+                }); 
+            }
+        };
+
+        function Module(data){
+            var module = {
+                data:data,
+                set:function(key,v){
+                    var oleValue = this.data[key]
+                    if(oleValue!==v){
+                        this.emiter('change');
+                        this.data[key] = v;
+                    }
+                }
+            };
+            module = $.extend(module,Emiter);
+            return module;
+        }
+
+        var m = Module({a:123});
+        m.on('change',function(){
+            l('被改变啦~');
+        })
+
+        //module数据没有改变，不触发change事件
+        //m.set('a',123);
+        
+        //module数据改变，触发chang事件
+        m.set('a',100);
+        m.set('a',101);
+    }
+
 
 
 

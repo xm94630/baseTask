@@ -229,6 +229,9 @@ var bee = (function(bee){
     * 4）事件化模型，用“事件化”的思想的一种架构。
     * 5) MVC： module、view、control 构成了MVC。其中 module 更新的时候，发布事件，
     * 通知view发生改变。MCV也是事件化模型的一种
+    * 6）事件循环：如果一个对象的事件，触发了一些列的事件，最后又导致了自身的对象的改变。
+    * 这就是“事件循环”，如果这个循环是同步的，那就和死循环无异。但是我们有时候又需要这种特性，
+    * 所以如何来解决这对矛盾，是一个可以研究的课题。
     ***************************************************************/
 
     /* 
@@ -298,7 +301,7 @@ var bee = (function(bee){
             },
             handler:{},
             emiter:function(name){
-                this.handler[name].forEach(function(fn){
+                this.handler[name] && this.handler[name].forEach(function(fn){
                     fn();
                 }); 
             }
@@ -308,8 +311,8 @@ var bee = (function(bee){
             var module = {
                 data:data,
                 set:function(key,v){
-                    var oleValue = this.data[key]
-                    if(oleValue!==v){
+                    var oldValue = this.data[key]
+                    if(oldValue!==v){
                         this.emiter('change');
                         this.data[key] = v;
                     }
@@ -330,6 +333,76 @@ var bee = (function(bee){
         //module数据改变，触发chang事件
         m.set('a',100);
         m.set('a',101);
+    }
+
+
+    /* 
+     * 研究案例10: 一个简单的 集合
+     */
+    bee.caseR10 = function(){
+
+        //这里将之前案例中的Emiter的实现，由简单的对象改成了工厂
+        //我的之前的章节中也讲了工厂。他能提供独立的一个新的实例。
+        var Emiter = {
+            create:function(){
+                return {
+                    on : function(name,fun){
+                        if(!this.handler[name]){
+                            this.handler[name] = [];
+                        }
+                        this.handler[name].push(fun);
+                    },
+                    handler:{},
+                    emiter:function(name){
+                        this.handler[name] && this.handler[name].forEach(function(fn){
+                            fn();
+                        }); 
+                    }
+                }
+            }
+        };
+
+        function Module(data){
+            var module = {
+                parent:null,  //新增
+                data:data,
+                set:function(key,v){
+                    var oldValue = this.data[key]
+                    if(oldValue!==v){
+                        this.emiter('change');
+                        this.parent && this.parent.emiter('change'); //如果有父级，则通知父级（即集合）
+                        this.data[key] = v;
+                    }
+                }
+            };
+            module = $.extend(module,Emiter.create());
+            return module;
+        }
+
+        function Collection(data){
+            var collection = {
+                data:data
+            };
+            //为集合中每一个module添加对集合本身的引用
+            collection.data.forEach(function(m){
+                m.parent = collection;
+            })
+            collection = $.extend(collection,Emiter.create());
+            return collection;
+        }
+
+        var m1    = Module({a:111});
+        var collection = Collection([m1]);
+        collection.on('change',function(){
+            l('集合发生了改变！');
+        });
+        m1.set('a',100);
+
+
+        //这个只是最最简单的一个演示，可以优化的东西还有很多：
+        //1）事件回调中，不是简单的一个回调，可以新增有用的参数，比如，对moudle本身的引用，改变的是哪个键值。
+        //2）能否有嵌套的集合
+        //3）如何规避“事件循环”的负面影响？这个也是需要思考的。
     }
 
 

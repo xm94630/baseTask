@@ -1,6 +1,7 @@
 /*******************************
 * 第四章 细碎知识点
 * 原型、位操作
+* js异常处理
 ********************************/
 
 var bee = (function(bee){
@@ -682,12 +683,245 @@ var bee = (function(bee){
 
 
 
+	/**************************************************************
+	* js异常处理
+	***************************************************************/
+
+	/* 
+	 * 研究案例29: 未捕获异常 之 语法错误
+	 */
+	bee.caseD29 = function(){
+		/*var fish = {
+			age:1;
+			name:'xx';
+		}*/
+
+		//语法错误，这种错误不同于运行时错误。错误马上回被抛出，即使是在未调用的函数中出现。
+	}
+
+
+	/* 
+	 * 研究案例29_2: 未捕获异常 之 js运行时错误
+	 * 运行时错误只有在运行的时候出现问题，才会出错。
+	 */
+	bee.caseD29_2 = function(){
+		var xxx=  function (){
+		    return JSON.parse(',')
+		}
+		var yyy = function(){
+		    xxx();
+		}
+		yyy();
+
+		//未捕获的运行时错误会被抛出，js环境生成一个有用的堆栈轨迹。
+		//我们可以观察下这个案例中的堆栈轨迹。
+		//
+		//这个案例还是单页的js出错，如果涉及到跨js文件的，会稍微复杂点点。
+	}
+
+
+	/* 
+	 * 研究案例30: catch捕获异常 之 语法错误
+	 */
+	bee.caseD30 = function(){
+		
+		/*try{
+			, //这个是错误的语法
+		}catch(e){
+			l('语法有问题哦！')
+		}*/
+
+		//语法错误无法用catch捕获。
+	}
+
+
+	/* 
+	 * 研究案例30_2: catch捕获异常 之 运行时错误
+	 */
+	bee.caseD30_2 = function(){
+		
+		try{
+			JSON.parse(',')
+		}catch(e){
+			l(e)
+			l(typeof e)
+			l('错误被捕获');
+		}
+
+		//运行时错误被catch捕获。
+		//需要注意的是，catch(e) 中的e是不能缺省的。
+	}
+
+
+	/* 
+	 * 研究案例30_3: catch 是反模式
+	 */
+	bee.caseD30_3 = function(){
+
+		try{
+			throw 'xx';  //他会忽略掉错误之后的代码
+			alert('这里的将不会被执行！');
+		}catch(e){
+			l('有报错');
+		}
+		l('结束啦~');
+	}
+
+
+	/* 
+	 * 研究案例31: 异步错误
+	 */
+	bee.caseD31 = function(){
+		var xxx=  function (){
+		    return JSON.parse(',')
+		}
+		var yyy = function(){
+			
+		    //嵌套了几个异步的操作
+			window.setTimeout(function(){
+				window.setTimeout(function(){
+					window.setTimeout(function(){
+						xxx();
+					},0)
+				},0)
+			},0)
+
+		}
+		yyy();
+
+		//运行时错误中，有异步的内容的时候，抛出的堆栈是缺省的。
+		//只有从当前异步的错误触发，往后的才能被捕获。
+	}
+
+
+	/* 
+	 * 研究案例31_2: 异步错误 如何捕获？
+	 */
+	bee.caseD31_2 = function(){
+		
+		//对异步函数（window.setTimeout），进行捕获，是失败的。
+		try{
+			window.setTimeout(function(){
+				JSON.parse(',')
+			},0)
+		}catch(e){
+			l(e);
+		}
+
+		//还有在异步函数的回调中进行捕获才是可以的。
+		window.setTimeout(function(){
+			try{
+				JSON.parse(',')
+			}catch(e){
+				l(e);
+			}
+		},0)
+
+		//当然也不是所有的异步函数都是不能被捕获，也有特例。
+		//比如下面这个node的代码中的 fs.watch 本身是一个异步的。
+		//但是它也有同步的特性，比如第一个参数是不存在的文件，这个错误是同步的就能被捕获。
+		/*var fs = require('fs');
+		try{
+			fs.watch('不存在的文件.js',function(){
+			    console.log('错误被捕获！')
+			})
+		}catch(e){console.log('xxx')}*/
+
+		//上面这些案例说明了，异步的函数的错误，通常只能在回调中进行处理。
+		//所以，在node中，异步回调函数中的第一个参数是一个错误的对象。
+	}
+
+
+	/* 
+	 * 研究案例31_3: 异步错误处理
+	 */
+	bee.caseD31_3 = function(){
+		
+		//上面caseD31_2说明了，异步的函数的错误，通常只能在回调中进行处理。
+		//所以，在node中，异步回调函数中的第一个参数是一个错误的对象。
+		//fs.readFile('xxx',function(err,data){})
+		//那么，在浏览器端如何处理？
+		
+		function $get(a,failureFun){
+			//模拟一个异步的错误
+			setTimeout(function(){
+				try{
+					throw new Error('服务器没有响应');
+				}catch(e){
+					failureFun(e);
+				}
+			},0);
+		}
+
+		$get('/data',function(e){
+			l('===>');
+			l(e);
+		});
+
+		//接口变化
+		/*$get('/data',{
+			failure:function(e){
+				l('===>');
+				l(e);
+			}
+		});*/
+
+		//客户端的处理，其实是没像node那样子的统一。这是模拟jquery.get的做法。
+		//其实，其原理还是在异步函数的回调函数中处理错误。
+		//
+		//回调中抛出的错误，由调用回调的那个人来处理异常。
+	}
+
+
+	/* 
+	 * 研究案例32: 忽略 未捕获的错误
+	 */
+	bee.caseD32 = function(){
+
+		//注意，这个是一定要放在前面的。
+		//另外，这个错误仅限于运行时错误，不包含语法错误。语法错误不能捕获，也不能忽略。
+		window.onerror = function(err){
+			l('这个错误会被忽略 ==> '+err)			
+			return true;
+		}
+		JSON.parse(',');
+
+		//window.onerror 除了可以忽略错误之外，还可以把错误的信息进行个性化的处理。
+		//（比如发送错误数据到指定的服务器这样子的处理）
+		//
+		//在node中，也有 uncaughtException事件 和 Domain事件化对象 来处理全局异常处理。
+	}
+
+
+	/* 
+	 * 研究案例33: 错误处理的最佳实践 —— throw
+	 */
+	bee.caseD33 = function(){
+		//两者的用法几乎一样的
+		throw '错啦！';
+		//throw new Error('错啦！');
+
+		//总结：关于错误的处理的最佳实践是什么？
+		//答案只有一个，抛出（throw），不要使用try...catch!
+		//抛出，也分成两种情况：
+		//1）一种就是因为“未捕获”，而被浏览器自动抛出（就是我们常见的）。
+		//2）一种是类似node中的异步操作中的回调函数，已经把错误对象捕获好了（没有捕获的时候为null）
+		//  你要做的就是，判断是否为null，然后手动的抛出！！
+	}
+
+
+
 
 	return bee;
 })(bee || {});
 
 
 //bee.caseD27();
+
+
+
+
+
 
 
 

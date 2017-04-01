@@ -173,7 +173,7 @@ var bee = (function(bee){
 	* 惰性链 
 	********************************/
 
-	//研究案例7: 尚未被调用的函数的形式（1） 
+	//研究案例7: 尚未被调用的函数的形式
 	//在学习惰性链之前要知道这个概念——就是那些迟迟没有执行的函数
 	bee.caseM7 = function(){
 
@@ -187,7 +187,7 @@ var bee = (function(bee){
 		//rxjs中的 observable 这个定义，就要数组、异步函数队列的概念，大概也可以从这里延伸开来
 		var arr = [fun1];
 
-		//3) 闭包
+		//3) 函数中的函数（闭包）
 		var fun2 = function(){
 			var text = "嘻嘻"
 			return function(){
@@ -196,21 +196,33 @@ var bee = (function(bee){
 		}
 		//这里就保存了一个为执行的函数，其实是一个闭包。
 		//fun2()还是一个函数~
-		fun2();
-	}
-
-	//研究案例8: 尚未被调用的函数的形式（2）
-	bee.caseM8 = function(){
-		
-		var obj = {king:'程咬金'}
-		var fun = function(){
-			return this.king;
-		}
-
-		//这里的fun2也是未调用的状态
-		var fun2 = fun.bind(0);
 		l(fun2());
 	}
+
+	//研究案例7_2: 函数中的函数
+	bee.caseM7_2 = function(){
+		
+		var obj = {king:'程咬金'}
+		var getName = function(){
+			l(this.king);
+		}
+
+		//这里的fun也是未调用的状态
+		var fun = getName.bind(obj);
+		fun();
+	}
+
+
+	//研究案例8:函数中的函数变化  _.compose
+	bee.caseM8 = function(){
+		function fun1(){l(1);}
+		function fun2(){l(2);}
+		var fun = _.compose(fun2,fun1); //从右到左，执行函数
+		fun();
+
+		//可见 _.compose 和 bind 一样，都有“惰”的特性
+	}
+
 
 	//研究案例9: 数组中的函数(1)
 	bee.caseM9 = function(){

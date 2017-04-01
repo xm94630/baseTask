@@ -216,15 +216,39 @@ var bee = (function(bee){
             constructor:function(superClass,width){
                 superClass(9);
                 this.width = width;
+
+                //这里案例中，可以继承上级属性和方法，但是如果实现“多态”的话，目前只有属性可以做到。
+                //对于方法呢？本案例确实没有实现，可能认为下面的做法是可以的：
+                /*this.run = function(){
+                    superClass.prototype.run.call();
+                }*/
+                //其实是不对的，看之前的代码：args.unshift(parentClass.bind(this));
+                //也就是说 传过来的 superClass，其实不是原先的那个，而是被 bind 包装了的。
+                //所以其原型上的内容（run）也就不存在。
+                //不过，如果硬是要这样子做，对代码调整下，也是可以实现的。只是有点丑陋。
+                //或者把 superPrototype 也带过来？有没有更好的呢？可以思考！
+                //
+                //补充：这个问题，我觉得好解决
+                //首先，把函数放在这里是不合适的。因为，按照这里的设计，构造器中的只有属性。
+                //见swim下方的run函数
             },
             swim:function(){
                 l('swimming');
             }
+
+            //这样子是可以的~ 只是 Animal.prototype.run 这样子的写法，看上去丑丑的
+            //如果，这里的extend 第二个参数是函数的形式（而不是这里的对象的形式），就可以用参数的形式把
+            //Animal.prototype 传过来，这样子也是个不错的手法。
+            /*,run:function(){
+                Animal.prototype.run.call(this); //这里的this是实例对象f
+                l('小鱼跑啊跑');
+            }*/
         });
 
         var f = new Fish(100);
 
         l(f)
+        //f.run()
         //l(f.age)
         //l(f.width)
         //l(f.constructor===Fish)
@@ -458,10 +482,18 @@ var bee = (function(bee){
                 Animal.call(this, age);
                 //子类自己的属性
                 this.width = width;
+
+                
             },
             swim:function(){
                 l('swim');
             }
+
+            //可以在 run 方法中利用父级的方法
+            /*,run:function(){
+                Animal.prototype.run.call(this);
+                l('小鱼跑啊跑');
+            }*/
         });
 
         var f = new Fish(9,100);
@@ -469,6 +501,409 @@ var bee = (function(bee){
 
         //这种写法，构造函数的名字，都是“constructor”，其他方面和 caseP3是一样的呢
     }
+
+
+    /* 
+     * 研究案例9: 类的继承【失败】【BOSS】
+     * 这个案例是我最初的设计思想，现在看上去非常的蠢。
+     * 不过介于失败的案例能够让我有更好的认知，也列于此
+     */
+    bee.caseP9 = function(){
+
+        //父级构造函数，这个没有问题
+        function Animal(age){
+            this.age = age;
+        }
+        Animal.prototype.run = function(){
+            l('run');
+        }
+
+        //这里问题大的去了。
+        //1）传入Fun1希望是在其函数体内mixin父级，但是其实我们不能在传入的函数体内做处理。所以 Fun1 传入是没有用的。
+        //2）如果 这个子类的函数，我们完全在 extend 内部构造（即这里的fn），那么 Fun1 自身的那些属性，方法如何配置？
+        //
+        //这个是我当时面临的问题。当然，这些问题都可以转换思路解决的。
+        //正确的解决方法，其实之前的案例中已经有了：
+        //Fun1的一些构造的信息，其实我们可以通过options配置对象传入！然后在内部组装这个函数。这是一个绝妙的思想！【BOSS】 
+        function extend(Fun1,Fun2){
+            var fn = function(){
+                var args = Array.prototype.slice.call(arguments,0);
+                Fun2.apply(this,args);
+            };
+            fn.prototype = Object.create(Fun2.prototype);
+            fn.prototype.constructor = fn;
+            fn.prototype.parent = Fun2;
+            return fn;
+        }
+
+        var Fish = function(width){
+            this.width = width;
+        };
+        Fish = extend(Fish,Animal);
+        //非常有趣的是，我当时其实已经孕育出，再传入第三个、第四个参数的思想，比如这里注释中的三个参数fun。
+        //只是我为何没有想到直接用一个对象呢？所以，后来我确实又进步了。
+        //Fish = extend(Fish,Animal,fun); 
+        var f = new Fish(100);
+        l(f)
+    }
+
+
+    /**************************************************************
+    * 第三节 mixin 模式
+    ***************************************************************/
+
+    /* 
+     * 研究案例10: mixin模式1
+     * 通过简单的属性复制
+     */
+    bee.caseP10 = function(){
+
+        var animal = {
+            age:4,
+            run:function(){l('run')},
+            eat:function(){l('eat')}
+        }
+        var fish = {
+            width:100
+        }
+        //通过属性复制，获取了animal的全部属性
+        for(var i in animal){
+            fish[i] = animal[i];
+        }
+        //使用extend 也是一样的道理
+        //$.extend(fish,animal);
+        l(fish);
+    }
+
+    /* 
+     * 研究案例11: mixin模式2
+     * 通过在构造函数中call另外一个构造函数
+     */
+    bee.caseP11 = function(){
+
+        function Animal(age){
+            this.age = age
+        }
+        function Fish(age,width){
+            Animal.call(this,age);
+            this.width = width;
+        }
+        var f = new Fish(4,100);
+        l(f);
+        //这个在之前的类的继承中已经多次出现了。
+    }
+
+
+    /* 
+     * 研究案例12: mixin模式3
+     * 通过在构造函数中call另外一个构造函数
+     */
+    bee.caseP11 = function(){
+
+        function Animal(age){
+            this.age = age
+        }
+        function Fish(age,width){
+            Animal.call(this,age);
+            this.width = width;
+        }
+        var f = new Fish(4,100);
+        l(f);
+        //这个在之前的类的继承中已经多次出现了。
+    }
+
+
+    /* 
+     * 研究案例12: mixin模式 
+     * 上面两个例子中的mixin模式都有使用
+     */
+    bee.caseP12 = function(){
+
+        var Animal = function(age){
+            this.age = age;
+        }
+        Animal.prototype.run = function(){
+            l('run');
+        }
+        var Fish = function(width,age){
+            Animal.call(this,age);        //混入1
+            this.width = width;
+        }
+        $.extend(Fish.prototype,Animal.prototype)   //混入2
+        Fish.prototype.constructor = Fish;
+        Fish.prototype.swim = function(){l('swimming');}
+        var f = new Fish(100,9);
+        l(f);
+
+        //这个案例虽然是讲 mixin 模式的
+        //但是同时也是 类的继承 的案例。同 caseP1_2 案例的结果是类似的。也就是说：
+        //$.extend(Fish.prototype,Animal.prototype) 和
+        //Fish.prototype = Animal.prototype;
+        //这两个行为是类似的
+    }
+
+
+    /* 
+     * 研究案例13: mixin模式 
+     * 控制混入的内容
+     */
+    bee.caseP13 = function(){
+
+        var Animal = function(age){this.age = age;}
+        Animal.prototype.run = function(){l('run');}
+        Animal.prototype.eat = function(){l('eat');}
+        var Fish = function(width,age){
+            Animal.call(this,age);        
+            this.width = width;
+        }
+
+        //自定义一个augment方法来进行 mixin
+        //augment的中文意思是补充、增强
+        function augment(obj1,obj2){
+            //如有第三个参数，说明是部分混入
+            if(arguments[2]){
+
+                for(var i=2;i<arguments.length;i++){
+                    obj1[arguments[i]] = obj2[arguments[i]]
+                }
+
+            //否则就是全部混入
+            }else{
+                $.extend(obj1,obj2);
+            }
+        }
+
+        //部分混入，这里只有混入eat这个属性
+        augment(Fish.prototype,Animal.prototype,'eat') 
+        //全部混入
+        //augment(Fish.prototype,Animal.prototype)   
+        
+        Fish.prototype.swim = function(){l('swimming');}
+        Fish.prototype.constructor = Fish;
+        var f = new Fish(100,9);
+        l(f);
+    }
+
+
+
+    /**************************************************************
+    * 第四节 装饰者 模式
+    ***************************************************************/
+
+    /* 
+     * 研究案例14: 最简单的装饰者
+     * 给一个对象添加一个属性，就是一种装饰行为~
+     * 装饰者和mixin，两者是非常类似的。
+     * 依我看来，我觉得 mixin 更加适合用在对 构造函数 的处理
+     * 而装饰者，就是对一个对象实例的修饰。
+     */
+    bee.caseP14 = function(){
+
+        var Animal = function(age){this.age = age;}
+        var animal = new Animal(4);
+        //装饰
+        animal.eat = function(){l('eat')}
+        l(animal)
+    }
+
+
+    /* 
+     * 研究案例15:装饰对象
+     */
+    bee.caseP15 = function(){
+
+        var Fish = function(age,width){
+            this.age = age;
+            this.width = width;
+        }
+        Fish.prototype.getAge = function(){
+            return this.age;
+        }
+        Fish.prototype.getWidth = function(){
+            return this.width;
+        }
+        var fish = new Fish(9,100);
+
+        //这个就是一个装饰者，会对一个对象进行装饰（新增属性、方法，修改属性和方法等等）
+        function modFishAge(fish){
+            var age = fish.getAge();
+            fish.getAge = function(){
+                return 100+age;
+            }
+        }
+
+        //装饰一次
+        modFishAge(fish);
+        //还可以继续装饰
+        modFishAge(fish);
+        //装饰之后的结果
+        l(fish.getAge());
+    }
+
+
+    /**************************************************************
+    * 第五节 综合练习
+    * 到目前为止，我其实已经实现了自己的“类的继承”(包含“mixin”、“装饰者”)，那么是不是还有更加优秀的实现存在呢？
+    * 恰好，今天我在网上看到了一个名为 “fiber” 的继承库，它还拿很多实现进行了对比，所以我获得了很多的对比的素材
+    * 官网：https://github.com/linkedin/Fiber
+    * 对比：http://jsperf.com/js-inheritance-performance
+    ***************************************************************/
+    /* 
+     * 研究案例16: fiber.js 类
+     */
+    bee.caseP16 = function(){
+
+        var Animal = Fiber.extend(function() {
+            return {
+                init: function(age) {
+                    this.age = age;
+
+                    /*****下面的这几个，不是这个fiber的特色，因为我之前的几个案例中，也完全可以加入这部分。****/
+                    //私有函数
+                    //function private(){l('myRun');};
+                    //特权函数（其实就是构造函数中的方法，通常的做法就是把这些函数外在原型上，比如这里的run函数）
+                    //this.myRun = private;
+                },
+                run: function(){
+                    l('run');
+                }
+            }
+        });
+        var animal = new Animal(4);
+        l(animal)
+
+        //相比 caseP8
+        //这里定义类的函数，传入的是一个函数，这个函数返回一个对象。
+        //其实目的都是类似的，略微觉得这里稍微麻烦了点。
+        //这里的 init 的功能和我之前的实现的 constructor 是一样的功能。似乎用 constructor 会更加巧妙点。
+        //init这个最后还会出现在实例上，不是很优雅的样子。
+        //
+        //另外，观察输出的结果，在原型链上会多一个层级
+    }
+
+    /* 
+     * 研究案例17: fiber.js 类的继承
+     */
+    bee.caseP17 = function(){
+
+        var Animal = Fiber.extend(function() {
+            return {
+                init: function(age) {
+                    this.age = age;
+                },
+                run: function(){
+                    l('run');
+                }
+            }
+        });
+        
+        var Fish = Animal.extend(function(superClass) {
+            return {
+                init: function(width,age) {
+
+                    //这个是调用父级的
+                    superClass.init(age);
+                    //可以使用call来绑定this
+                    //superClass.init.call(this,age);
+                    //也可以使用 Fiber.proxy 这个来完成 this 的绑定
+                    //Fiber.proxy(superClass, this).init();
+                    
+                    this.width = width;
+                },
+                run:function(){
+                    //调用父级的run;
+                    superClass.run.call(this);
+                    //自己的
+                    l('小鱼跑啊跑');
+                },
+                swim:function(){
+                    l('swim');
+                }
+            }
+        });
+
+        var f = new Fish(100,4);
+        l(f); 
+        //l(f.age)
+        //f.run() 
+        
+        //fiber 继承就显得有点怪怪的了。用了extend之后，对方法的继承确实做的不错。
+        //属性的继承是通过调用 superClass.init 这个方法。
+    }
+
+
+    /* 
+     * 研究案例18: fiber.js 混入
+     */
+    bee.caseP18 = function(){
+
+        var Animal = Fiber.extend(function() {
+            return {
+                init: function(age) {
+                    this.age = age;
+                },
+                run: function(){
+                    l('run');
+                }
+            }
+        });
+
+        var animal = new Animal(4);        
+        l(animal)
+
+        //混入
+        Fiber.mixin(Animal, function(xxx) {
+            return  {
+                run: function() {
+                    //l(animal.__proto__.__proto__==xxx);  ==>true
+                    l('小鱼跑啊跑！');
+                }
+            }
+        });
+
+        animal.run();
+
+        //这里 mixin 这个单独的方法还是不错的，我之前的混入都是内部的实现，这里单独在提供一个的思路很好。
+        //这样子可以继承多个了（多重继承）。
+        //另外还有值得注意的是，实例化在前，mixin在后，可见，内部的实现，其实是修改了原型中的内容。
+        //
+        //最后 这里还传入了一个xxx的参数，我测试了下，正好是 animal.__proto__.__proto__
+        //这个传进来，是不是意义很大呢？
+    }
+
+
+    /* 
+     * 研究案例19: fiber.js 装饰者
+     */
+    bee.caseP19 = function(){
+
+        function AnimalWithPowerRun(base) {
+            return {
+                run: function() {
+                    l('run <=== 这个是被装饰的功能')
+                }
+            }
+        }
+
+        var Animal = Fiber.extend(function() {
+            return {
+                init: function(age) {
+                    this.age = age;
+                }
+            }
+        });
+        var animal = new Animal(4);        
+
+        Fiber.decorate(animal, AnimalWithPowerRun);
+
+        l(animal)
+        animal.run();
+    }
+
+
+
+
+
 
 
 
@@ -479,38 +914,22 @@ var bee = (function(bee){
 
 
 
-
-
-
-
-
-
-/*
-function extend(Fun1,Fun2){
-	Fun1 = function(){
-		var args = Array.prototype.slice.call(arguments,0);
-    Fun2.apply(this,args);
-	};
-	Fun1.prototype = Object.create(Fun2.prototype);
-	Fun1.prototype.constructor = Fun1;
-	Fun1.prototype.parent = Fun2;
-	return Fun1;
+/*var Fish = function(){
+    this.age = 123;
 }
-function Animal(height,weight){
-	this.height = height;
-	this.weight = weight;
-}
-Animal.prototype.run = function(){
-	l('running!');
-}
-var Fish;
-var Fish = extend(Fish,Animal,fun);
-var f = new Fish(100,200);
-l(f.height)
-l(f.weight)
-f.run()
-l(f.constructor)
-*/
+Fish.prototype = new Fish();
+var f = new Fish();
+l(f)*/
+
+
+
+
+
+
+
+
+
+
 
 
 

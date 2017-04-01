@@ -210,6 +210,33 @@ var bee = (function(bee){
 		l([11,11,11,11].map(curry(parseInt)));
 	}
 
+	/* 
+	 * 研究案例10:requestAnimationFrame
+	 * 这个老早之前就有了，我都没有应用过，看了下原来很简单。
+	 * 它的优点是：
+	 * 1、requestAnimationFrame 会把每一帧中的所有DOM操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率，一般来说，这个频率为每秒60帧。
+	 * 2、在隐藏或不可见的元素中，requestAnimationFrame将不会进行重绘或回流，这当然就意味着更少的的cpu，gpu和内存使用量。
+	 */
+	bee.caseC10 = function(){
+
+		$(function(){
+		    $('body').append('<div id="SomeElementYouWantToAnimate" style="width:50px;height:50px;" class="bg3"></div>');
+		    var ele = document.getElementById('SomeElementYouWantToAnimate');
+		    ele.style.position = 'absolute';
+
+		    var start = null;
+		    window.requestAnimationFrame(function step(timestamp) { //只需要提供一个回调就好了，timestamp就是经过的时间，每次增加16毫秒左右（按照60帧每秒）
+		        if (!start) start = timestamp;
+		        var progress = timestamp - start;
+		        var s = progress  + 'px';
+		        ele.style.left = s;
+		        if (progress < 1000) {
+		          window.requestAnimationFrame(step);
+		        }
+		    });
+		});
+	}
+
 	return bee;
 })(bee || {});
 

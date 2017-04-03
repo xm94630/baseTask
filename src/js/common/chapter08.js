@@ -1579,7 +1579,15 @@ var bee = (function(bee){
 	 * 研究案例43: 最简单的 promise !
 	 */
 	bee.caseH43 = function(){
-
+		window.setTimeout(function(){
+			feature();
+		},1000);
+		
+		//这个feature，你可以认为是一个异步函数的回调
+		//其实也是一个promise的基础的形态。
+		function feature(){
+			l('promise被履行了');
+		}
 	}
 
 

@@ -1575,6 +1575,13 @@ var bee = (function(bee){
 		//参见 caseO13 案例
 	}
 
+	/*
+	 * 研究案例43: 最简单的 promise !
+	 */
+	bee.caseH43 = function(){
+
+	}
+
 
 
 

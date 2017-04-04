@@ -196,7 +196,37 @@ var bee = (function(bee){
 
 
 
+	/*******************************
+	* 第2节 async.js
+	********************************/
 
+	/* 
+	 * 研究案例9: forEachSeries
+	 * 它的作用是将异步的迭代器按照顺序执行。
+	 * 这里的关键是 next 这个函数。
+	 * 是通过它的调用来维系顺序，然后才能继续 下一个迭代！
+	 */
+	bee.caseK9 = function(){
+
+		async.forEachSeries(['兰陵王','程咬金'],iterator,function(err){
+			l('两人已经复活');
+		})
+
+		function iterator(name,next){
+			
+			//模拟的异步行为
+			window.setTimeout(function(){
+				l('1秒后...'+name+'复活');
+				next();
+			},1000);
+		}
+
+		//对数组、集合，进行迭代器操作的方法又称之为 async.js的 “数据收集方法”。
+		//比如这里 forEachSeries，还有mapSeries、reduceSeries
+		//上面的是有顺序的，没顺序的：forEach、map、reduce。这些是异步的。
+		//
+		//在同步的迭代中也有forEach、map、reduce这些。
+	}
 
 
 	/* 
@@ -226,6 +256,10 @@ var bee = (function(bee){
 		        }, 1000);
 		    },
 		}, function(err, results) {});
+
+		//以前我傻傻的分不清楚 forEachSeries 和 series 这些。
+		//其实很明显，前者是对数组迭代的异步版本。（又分成有顺序、和无顺序），forEachSeries就是有顺序的异步版本的forEach。
+		//series 和迭代无关，而是对一些列的任务的处理。
 	}
 
 

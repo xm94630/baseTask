@@ -1583,8 +1583,7 @@ var bee = (function(bee){
 			feature();
 		},1000);
 		
-		//这个feature，你可以认为是一个异步函数的回调
-		//其实也是一个promise的基础的形态。
+		//这个feature函数，可以认为是promise的基础的形态。
 		function feature(){
 			l('promise被履行了');
 		}

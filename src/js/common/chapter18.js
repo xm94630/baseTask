@@ -187,7 +187,7 @@ var bee = (function(bee){
                 this.handler[name].push(fun);
             },
             handler:{},
-            emiter:function(name){
+            emit:function(name){
                 this.handler[name].forEach(function(fn){
                     fn();
                 }); 
@@ -205,13 +205,13 @@ var bee = (function(bee){
         l('==>');
         window.setTimeout(function(){
             ele.onclick();
-            ele.emiter('click');
+            ele.emit('click');
         },1000);
 
         //这个只是一个实现机制的模拟，和真实实现肯定是不一样的，但是也能说明其原理。
         //事件绑定的两种方法中，第一种是直接改变了方法的内容，第二种是调用其方法。
         //从调用角度看，第一种对应的是“直接调用”，所以多次对 onclick 进行赋值的时候，以最后一次为准。
-        //第二种对应的是“调用了其他的函数”，比如这里的emiter。
+        //第二种对应的是“调用了其他的函数”，比如这里的emit。
         //
         //我也可以改变 addEventListener 这个函数！ 但是对用用户来说，它的实现就是个黑盒子。你不知道它内部的发布订阅系统的实现逻辑。
         //比如把变量存到那个地方。
@@ -249,7 +249,7 @@ var bee = (function(bee){
      *
      * 如今，我才知道了原理：其实针对于浏览器的那种默认的事件（如click）,事件分发系统做了两手的准备，
      * 一方面把回调放到 handler 中存储，另外用原生的 addEventListener 进行了代理！！
-     * 所以，emiter可以手动触发。而鼠标的点击事件，就可以触发addEventListener中的回调！
+     * 所以，emit 可以手动触发。而鼠标的点击事件，就可以触发addEventListener中的回调！
      */
     bee.caseR9 = function(){
 
@@ -271,7 +271,7 @@ var bee = (function(bee){
                 }
             },
             handler:{},
-            emiter:function(name){
+            emit:function(name){
                 this.handler[name].forEach(function(fn){
                     fn();
                 }); 
@@ -284,7 +284,7 @@ var bee = (function(bee){
             ele = $.extend(ele,Emiter);
             ele.on('click',function(){l('1')})
             ele.on('click',function(){l('2')})
-            ele.emiter('click')
+            ele.emit('click')
         }
     }
 
@@ -302,7 +302,7 @@ var bee = (function(bee){
                 this.handler[name].push(fun);
             },
             handler:{},
-            emiter:function(name){
+            emit:function(name){
                 this.handler[name] && this.handler[name].forEach(function(fn){
                     fn();
                 }); 
@@ -315,7 +315,7 @@ var bee = (function(bee){
                 set:function(key,v){
                     var oldValue = this.data[key]
                     if(oldValue!==v){
-                        this.emiter('change');
+                        this.emit('change');
                         this.data[key] = v;
                     }
                 }
@@ -355,7 +355,7 @@ var bee = (function(bee){
                         this.handler[name].push(fun);
                     },
                     handler:{},
-                    emiter:function(name){
+                    emit:function(name){
                         this.handler[name] && this.handler[name].forEach(function(fn){
                             fn();
                         }); 
@@ -371,8 +371,8 @@ var bee = (function(bee){
                 set:function(key,v){
                     var oldValue = this.data[key]
                     if(oldValue!==v){
-                        this.emiter('change');
-                        this.parent && this.parent.emiter('change'); //如果有父级，则通知父级（即集合）
+                        this.emit('change');
+                        this.parent && this.parent.emit('change'); //如果有父级，则通知父级（即集合）
                         this.data[key] = v;
                     }
                 }
@@ -432,7 +432,7 @@ var bee = (function(bee){
                         this.handler[name].push(fun);
                     },
                     handler:{},
-                    emiter:function(name){
+                    emit:function(name){
                         this.handler[name] && this.handler[name].forEach(function(fn){
                             fn();
                         }); 
@@ -450,12 +450,12 @@ var bee = (function(bee){
             setTimeout(function(){
 
                 //事件的回调中再次触发了事件，这样子就是“事件的循环”。
-                eModule.emiter('xxx');
+                eModule.emit('xxx');
             },1000)
         });
 
         //启动
-        eModule.emiter('xxx');
+        eModule.emit('xxx');
 
         //结论，同步的事件循环是一定要避免的，这个是事件循环的一个噩耗。
         //异步的，就避免了这样子的噩耗。

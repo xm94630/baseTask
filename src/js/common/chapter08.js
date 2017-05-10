@@ -1590,6 +1590,19 @@ var bee = (function(bee){
 	}
 
 
+	/*
+	 * 研究案例44: jquery 中的动画也实现了promise的接口
+	 */
+	bee.caseH44 = function(){
+		$(function(){
+			pro = $('#myBtn').fadeOut(500).fadeIn(500);
+			$.when(pro).done(function(x){console.log('完成动画')})
+		})
+	}
+
+
+
+
 
 
 

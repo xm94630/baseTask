@@ -758,13 +758,71 @@ var bee = (function(bee){
 	}
 
 	/*
-	 * 研究案例18:
+	 * 研究案例18: 数组方法 splice
+	 * splice会改变原来的数据，一般用来添加、删除元素。
 	 */
 	bee.caseF18 = function(){
-
-
-
+		var arr = [111,222,333,444,555];
+		//splice从index 为1开始，删除2个元素
+		arr.splice(1,2);
+		l(arr)
 	}
+	bee.caseF18_2 = function(){
+		var arr = [111,222,333,444,555];
+		//splice从index 为1开始，删除0个元素
+		arr.splice(1,0);
+		l(arr)
+	}
+	bee.caseF18_3 = function(){
+		var arr = [111,222,333,444,555];
+		//splice从index 为1开始，删除0个元素，在索引为1处增加一个元素
+		arr.splice(1,0,999);
+		l(arr)
+	}
+	bee.caseF18_4 = function(){
+		var arr = [111,222,333,444,555];
+		//splice从index 为1开始，删除0个元素，在索引为1处增加一个元素
+		arr.splice(1,0,999);
+		l(arr)
+	}
+
+	/*
+	 * 研究案例19: 数组方法 slice
+	 * slice不会改变原来的数据，一般用来截取数组，返回截取的部分。
+	 */
+	bee.caseF19 = function(){
+		var arr = [111,222,333,444,555];
+		//slice从index 为1开始，结束为2（不包含）
+		var newArr = arr.slice(1,2);
+		l(arr); //不会改变
+		l(newArr) //[222]
+	}
+	
+	/*
+	 * 研究案例20: 字符串方法 slice (同 substring)
+	 * slice不会改变原来的数据，一般用来截取字符串，返回截取的部分。
+	 */
+	bee.caseF20 = function(){
+		var str = 'xm94630';
+		//splice从index 为1开始，结束为2（不包含）
+		var newStr = str.slice(1,2);
+		//var newStr = str.substring(1,2); //同上
+		l(str); //不会改变
+		l(newStr) //'m'
+	}
+
+	/*
+	 * 研究案例21: 字符串方法 substr
+	 * substr 不会改变原来的数据，一般用来截取字符串，返回截取的部分。
+	 */
+	bee.caseF21 = function(){
+		var str = 'xm94630';
+		//substr 从index 为1开始，长度为2
+		var newStr = str.substr(1,2);
+		l(str); //不会改变
+		l(newStr) //'m9'
+	}
+
 
 
 

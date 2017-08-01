@@ -666,6 +666,15 @@ var bee = (function(bee){
 
 	}
 
+	/* 
+	 * 研究案例19:
+	 */
+	bee.case19 = function(){
+	
+
+
+
+	}()
 
 
 	return bee;
@@ -673,10 +682,27 @@ var bee = (function(bee){
 
 
 
+/*$.get('http://localhost:5000/api/getStocks/',function(data){
+	var d = JSON.parse(data);
+	l(d);
+	l(d[0].name);
+})
+*/
 
+//jsonp的用法
+/*$.ajax({
 
+    type: "GET",
+    url: "http://localhost:5000/api/getStocks/",
+    dataType:"jsonp",
+    jsonp:"callback",         
+    success: function(data){
+    	l('===>')
+        console.log(data);
+    }
 
-
+});
+*/
 		
 
 

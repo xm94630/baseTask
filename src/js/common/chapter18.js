@@ -217,6 +217,23 @@ var bee = (function(bee){
         //比如把变量存到那个地方。
     }
 
+    /* 
+     * 研究案例8: 这个是事件触发顺序，一定要记住
+     */
+    bee.caseR8_1 = function(){
+        $(function(){
+            $('#myBtn').hover(function(){
+                //移入移出会被触发一次
+                alert(0)
+            })
+            $('#myBtn').on('mouseover',function(){
+                alert(1)
+            });
+            $('#myBtn').on('mouseenter',function(){
+                alert(2)
+            });
+        })
+    }
 
 
 

@@ -515,7 +515,20 @@ var bee = (function(bee){
 		l(obj.jy)
 	}
 
-
+	//案例24_3: 注意
+	//descriptor分成2个主要类别，一个叫做“data descriptors”和“accessor descriptors”，这两套只能存在一套。
+	bee.caseB24_3 = function(){
+		Object.defineProperty(this,'haha',{
+			get: function (v) {
+				return 123;
+			},
+			set: function (v) {
+				l(this)
+			},
+			//value:123, //这个不能和 getter-setter pair 在一起，否者就会报错。
+		})
+		l(haha);
+	}
 
 
 

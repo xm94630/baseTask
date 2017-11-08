@@ -519,7 +519,7 @@ var bee = (function(bee){
 	//descriptor分成2个主要类别，一个叫做“data descriptors”和“accessor descriptors”，这两套只能存在一套。
 	bee.caseB24_3 = function(){
 		Object.defineProperty(this,'haha',{
-			get: function (v) {
+			get: function () {
 				return 123;
 			},
 			set: function (v) {
@@ -530,7 +530,53 @@ var bee = (function(bee){
 		l(haha);
 	}
 
+	//案例24_4: 继续
+	//这里的set是否可以成为 two-way binding 的实现。
+	bee.caseB24_4 = function(){
+		Object.defineProperty(this,'haha',{
+			get: function () {
+				return '我这个字符串本身能不能被改变呢';
+				//答案是有的，看案例 24_5
+			},
+			set: function (v) {
+				window.xixi='haha变量的set，导致window上xixi属性的改变，这是不是一种类似“two-way binding”的实现呢？';
+			},
+		})
+		haha='试着改变一下';
+		l(haha);
+		l(window.xixi)
+	}
 
+	//案例24_5: 继续
+	//这里get时候，返回的值是一个变量。这样子haha的值一直会跟随 myValue 的变化。
+	bee.caseB24_5 = function(){
+		var obj = {};
+		var myValue = '我这个字符串本身能不能被改变呢'
+		Object.defineProperty(obj,'haha',{
+			get: function () {
+				return myValue;
+			},
+			set: function (v) {
+			},
+		})
+		myValue = '试着改变一下';
+		l(obj.haha);
+	};
+
+	//案例24_6: data deccriptor
+	//这个类似于es6的“const”
+	bee.caseB24_6 = function(){
+		var obj = {};
+		Object.defineProperty(obj,'PI',{
+			value:        3.14,
+			enumerable:   true, //待学
+			writable:     false,
+			configurable: false //待学
+		})
+		l(obj.PI);
+		obj.PI = '不会被改变';
+		l(obj.PI);
+	};
 
 
 

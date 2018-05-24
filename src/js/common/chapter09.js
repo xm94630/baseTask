@@ -530,6 +530,30 @@ var bee = (function(bee){
 	 	l(/(?:e+)?I(?:e+?)/.exec(b));  //“?:”不在说了，已讲。
 	 }
 
+	/* 
+	 * 研究案例20: 去空格1
+	 * 利用的是字符串方法：replace
+	 */
+	bee.caseI20 = function(){
+		var s = 'hello xiao  ming'
+		var x = s.replace(/\s/g,function(){
+		    return ''
+		});
+		console.log(x)
+	}
+
+	/* 
+	 * 研究案例21: 去空格2
+	 * 利用的是字符串方法：match
+	 */
+	bee.caseI21 = function(){
+		var str = 'hello xiao  ming';
+		var newStr = str.match(/\S+/g).join('');
+		console.log(newStr)
+	}
+
+
+
 	return bee;
 })(bee || {});
 

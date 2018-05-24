@@ -79,6 +79,23 @@ var bee = (function(bee){
 })(bee || {});
 
 
+//去重
+//这个是有问题的案例
+// var arr = [1,2,2,1,4];
+// var obj = {}
+// arr.forEach(function(one,index){
+
+//     console.log(one,index);
+
+//     if(obj[one]){
+//         arr.splice(index,1)
+//     }else{
+//         obj[one] = true;
+//     }
+
+// });
+// console.log(arr)
+
 
 
 

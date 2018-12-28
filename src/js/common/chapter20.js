@@ -13,6 +13,10 @@ var bee = (function(bee){
 
     //match、replace
 
+    //substring
+
+    
+
 
 
 

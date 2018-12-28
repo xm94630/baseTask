@@ -355,7 +355,7 @@ var bee = (function(bee){
 
         class Fish extends Animal {
           constructor(age,width) {
-            super(3);
+            super(3);   //用于访问父级对象上的方法 //有待进一步研究
             this.age = age;
             this.width = width;
           } 

@@ -108,24 +108,29 @@ article {
 }
 
 
+
+
+
+
 /* 布局 左右定宽，中间自适应 */
 .layoutBox{
   display:flex;
-  background:lightseagreen;
-}
-.layoutBox article{
 }
 .layoutBoxL{
-  background:coral;
+  background:darkseagreen;
   width: 200px;
 }
 .layoutBoxM{
-  background:coral;
+  background:plum;
   flex: 1;
 }
 .layoutBoxR{
-  background:coral;
+  background:deepskyblue;
   width: 200px;
 }
+
+
+
+
 
 

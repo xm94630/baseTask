@@ -1,6 +1,10 @@
+.clearBox{
+  clear: both;
+}
+
 /* 这个是容器的基本样式，和下面居中对齐的实现，没有关系 */
 .box{
-  width:100px;
+  width: 100px;
   height:100px;
   margin:10px;
   float: left;
@@ -37,18 +41,20 @@
   3）flex容器：下面的 fatherBox2
   4）flex元素：下面的 article
   5）flex: 1： 表示除了占有内外边距之外，每个元素都占有等量的空间
-  6）flex: 1 200px; 这个在5）的基础上设置了最小的宽度限定。优先分配flex元素200像素位置，剩下的再看着办。这种写法是简写，单独的话用 flex-grow 、flex-basis 设置。（flex-shrink也可以简写到flex，这个用法比较高级，这里不介绍）
+  6）flex: 1 200px; 这个在5）的基础上设置了最小的宽度限定。有足够空间的话，优先分配flex元素200像素位置，剩下的再看着办。这种写法是简写，单独的话用 flex-grow 、flex-basis 设置。（flex-shrink也可以简写到flex，这个用法比较高级，这里不介绍）
 
   注意点：
   flex比其他的css要复杂一点。而且兼容要做好。像阴影什么的不支持也没啥关系，但是用不支持flex的浏览器，样式就全乱套了..
 
   小结：
   所以核心的几个属性就是：
-  flex-flow 流向设置
-  flex 大小间距设定
-  align-items 对齐设置，默认是 stretch（这就是为什么下面案例，高度是对齐的）
-  justify-content  项对于主轴而言的分布
-  order: 1; 这个属性可以更改元素的排列位置，这是以前的无法做到的。（默认是是0，设置1就说明要往后排了）
+  1）作用于父级
+    align-items 对齐设置，默认是 stretch（这就是为什么下面案例，高度是对齐的）
+    justify-content  项对于主轴而言的分布
+    flex-flow 流向设置
+  2）作用于子级
+    flex 大小间距设定
+    order: 1; 这个属性可以更改元素的排列位置，这是以前的无法做到的。（默认是是0，设置1就说明要往后排了）
   
 */
 

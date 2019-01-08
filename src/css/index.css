@@ -108,6 +108,7 @@ article {
 }
 
 
+/* 布局 左右定宽，中间自适应 */
 .layoutBox{
   display:flex;
   background:lightseagreen;
@@ -126,3 +127,5 @@ article {
   background:coral;
   width: 200px;
 }
+
+

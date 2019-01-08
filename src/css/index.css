@@ -106,3 +106,23 @@ article {
   align-items:center;
   justify-content: space-around;
 }
+
+
+.layoutBox{
+  display:flex;
+  background:lightseagreen;
+}
+.layoutBox article{
+}
+.layoutBoxL{
+  background:coral;
+  width: 200px;
+}
+.layoutBoxM{
+  background:coral;
+  flex: 1;
+}
+.layoutBoxR{
+  background:coral;
+  width: 200px;
+}

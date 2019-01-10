@@ -834,6 +834,32 @@ var bee = (function(bee){
 		}
 	}
 
+	//研究案例15
+	bee.caseO15 = function(){
+
+		var promise = new Promise(function(resolve, reject){
+			resolve();
+		})
+		var promise2 = new Promise(function(resolve, reject){
+			resolve();
+		})
+
+		console.log("start")
+		promise.then(function(){
+			l(1)
+		}).then(function(){
+			l(2)
+		})
+		setTimeout(()=>{
+			promise.then(function(){
+				l(3)
+			})
+			l(4)
+		},300)
+		console.log("end")
+	}
+
+
 
 
 

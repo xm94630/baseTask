@@ -884,9 +884,55 @@ var bee = (function(bee){
 		fun('我是数据').pipe(console.log)
 	}
 
+	/*
+	 * 研究案例7_3: 中间件
+	 * 20190110
+	 * 这个模拟中间件的写法，不过，这个好像可以为了满足这种实现而刻意写出来的。
+	 * 真正的实现，更加精妙，特别是对next的处理。
+	 * 我觉得aysnc源码中可以有我要的答案
+	 */
+	bee.caseN7_3 = function(){
+		
+		let result;
+		let app = {
+			myCtx:{},
+			flag:true,
+			next:function(){
+				app.flag = true;
+			},
+			use:function(fun){
+				if(app.flag){
+					app.flag = false;
+					fun(this.myCtx,this.next);
+				}
+			},
+			go:function(){
+				return this.myCtx
+			}
+		}
+
+		app.use((ctx,next)=>{
+			ctx.name='I';
+			next();
+		})
+		app.use((ctx,next)=>{
+			ctx.name += ' love';
+			//next();
+		})
+		app.use((ctx,next)=>{
+			ctx.name += ' you!';
+			next();
+		})
+		result = app.go();
+		console.log(result.name);
+	
+	}
+
+
+	
+
 	return bee;
 })(bee || {});
-
 
 
 

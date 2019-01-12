@@ -176,6 +176,7 @@ var bee = (function(bee){
 				arr[channel]=[];
 			}
 			arr[channel].push(fun);
+			//返回的内容，其实对 channel，fun 两者的记录
 			return [channel,fun];
 		}
 		//取消订阅
@@ -215,30 +216,30 @@ var bee = (function(bee){
 	//研究案例3_2: 发布订阅模式 jquery版本
 	bee.caseO3_2 = function(){
 
-		$(function(){
-			var ele = $(document);
-			//等同于订阅者
-			ele.on('king/red',function(e,info){
-				l('程咬金收到消息:'+info);
-			})
-			ele.on('king/red',function(e,info){
-				l('兰陵王收到消息:'+info);
-			})
-			//等同于发布者
-			ele.trigger('king/red','准备团战！');
-		})
+		// $(function(){
+		// 	var ele = $(document);
+		// 	//等同于订阅者
+		// 	ele.on('king/red',function(e,info){
+		// 		l('程咬金收到消息:'+info);
+		// 	})
+		// 	ele.on('king/red',function(e,info){
+		// 		l('兰陵王收到消息:'+info);
+		// 	})
+		// 	//等同于发布者
+		// 	ele.trigger('king/red','准备团战！');
+		// })
 
 		//注意：这里的ele必须是选中有效的元素。$('')、$([]),虽然也是有on、trigger，但无效。原因参见下面的1）。
 		//另外，下面这个例子说明了几个有趣的现象：
 		//1）document、div是存在层级结构的，只有在其路径下才能触发。
 		//2）如果页面中有4个div元素，就意味着，会触发四次！
 
-		/*$(function(){
+		$(function(){
 			$(document).on('king/red',function(e,info){
 				l('程咬金收到消息:'+info);
 			})
 			$('div').trigger('king/red','准备团战！');
-		})*/
+		})
 	}
 
 
@@ -345,7 +346,7 @@ var bee = (function(bee){
 	//研究案例5: 中介者模式
 	//其实在我看来还是发布订阅模式的加强版
 	//之前是有了channel层的抽象，如果我们对 channel 抽象做的更加的完美，比如：
-	// "king:red:llw" 这样子具有层级关系的（命名空间）来控制订阅者，就更加完没了。
+	// "king:red:llw" 这样子具有层级关系的（命名空间）来控制订阅者，就更加完美了。
 	bee.caseO5 = function(){
 		//在 Mediator.js 中就实现了这样子的模式。这里不具体实现。主要说说这个主题对象（相当于channel，但是更加抽象）：
 

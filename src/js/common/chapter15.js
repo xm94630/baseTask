@@ -159,8 +159,8 @@ var bee = (function(bee){
 	//研究案例3: 发布订阅模式 （观察者 的特殊形式）
 	bee.caseO3 = function(){
 
-		//存储 信道和回调的数组
-		var arr = [];
+		//存储 信道和回调的对象
+		var arr = {};
 		
 		//发布
 		function publish(channel,data){

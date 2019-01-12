@@ -385,7 +385,7 @@ var bee = (function(bee){
 
 			//这部分是实例生成的部分
 			return function KingFactory(name,callback){
-				id++;
+				id++;//20190112这里我也看打了工厂的好处。这里的id的累计，是直接使用构造函数无法完成的。
 				var king = {
 					id:id,
 					name:name||'无名'+id,

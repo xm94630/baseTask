@@ -851,6 +851,7 @@ var bee = (function(bee){
 	}
 
 	//研究案例15
+	//研究输出顺序，这个到时候放到别的地方去
 	bee.caseO15 = function(){
 
 		var promise = new Promise(function(resolve, reject){

@@ -60,6 +60,10 @@ var bee = (function(bee){
 			}
 		}
 		observer.next('暂时撤退！');
+		
+		//20190112 
+		//这种写法，看上去不能再傻了，但是这样子写，确实多了很多操作空间。（这点上和工厂是非常像的）
+		//bee.caseO9、和之后几个案例是异步的观察者
 	}
 
 
@@ -658,9 +662,9 @@ var bee = (function(bee){
 		function fun(info){l('王者荣耀：'+info);}
 		//发布者 
 		//异步的发布信息的行为被一个容器函数包装了，于是这个异步行为，处于等待的状态。（”惰性“、”懒“相关的观念多数使用这样子的包装行为）
-		function container(fun){
+		function container(cb){
 			setTimeout(function(){
-				fun('敌人5秒钟后达到战场，请做好准备');
+				cb('敌人5秒钟后达到战场，请做好准备');
 			},0);
 		}
 		//订阅行为
@@ -679,6 +683,9 @@ var bee = (function(bee){
 		//非常方便的制定了例外一个订阅者（一旦指定了，分布者马上给他发布！）
 		function fun2(info){l('全名超神：'+info);}
 		subscribe(fun2);
+
+		//20190112
+		//container这个看上去傻傻的设计，其实没有那么废，继续看下面例子的演变
 	}
 
 
@@ -714,7 +721,11 @@ var bee = (function(bee){
 		//发布者的选择订阅的函数，并触发“发布”行为
 		myObservable.subscribe(fun);
 
-		//20190112
+
+		// 20190112
+		// container这个看上去傻傻的设计，其实没有那么废。
+		// Observable.create(container).subscribe(fun) 这种写法代替了 container(fun)
+		// 这是一种链式调用的形式，蕴含  Promise(container).then(fun) 的味道
 	}
 
 

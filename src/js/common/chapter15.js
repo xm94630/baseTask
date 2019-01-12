@@ -786,6 +786,7 @@ var bee = (function(bee){
 		}
 
 		function container(cb){
+			l('我会被最先打印出来！我和异步无关')
 			setTimeout(function(){
 				l('1秒之后...');
 				cb('xm94630');
@@ -814,6 +815,8 @@ var bee = (function(bee){
 
 	/*
 	 * 研究案例14: 模拟实现 Rx.Observable.fromEvent [利用异步的观察者模式]
+	 * RxJS 中的接口
+	 * RxJS 被称为响应式编程的库
 	 */
 	bee.caseO14 = function(){
 

@@ -813,12 +813,42 @@ var bee = (function(bee){
 	}
 
 
+	//研究案例14: promise
+	bee.caseO14 = function(){
+
+		var myPromise = {
+			create:function(fun){
+				return {
+					then:function(cb){
+						fun(cb);
+					}
+				}
+			}
+		}
+
+		function container(cb){
+			l('我会被最先打印出来！我和异步无关')
+			setTimeout(function(){
+				l('1秒之后...');
+				cb('xm94630');
+			},1000)
+		}
+
+		var promise = myPromise.create(container);
+
+		promise.then(function(data){
+			l('异步获取的数据是：'+data);
+		});
+
+	}()
+
+
 	/*
-	 * 研究案例14: 模拟实现 Rx.Observable.fromEvent [利用异步的观察者模式]
+	 * 研究案例15: 模拟实现 Rx.Observable.fromEvent [利用异步的观察者模式]
 	 * RxJS 中的接口
 	 * RxJS 被称为响应式编程的库
 	 */
-	bee.caseO14 = function(){
+	bee.caseO15 = function(){
 
 		window.onload=function(){
 
@@ -850,9 +880,9 @@ var bee = (function(bee){
 		}
 	}
 
-	//研究案例15
+	//研究案例16
 	//研究输出顺序，这个到时候放到别的地方去
-	bee.caseO15 = function(){
+	bee.caseO16 = function(){
 
 		var promise = new Promise(function(resolve, reject){
 			resolve();

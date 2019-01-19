@@ -769,7 +769,7 @@ var bee = (function(bee){
 	}
 
 
-	//研究案例13: 完美的 promise !【BOSS】
+	//研究案例13: 完美的 promise 【其实是有问题的一个范例...】
 	//在第八章节中，我们实现了很多的promise，但是，都有一个问题就是不支持同步代码。
 	//于是我开始从 caseO10 例子中悟出道理，觉得可以支持同步的，只要利用惰性。
 	//然后我就改造了一番，得出完美的promise！
@@ -799,11 +799,11 @@ var bee = (function(bee){
 			l('异步获取的数据是：'+data);
 		});
 
-		//这样子结构的封装，比我之前的更加的好！！
+		//这样子结构的封装，比我之前的更加的好
 		//
-		//最令人惊讶的是！该例子和上面的案例居然一模一样！！！！！
+		//最令人惊讶的是！该例子和上面的案例居然一模一样！
 		//这个真是所谓殊途同归啊！
-		//原来“异步的事件观察者模式”，居然就等效于“Promise”!!!!!!
+		//原来“异步的事件观察者模式”，居然就等效于“Promise”
 		//
 		//如此，反过来，我对promise的理解更加深刻了：
 		//异步的行为被promise封装了，而且是“惰性”的，只有指定了“观察者”，异步行为才会触发，然后再触发回调！
@@ -814,32 +814,52 @@ var bee = (function(bee){
 
 
 	//研究案例14: promise
+	//案例13有问题...
+	//这个可以，简单案例
 	bee.caseO14 = function(){
 
 		var myPromise = {
-			create:function(fun){
+			create:function(asyncFun){
+				var status = 'pendding';
+				var myData = null;
+				var xxx = function(){};
+				
+				let resolveFun = function (data){
+					myData    = data
+					status = "resolved";
+					xxx(myData);
+				}
+				asyncFun(resolveFun);
+
+
 				return {
-					then:function(cb){
-						fun(cb);
+					then:function(successCallback,filedCallback){
+						if(status == "resolved"){
+							successCallback(myData);
+						}else{
+							xxx = successCallback;
+						}
 					}
 				}
 			}
 		}
 
-		function container(cb){
-			l('我会被最先打印出来！我和异步无关')
+		var promise = myPromise.create((resolve,reject)=>{
+			l('111')
 			setTimeout(function(){
 				l('1秒之后...');
-				cb('xm94630');
+				resolve('xm94630');
 			},1000)
-		}
+		})
+		
+		setTimeout(function(){
+			promise.then(function(data){
+				l('异步获取的数据是：'+data);
+			});
+		},0)
 
-		var promise = myPromise.create(container);
 
-		promise.then(function(data){
-			l('异步获取的数据是：'+data);
-		});
-
+		l('222')
 	}()
 
 

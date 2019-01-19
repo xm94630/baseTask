@@ -860,7 +860,7 @@ var bee = (function(bee){
 
 
 		l('222')
-	}()
+	}
 
 
 	/*
@@ -927,6 +927,24 @@ var bee = (function(bee){
 	}
 
 
+	//研究案例17
+	//20190119 昨天的头条一题目
+	bee.caseO17 = function(){
+		var ob = {a,b,c}
+		function a(){
+			console.log(1)
+			return ob
+		}
+		function b(){
+			console.log(2)
+			return ob
+		}
+		function c(){
+			console.log(3)
+			return ob
+		}
+		b().a().c().a().c()
+	}()
 
 
 

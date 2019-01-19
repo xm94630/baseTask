@@ -944,7 +944,7 @@ var bee = (function(bee){
 			return ob
 		}
 		b().a().c().a().c()
-	}()
+	}
 
 
 

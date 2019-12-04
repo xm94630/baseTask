@@ -75,7 +75,7 @@ var bee = (function(bee){
 	 * 研究案例3:闭包
 	 * 因为有闭包的存在，不能简单地通过log两个函数来比较是否功能相同
 	 * 下面的fun1和fun3通过log、tostring处理后显示完全一样
-	 * 然偶调用的时候结果完全不同！
+	 * 然而调用的时候结果完全不同！
 	 */
 	bee.case03 = function(){
 

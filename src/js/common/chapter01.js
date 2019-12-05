@@ -101,7 +101,7 @@ var bee = (function(bee){
 	/* 
 	 * 研究案例4:函数对象
 	 * 本案例中，可以看到函数对象的很多特性
-	 * 1）直接log处函数，基本上是它的toString状态
+	 * 1）直接log出函数，基本上是它的toString状态(不对，log出函数就是函数、log对象就是对象)
 	 * 2）只有作为函数方法的时候log出来，才把它显示为对象，所以要查看全局函数，可以log(window),然后找到该方法。
 	 * 3）arguments、caller、length、name为4个函数对象属性，并不被for循环输出。
 	 * 4）自己为函数对象添加的属性，会在for in循环中输出
@@ -120,6 +120,7 @@ var bee = (function(bee){
 		l(obj.fun2.caller)
 		l(obj.fun2.length)
 		l(obj.fun2.name)
+		l(obj.fun2.lalala)
 
 		obj.fun2.xxx=123;
 		l('获取函数对象中的属性:')
@@ -141,6 +142,9 @@ var bee = (function(bee){
 	 * fun函数对象还有[[bound fun]]（最近一次看，变成了[[TargetFunction]]）、[[BoundThis]]、[[BoundArgs]]这样的写法
 	 * 百度了下发现和原生的bind实现有关系，其中诡异的写法也就原生的能做到了
 	 * 可见_.bindAll函数可以用bind来实现封装的
+	 * 
+	 * 20191205 对bind解释比较好的文章：
+	 * https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
 	 */
 	bee.case05 = function(){
 

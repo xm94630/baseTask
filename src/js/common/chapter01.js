@@ -196,6 +196,11 @@ var bee = (function(bee){
 	 * 研究案例7:原生bind
 	 * 看看bind的第1个参数之后的其他参数，作为新函数默认传入的参数
 	 * 于是真正函数调用的唯一参数“cc”其实是第三个参数了
+	 * 
+	 * 20191205补充：
+	 * 1）bind一方面会返回一个函数
+	 * 2）一方面会指定this指向
+	 * 3）还有一个重要的作用，就是预先设置好参数，就是本案例的作用。
 	 */
 	bee.case07 = function(){
 		var func = function( a,b,c ) {
@@ -397,7 +402,7 @@ var bee = (function(bee){
 
 	/* 
 	 * 研究案例8:自己写一个类似于_.bind的简单例子
-	 * myBind利用原生的bing很好实现
+	 * myBind利用原生的bind很好实现
 	 */
 	bee.case08 = function(){
 		var obj2 = {
@@ -441,9 +446,10 @@ var bee = (function(bee){
 		function myBind(myFunc,AttrName){
 
 			//不要写成注释中的那样，堆栈会溢出
-			/*myFunc[AttrName] = function(){
-				return myFunc[AttrName].call(myFunc);
-			}*/
+			//20191205：这里是会重复的调用自身。而下者是，先记住了原来的函数，然后对其改装。不存在反复调用
+			// myFunc[AttrName] = function(){
+			// 	return myFunc[AttrName].call(myFunc);
+			// }
 
 			//正确使用
 			//这里的操作，说白了就是把obj2.fun改造了，把原来的this用闭包代替了

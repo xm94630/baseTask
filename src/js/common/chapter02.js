@@ -39,6 +39,30 @@ var bee = (function(bee){
 
 	}
 
+	bee.caseB2_1 = function (){
+
+		function sum(num){
+			if (num<=1) {
+				return 1;
+			} else{
+				return num*sum(num-1);   //自己调用自己,递归
+			}
+		}
+		l(sum(4));
+	}
+
+	//上个例子递归用的是函数的名字，这里用的是callee
+	bee.caseB2_2 = function (){
+		function sum(num){
+			if (num<=1) {
+				return 1;
+			}else{
+				return num*arguments.callee(num-1);
+			}
+		}
+		l(sum(4));
+	}
+
 	/* 
 	 * 研究案例3:函数表达式
 	 * 有报错
@@ -268,26 +292,6 @@ var bee = (function(bee){
 		l(bee2.bbb()===bee2);
 
 	}
-
-	/* 
-	 * 研究案例14_2: 引用
-	 * bee2.bbb对自由变量设置了新的引用，所以结果为false
-	 */
-	bee.caseB14 = function(){
-
-		var bee2 = (function(bee2){
-			bee2.aaa = function(){};
-			bee2.bbb = function(){
-				bee2 = {};
-				return bee2;
-			}
-			return bee2;
-		})(bee2||{})
-
-		l(bee2.bbb()===bee2);
-
-	}
-
 
 
 	/* 

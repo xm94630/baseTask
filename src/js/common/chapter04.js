@@ -40,6 +40,11 @@ var bee = (function(bee){
 	 * 这个主要是和案例4的对比
 	 * 最大的区别在于，案例4只继承原型上的属性，案例3会继承实例全部的属性
 	 * 其他差异比较小，可以观察两者的log结果
+	 * 
+	 * 20191206 
+	 * 使用__proto__ 是比较便利的方法，不过却有性能的问题。
+	 * https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/proto
+	 * 
 	 */
 	bee.caseD3 = function(){
 

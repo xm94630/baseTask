@@ -555,6 +555,7 @@ var bee = (function(bee){
 	 */
 	bee.case14 = function(){
 
+		//正确
 		var obj = {
 			fun:function (){return 123;}
 		}
@@ -564,13 +565,28 @@ var bee = (function(bee){
 		}
 		l(obj.fun());
 
-		var obj2 = {
-			fun:function (){return 123;}
-		}
-		obj2.fun = function(){
-			return obj2.fun();
-		}
-		l(obj2.fun());
+		//死循环
+		// var obj2 = {
+		// 	fun:function (){return 123;}
+		// }
+		// obj2.fun = function(){
+		// 	return obj2.fun();
+		// }
+		// l(obj2.fun());
+
+		//上者其实就是这个
+		// var obj3 = {
+		// 	fun:function(){
+		// 		return obj3.fun();
+		// 	}
+		// }
+		// l(obj3.fun());
+
+		//也等同于
+		// var fun = function(){
+		// 	fun();
+		// }
+		// l(fun());
 
 	}
 
@@ -617,7 +633,9 @@ var bee = (function(bee){
 
 		$(function(){
 			$('.C1').bind('click',function(){
+				l(this)
 				l(this.id);
+				l($(this))
 			});
 		});
 
@@ -625,7 +643,7 @@ var bee = (function(bee){
 
 	/* 
 	 * 研究案例17:闭包(结合案例18一起学习)
-	 * 这里闭包中欧捕获的自由变量x,外界是无法改变的
+	 * 这里闭包中捕获的自由变量x,外界是无法改变的
 	 * 为何研究本案例呢，来自给晓燕解决的问题，项目用sea.js作为模块加载，在模块间交互的时候，总是有一个变量为undefined
 	 * 那个道理和这个是一样的，sea模块就好比这里fun2对象，有属性name、fun等，但是它维持引用了一个自由变量x
 	 * 所以我无论如何改变全局中的x的值，fun2中的值还是捕获的那个自由变量

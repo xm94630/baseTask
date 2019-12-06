@@ -9,6 +9,8 @@ var bee = (function(bee){
 	/* 
 	 * 研究案例1:worker
 	 * worker也是异步的，和ajax、setTime系列是同样的道理
+	 * 
+	 * 20191206 补充：worker 是提升性能的一个重要工具。我之前的关于提升前端性能的知识点中没有这个，现在要补上。
 	 */
 	bee.caseC1 = function(){
 
@@ -160,6 +162,8 @@ var bee = (function(bee){
 	/* 
 	 * 研究案例7:JQ发布订阅模式
 	 * 这里可以看出，这种形式的事件回调，其实是同步的代码
+	 * 
+	 * 20190612 我现在理解，trigger这个中触发的是同步的，真实的点击事件肯定还是异步的。
 	 */
 	bee.caseC7 = function(){
 		$(function(){
@@ -189,25 +193,23 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例9:parseInt第二个参数
+	 * 研究案例9:parseInt第二个参数，省略、或者为0的时候，表示为十进制。为1的时候，会有问题，没有1一进制。
 	 */
 	bee.caseC9 = function(){
+
+		l([11,11,11,11].map(parseInt));
+		//上面的相当于执行了
+		l(parseInt(11,0,[11,11,11,11])); 
+		l(parseInt(11,1,[11,11,11,11]));
+		l(parseInt(11,2,[11,11,11,11]));
+		l(parseInt(11,3,[11,11,11,11]));
 
 		function curry(fun){
 			return function(x){
 				return fun(x);
 			}
 		}
-
-		l([11,11,11,11].map(parseInt));
-
-		//上面的相当于执行了
-		l(parseInt(11,0,[11,11,11,11]));
-		l(parseInt(11,1,[11,11,11,11]));
-		l(parseInt(11,2,[11,11,11,11]));
-		l(parseInt(11,3,[11,11,11,11]));
-
-		l([11,11,11,11].map(curry(parseInt)));
+		l([11,11,11,11].map(curry(parseInt))); //curry函数包装之后，就没有这个问题了。
 	}
 
 	/* 
@@ -235,6 +237,7 @@ var bee = (function(bee){
 		        }
 		    });
 		});
+	
 	}
 
 	return bee;

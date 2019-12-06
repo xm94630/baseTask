@@ -520,7 +520,7 @@ var bee = (function(bee){
 	}
 
 	//案例24_3: 注意
-	//descriptor分成2个主要类别，一个叫做“data descriptors”和“accessor descriptors”，这两套只能存在一套。
+	// descriptor 分成2个主要类别，一个叫做“data descriptors”和“accessor descriptors”，这两套只能存在一套。
 	bee.caseB24_3 = function(){
 		Object.defineProperty(this,'haha',{
 			get: function () {
@@ -565,7 +565,7 @@ var bee = (function(bee){
 		})
 		myValue = '试着改变一下';
 		l(obj.haha);
-	};
+	}
 
 	//案例24_6: data deccriptor
 	//这个类似于es6的“const”
@@ -580,7 +580,7 @@ var bee = (function(bee){
 		l(obj.PI);
 		obj.PI = '不会被改变';
 		l(obj.PI);
-	};
+	}
 
 
 

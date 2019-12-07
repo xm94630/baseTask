@@ -112,9 +112,6 @@ var bee = (function(bee){
 		//l(ani.__proto__===Animal.prototype)
 	}
 
-
-
-
 	/* 
 	 * 研究案例4:原型研究
 	 * 这个主要是和案例4_2的对比
@@ -131,9 +128,10 @@ var bee = (function(bee){
 		function Animal(){}
 		Animal.prototype.a=123;
 		function Fish(){}
-		Fish.prototype = new Animal();
+		Fish.prototype = new Animal(); //原型被“实例”覆盖
 		var fish = new Fish;
 		l(fish);
+		l(fish.constructor); //因为Fish的原型被“实例”覆盖的问题，所以 constructor 指向是 Animal
 	}
 
 	/* 
@@ -144,18 +142,19 @@ var bee = (function(bee){
 		function Animal(){}
 		Animal.prototype.a=123;
 		function Fish(){}
-		Fish.prototype = Animal.prototype;
+		Fish.prototype = Animal.prototype; //原型被“另一个原型”覆盖
 		var fish = new Fish;
 		l(fish);
 		l(fish.constructor)
 		l(Animal.prototype)
-
 	}
 
 	/* 
 	 * 研究案例5:代码重用机制 mixin模式
 	 * 这里 stateMachine（共享状态机） 模块起到了公用的作用
 	 * 之所以它能过灵活的运用，关键在于 stateMachine 中 this的作用
+	 * 
+	 * 20191207 这个案例其实没有什么用吧。
 	 */
 	bee.caseD5 = function(){
 
@@ -191,7 +190,25 @@ var bee = (function(bee){
 	}
 
 	/* 
+	 * 研究案例6_2:
+	 * 其实上面这个也是变量声明的知识
+	 * 我认为上例子等同于下面的这个：
+	 * bee.caseB10 也有此知识
+	 */
+	bee.caseD6_2 = function(){
+		var a; //默认值为 undefined 
+		var b;
+		var c;
+		var d;
+		a = 111;
+		b = 222+a;
+		c = 1+d;  //1+undefined 即为 null
+		d = 2;
+	}
+
+	/* 
 	 * 研究案例7:二进制
+	 * bee.caseC9 中就有
 	 */
 	bee.caseD7 = function(){
 		//二进制转为十进制
@@ -201,8 +218,9 @@ var bee = (function(bee){
 
 		//十进制转为而二进制（字符串形式）
 		var a = 87;
-		a = a.toString(2);
-		l(a);
+		l(a.toString(2));
+		l(a.toString());
+		l(a.toString(32));
 	}
 
 	/* 

@@ -36,9 +36,89 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例3:原型研究
-	 * 这个主要是和案例4的对比
-	 * 最大的区别在于，案例4只继承原型上的属性，案例3会继承实例全部的属性
+	 * 研究案例3:原型继承
+	 * 学习这部分的内容，最方便的方法就是 
+	 * 1）图形法
+	 * 2）按照图形对比Log输出内容
+	 */
+	
+	//构造函数的原型对象
+	bee.caseD3 = function(){
+		function Animal(){}
+		l(Animal)
+		
+		//从log可以看出，构造函数的原型对象默认是一个Object对象，它有2个自己的属性：
+		//一个是constructor，指向“该原型的拥有者”，即Animal函数本身。原型的 constructor ，我理解就是任何（构造）函数都会默认添加的一个属性。
+		//另外一个是__proto__，指向“该原型”的构造函数的原型对象，简单的说就是“原型链上一个节点“。
+		l(Animal.prototype)
+
+		//当然，构造函数的原型对象还可以有继承于Object的一些继承属性，比如：
+		l(Animal.prototype.hasOwnProperty)
+
+	}
+
+	// Animal的原型对象其实是Object的一个实例，所以这里对Object做一个研究：
+	bee.caseD3_2 = function(){
+		l(Object)
+
+		//Object实例对象和构造函数的原型对象的差别在于，后者多了一个 constructor 属性。
+		l(new Object) 
+
+		//Object的实例之所以有那么多的自带方法，都是来自于它的原型，包含 toString、__proto__、constructor 在内的13个属性。
+		//Object实例的原型，和普通构造函数的原型差别在于，后者只有 __proto__、constructor 2个属性。
+		l(Object.prototype) 
+		
+		//Object的原型再往上就是null了。
+		l(Object.prototype.__proto__) 
+	}
+
+	//构造
+	bee.caseD3_3 = function(){
+		function Animal(){this.age=99}
+		let animal = new Animal();
+
+		//Animal的原型有2个属性，animal中继承了，但是都不会显示。但是__proto__显示在log中。
+		l(animal)
+		
+		l(animal.__proto__)
+		l(animal.constructor)
+		l(animal.hasOwnProperty('__proto__'))  //虽然显示了，但是依然不属于 hasOwnProperty 之列。
+		l(animal.hasOwnProperty('constructor'))
+		l(animal.hasOwnProperty('age'))
+	}
+
+
+	// instanceof 深入【boss】
+	bee.caseD3_4 = function(){
+		function Animal(){}
+		function Book(){}
+		
+		//原型是会被覆盖的，这样子的话， constructor 指向就有问题了。
+		Animal.prototype = Book.prototype;
+		var ani = new Animal();
+		l(ani)
+		l(ani.constructor)
+		
+		//这个时候，发现ani 即是Animal的实例、也是Book的实例。
+		//于是，我这里不免会疑惑，instanceof的判断依据是什么，我最初认为是 constructor
+		//但是 constructor 这个，不能同时是Animal、或者Book，显然不是 constructor。
+		l(ani instanceof Animal) //true
+		l(ani instanceof Book)   //true
+		
+		//后来我才知道，是基于下面的这个判断：
+		//"Animal.prototype = Book.prototype"这个句子，让两者的原型都指向了同一个对象。所以下面2个都成立，因此 instanceof 判断都成立。
+
+		//l(ani.__proto__===Book.prototype)
+		//l(ani.__proto__===Animal.prototype)
+	}
+
+
+
+
+	/* 
+	 * 研究案例4:原型研究
+	 * 这个主要是和案例4_2的对比
+	 * 最大的区别在于，案例4_2只继承原型上的属性，案例3会继承实例全部的属性
 	 * 其他差异比较小，可以观察两者的log结果
 	 * 
 	 * 20191206 
@@ -46,7 +126,7 @@ var bee = (function(bee){
 	 * https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/proto
 	 * 
 	 */
-	bee.caseD3 = function(){
+	bee.caseD4 = function(){
 
 		function Animal(){}
 		Animal.prototype.a=123;
@@ -59,7 +139,7 @@ var bee = (function(bee){
 	/* 
 	 * 研究案例4:原型研究
 	 */
-	bee.caseD4 = function(){
+	bee.caseD4_2 = function(){
 
 		function Animal(){}
 		Animal.prototype.a=123;
@@ -67,6 +147,8 @@ var bee = (function(bee){
 		Fish.prototype = Animal.prototype;
 		var fish = new Fish;
 		l(fish);
+		l(fish.constructor)
+		l(Animal.prototype)
 
 	}
 

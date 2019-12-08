@@ -236,27 +236,26 @@ var bee = (function(bee){
 
 	/* 
 	 * 研究案例9:“位或”运算
-	 * 位操作的结果是十进制的哦
+	 * 注意：位操作的2个数,以及结果都是十进制
 	 */
 	bee.caseD9 = function(){
-		var a = parseInt(1001,2);
-		var b = parseInt(1110,2);
+		var a = parseInt(1001,2);  //9
+		var b = parseInt(1110,2);  //14
 		l((a).toString(2));
 		l((b).toString(2));
-		l(a|b);
+		l(a|b); // 9|14
+		l((a|b).toString(2));
 	}
 
 	/* 
 	 * 研究案例10:“位或”运算
-	 * 位操作的结果是十进制的哦
 	 */
 	bee.caseD10 = function(){
-		var a = parseInt(0x3,16);
-		var b = parseInt(0x8,16);
-		l((a).toString(2));
-		l((b).toString(2));
-		//结果为11，注意这个是十进制的数字。刚才误理解为二进制了，然后就傻了一会
-		l(a|b);
+		var a = parseInt(0x3,16); //3
+		var b = parseInt(0x8,16); //8
+		l((a).toString(2)); //  11
+		l((b).toString(2)); //1000
+		l(a|b); // 十进制的11（二进制为：1011）
 	}
 
 	/* 
@@ -324,7 +323,9 @@ var bee = (function(bee){
 			}).apply(null,arr);
 		}
 		l(fun(11,22,33));
+	}
 
+	bee.caseD13_2 = function(){
 		//获得arguments的引用，可以用来做什么呢？
 		function fun2(){
 			return arguments;
@@ -334,8 +335,8 @@ var bee = (function(bee){
 		l(Object.prototype.toString.call(thisArguments));
 
 		//对于原生的数组方法concat而言，下面两种是一样的
-		l([99,77,88].concat([123]));
-		l([99,77,88].concat(123));
+		l([99,77,88].concat([123,1,2,3]));
+		l([99,77,88].concat(123,[1,2,3]));
 		//如果参数对象的话，就直接添加在末尾，同上面的第二种
 		l([99,77,88].concat({a:'haha'}));
 		//显然thisArguments这里被处理成对象了

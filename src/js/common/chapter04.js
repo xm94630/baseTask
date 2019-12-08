@@ -376,29 +376,51 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例16:保证最小值
+	 * 研究案例16
 	 */
 	bee.caseD16 = function(){
-		var base =1;
-		var v=4;
-		l(Math.max(base,v));
-		var v=-1;
-		l(Math.max(base,v));
+		l(Math.max(1,4));
+		l(Math.max(2,-1,9));
 	}
 
 	/*
 	 * 研究案例17:数组方法——sort排序
 	 */
 	bee.caseD17 = function(){
+		var numbers = [1,3,2];
+		numbers.sort(function(a, b) {
+			//记忆法，只要是a-b的写法，就是升序。
+			//至于a-b的值是正的负的，都无所谓，只管返会就行。
+			return a - b; 
+		});
+		l(numbers)
+	}
+
+	//等同上例子，不过这个显得啰嗦了
+	bee.caseD17_2 = function(){
+		var numbers = [1,3,2];
+		numbers.sort(function(a, b) {
+			//升序
+			if(a-b<0){
+				return -1; 
+			}else{
+				return 1;
+			}
+		});
+		l(numbers)
+	}
+
+
+	bee.caseD17_3 = function(){
 		var lessThan = function(a,b){
-			if(a<b){
+			if(a-b<0){
 				return true;
 			}else{
 				return false;
 			}
 		};
 		var isEqual = function(a,b){
-			if(a==b){
+			if(a-b==0){
 				return true;
 			}else{
 				return false;
@@ -408,21 +430,23 @@ var bee = (function(bee){
 			return function(a,b){
 				if(fun(a,b))
 				    return -1;
-				//else if(!fun(a,b))
 				else if(fun(b,a))
 					return 1;
 				else
 					return 0;
 			}
 		};
-		var arr = [1,-3,5,3,-9];
+		var arr = [1,3,2];
 		l(arr.sort(comparator(lessThan)));
 
-		//这里isEqual 和 comparator 组合就是有问题的
-		//第一次获取1，和-3，因为不等，所以return 1,表示交换
-		//这里都是不同的数字，所以每次都会进行交换
-		//最后的结果成了“反序”
-		var arr2 = [1,-3,5,3,-9];
+		//注意：这里要刷新下之前的理解。
+		//comparator(isEqual)这种情况下，
+		//当 a、b的值不等的时候，会return 0
+		//当 a、b的值相等的时候，会return -1
+		//在底层实现中，0表示的不交换。-1表示的是交换（先不管是向左还是向右）
+		//值不等的时候不交换、值相等的时候交换，说白就了就是不换！
+		//所以在sort函数中，使用了 comparator(isEqual) 这样子的函数，其实是没有意义的。
+		var arr2 = [1,3,2];
 		l(arr2.sort(comparator(isEqual)));
 
 	}

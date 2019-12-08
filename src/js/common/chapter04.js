@@ -623,7 +623,7 @@ var bee = (function(bee){
 	/*
 	 * 研究案例23:元编程
 	 * 感觉是不是和案例5中的mixin模式有共同之处呢
-	 * 这里也是利用了this的作用
+	 * 这里是利用了apply、this的作用
 	 */
 	bee.caseD23 = function(){
 
@@ -648,10 +648,10 @@ var bee = (function(bee){
 	bee.caseD24 = function(){
 
 		var obj = {
-			name:'lala',
+			name:'张小欧',
 			desc:'貌美如花'
 		}
-		var tmpl = '{{name}}看上去20来岁的样子，长得{{desc}}';
+		var tmpl = '{{name}}看上去20来岁的样子，长得{{desc}}。{{name}}是张家堡堡主的女儿。';
 		function randerTmpl(tmpl,obj){
 			for(var i in obj){
 				var reg = new RegExp('{{'+i+'}}','g');
@@ -672,12 +672,21 @@ var bee = (function(bee){
 		//这个是简化版本的，严谨方案可以参考jquery
 		function isPlainObject(xxx){
 			return Object.prototype.hasOwnProperty.call( xxx.constructor.prototype, "isPrototypeOf");
+			
+			//20191208 好像这样子写也没有问题吧：
+			//所谓对象字面量（或者PlainObject）其实就是指是不是Object的直接的实例，而不是Fish的实例
+			//return xxx.constructor.prototype.hasOwnProperty("isPrototypeOf");
+			
+			//20191208 从后面的例子中可以知道，这个才是对的。
+			//return xxx.__proto__.hasOwnProperty("isPrototypeOf");
 		}
-		l(isPlainObject({a:213}))
+		l(isPlainObject({a:{b:222}}))
 		l(isPlainObject($('body')))
 
 		//这个是个反例...
 		//照理来说，这个也算是对象自变量了，但是因为prototype上的constructor 被修改了
+		l($.prototype)
+		l($.prototype.constructor)
 		l(isPlainObject($.prototype))
 
 		//不过jquery这个新版本的里面判断没有错误！
@@ -728,6 +737,7 @@ var bee = (function(bee){
 		l($('body').constructor.prototype)
 		//所以这里是相等的，没有什么疑问吧
 		//我以前就得出结论“.constructor.prototype 效果同 __proto__”，但是这个并不是完全对的，比如下面这个就不行：
+		//20191208 现在验证了下，是好的（这样子就不矛盾了）。
 		l($('body').constructor.prototype == $('body').__proto__)
 
 		l('==>5')
@@ -750,6 +760,8 @@ var bee = (function(bee){
 		 * 2.而__proto__ 这个呢！是不会因为后期修改而改变的，人家还是认为是那个Object!! 
 		 * 这个就是使用 .constructor.prototype 和 __proto__ 的区别！
 		 * 也就是说__proto__ 能够真正找到那个构造他的函数，而 .constructor.prototype 却不行！因为可以被修改！！！
+		 *
+		 * 20191208 正解。在我回顾的时候，没有看到这段话，我也是这么理解的。
 		 */
 		
 		l('==>6')

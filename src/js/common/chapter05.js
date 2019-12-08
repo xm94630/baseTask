@@ -125,19 +125,6 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例7: 函数作用域
-	 * 本例中，fun函数并没有定义a，却也能读取a的值
-	 */
-	bee.caseE7 = function(){
-
-		var a = 1;
-		function fun(){
-			return a;
-		}
-		l(fun());
-	}
-
-	/* 
 	 * 研究案例8: 函数作用域
 	 * 本例中，fun函数并没有定义a，却也能读取a的值
 	 * 结合案例9

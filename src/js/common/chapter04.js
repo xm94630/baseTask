@@ -2,6 +2,7 @@
 * 第四章 细碎知识点
 * 原型、位操作
 * js异常处理
+* 函数式编程
 ********************************/
 
 var bee = (function(bee){
@@ -481,20 +482,19 @@ var bee = (function(bee){
 
 		function cat(){
 			var first = arguments[0];
-			var rest = Array.prototype.slice.apply(arguments,[1]);
+			var rest = Array.prototype.slice.call(arguments,1);
 			
-			//这样子是由问题的，因为rest中的结构是 [[77],[88]] 
+			//这样子是有问题的，因为rest中的结构是 [[77],[88]] 
 			//return first.concat(rest);
 			
 			//这里灵活地运用了apply，将[[77],[88]]中外层的[]结构化解了，非常巧妙！
-			return first.concat.apply(first,rest);
+			//return first.concat.apply(first,rest);
 
 			//这里绑定对象不能为null
 			//return first.concat.apply(null,rest);
 			
 			//这中写法也是可以的，只是这个first就没有用上了，被字符串“代理”了！
 			//return first.concat.apply(['居然还可以这样子'],rest);
-			
 		}
 
 		var r2 = cat(arr1,arr2,arr3);
@@ -533,6 +533,8 @@ var bee = (function(bee){
 		l(r1);
 
 		//被change改变完之后的函数的用法
+		//换句话说，被change包装之后的函数，会把散列的参数收集成一个数组传入到原来的函数
+		//当然你也许会问，可以创建[99,77,88]这样子的数组作为参数，这样也是可以的（就是上式子）。
 		var r2 = change(fun)(99,77,88);
 		l(r2);
 	}
@@ -582,16 +584,16 @@ var bee = (function(bee){
 	 * 利用apply部分改变函数addBy的参数调用形式
 	 * addBy(obj,key1,key2...)
 	 * newAddBy(obj,[key1,key2...])
-	 * 这个一种在高阶函数中最为常用的手段,在undersore、async的源码中多有出现
+	 * 这是一种在高阶函数中最为常用的手段,在undersore、async的源码中多有出现
 	 * 以前还不是很纯熟，掌握下面这种模式就可以一通百通。
 	 */
 	bee.caseD22 = function(){
 		
 		var obj={
 			a:1,
-			b:2,
-			c:44,
-			d:100
+			b:10,
+			c:100,
+			d:1000
 		};
 		function addBy(obj){
 			var rest = Array.prototype.slice.call(arguments,1);
@@ -607,14 +609,15 @@ var bee = (function(bee){
 				var fist = obj;
 				var rest = arr;
 				var arr = [obj].concat(rest);
+				//这里为什么apply第一个参数是null呢？因为apply有2个作用，其中一个是代理this，需要第一个参数
+				//另外一个就是简单的调用，只是参数的形式不同，apply需要一个数组。
 				return addBy.apply(null,arr);
 			}
 		}
 
-		l(addBy(obj,'a','c','d'));
-		l(change(addBy)(obj,['a','c','d']));
+		l(addBy(obj,'a','b','c','d'));
+		l(change(addBy)(obj,['a','b','c','d']));
 		l(change(addBy)(obj,['a','a','a','a']));
-
 	}
 
 	/*

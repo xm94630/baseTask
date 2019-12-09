@@ -691,19 +691,19 @@ var bee = (function(bee){
 				}
 			}			
 		}
-		function promiseFun(fn){
-			setTimeout(function(){
-				d.promise().done(function(){
-					l('执行了');
-				})
+
+		setTimeout(function(){
+			d.promise().done(function(){
+				l('执行了');
 			})
-		}
+		},300)
+
 		//hold住了两次，释放两次最后还是会被执行的。
 		hold(true);
 		hold(true);
 		hold(false);
 		hold(false);
-		promiseFun();
+
 
 		//第一次，在学习jquery源码的时候，看到这个$.holdReady的时候，惊呆了。
 		//现在看来其实就是 promise 的应用吧
@@ -1239,6 +1239,8 @@ var bee = (function(bee){
 			ReactDOM.render( myDom , document.getElementById('container'));
 			ReactDOM.render( myDom2 , document.getElementById('container2'));
 		})
+
+		//20191209 这个案例可以
 	}
 
 
@@ -1291,6 +1293,9 @@ var bee = (function(bee){
 		/* 结论：
 		 * 由此可见，连个函数没有直接交换数据，必定有一个全局的变量来进行交换。
 		 * 但是这样子的设计模式，并不是很高明，因为我们不希望把插件的状态泄露到全局。
+		 * 
+		 * 20191209
+		 * 恩，这个 mockschema 是用来做mock假数据的。可以在npm上先看下。
 		 */
 	}
 
@@ -1309,7 +1314,7 @@ var bee = (function(bee){
 		l(reg.exec(str2))
 		l(reg.exec(str3))
 		l(reg.exec(str4))
-	};
+	}
 
 
 	/* 
@@ -1356,7 +1361,9 @@ var bee = (function(bee){
 		$('div').addClass('myb').addClass('myb2');
 		$('p').addClass('red');
 		l($.html());
-	};
+
+		//20191209 可以的
+	}
 
 
 	/* 
@@ -1612,7 +1619,7 @@ var bee = (function(bee){
 
 
 
-
+	// 20191209 这个章节，看的是有点累。
 
 
 	return bee;

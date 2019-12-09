@@ -288,27 +288,6 @@ var bee = (function(bee){
 	}
 
 	/* 
-	 * 研究案例10:同上
-	 */
-	bee.caseF10_2 = function(){
-
-		function Fish (){
-			this.a = 123;
-		}
-
-		function Jing (){}
-		Jing.prototype = new Fish();
-		var obj1= new Jing();  
-
-		l(obj1.constructor===Fish);    //构造器使用是Fish
-	
-		//这个例子其实就是对 Object.create 原理的解释。
-		//不过自己在使用这个模式的时候，最好把构造函数调整过来。因为在这里其实应该是 Jing才是实例最直接的构造函数。
-		//然而对于上式子而言，确实是可以的，以为上式子没有这个Jing这个中间者出现。
-	}
-
-
-	/* 
 	 * 研究案例11:封装一个和 Object.create 等效的函数 createObject
 	 */
 	bee.caseF11 = function(){
@@ -340,11 +319,11 @@ var bee = (function(bee){
 	 */
 	bee.caseF11_2 = function(){
 		function Fish (){
-			this.width = 123;
+			this.width = 100;
 		}
 		var fish= Object.create(new Fish(),{
 			width:{
-				value:'199'
+				value:'200'
 			},
 			height:{
 				configurable: false,  //不可设置值
@@ -360,7 +339,6 @@ var bee = (function(bee){
 
 	/* 
 	 * 研究案例11_3: Object.create 深入
-	 * 第二个参数可以指定返回的实例的属性，参数的写法比较特殊（Property descriptors 使用属性描述）
 	 */
 	bee.caseF11_3 = function(){
 		
@@ -376,12 +354,6 @@ var bee = (function(bee){
 		var o2 = Object.create(Object.prototype);
 		l(o1)
 		l(o2)
-
-		//这两种也是等效的！
-		var o3 = Object.create({});
-		var o4 = Object.create(o1);
-		l(o3)
-		l(o4)
 	}
 
 	/* 
@@ -774,12 +746,6 @@ var bee = (function(bee){
 		l(arr)
 	}
 	bee.caseF18_3 = function(){
-		var arr = [111,222,333,444,555];
-		//splice从index 为1开始，删除0个元素，在索引为1处增加一个元素
-		arr.splice(1,0,999);
-		l(arr)
-	}
-	bee.caseF18_4 = function(){
 		var arr = [111,222,333,444,555];
 		//splice从index 为1开始，删除0个元素，在索引为1处增加一个元素
 		arr.splice(1,0,999);

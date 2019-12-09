@@ -624,6 +624,8 @@ var bee = (function(bee){
 	 * 研究案例23:元编程
 	 * 感觉是不是和案例5中的mixin模式有共同之处呢
 	 * 这里是利用了apply、this的作用
+	 * 
+	 * 2019 同 bee.caseE27 三个例子。这个可以保留
 	 */
 	bee.caseD23 = function(){
 

@@ -8,6 +8,8 @@ var bee = (function(bee){
 	 * 研究案例1:this
 	 * 属性中的this并不是指代 people
 	 * 方法中的this才指 people
+	 * 
+	 * 20190912 同 caseE22
 	 */
 	bee.caseE1 = function(){
 
@@ -256,6 +258,8 @@ var bee = (function(bee){
 	 * 研究案例15: 前馈函数
 	 * 本例子很简单，思想很重要
 	 * pipe实现原来就来源于此
+	 * 
+	 * 20191209 不太明白“前馈函数”、pipe和这个有啥关系
 	 */
 	bee.caseE15 = function(){
 
@@ -264,9 +268,6 @@ var bee = (function(bee){
 			return 2*n;
 		}
 		while(result<1000){
-			
-			//之前把代码写成这样子了，结果页面就渲染不出来了，我以为是gulp中的依赖文件出问题了呢。
-			//fun(result);
 			result = fun(result);
 		}
 		l(result);
@@ -305,6 +306,8 @@ var bee = (function(bee){
 	 * 第1对是，默认值的设置
 	 * 第2对是，获取对象的某个属性
 	 * 这样子的思路，再来设计defaults就明确多了
+	 * 
+	 * 20191209 还好，不是很难理解。主要还是 apply\call 的功效。
 	 */
 	bee.caseE17 = function(){
 
@@ -331,7 +334,7 @@ var bee = (function(bee){
 				return o && val(o[k]);
 			}
 		}
-		l(defaults({a:123})({a:undefined},'a'));
+		l(  defaults({a:123}) ({a:undefined},'a')  );
 	}
 
 
@@ -397,7 +400,7 @@ var bee = (function(bee){
 		l(dealWith10(double));
 		//十倍
 		l(dealWith10(tenfold));
-	};
+	}
 
 	/* 
 	 * 研究案例20: curry1（2）的优势
@@ -424,7 +427,7 @@ var bee = (function(bee){
 		});
 		////这里filter的第二个参数是curry化用法，使用很灵活，可读性强
 		l(_.filter(arr,greatThan(3)));
-	};
+	}
 
 	/* 
 	 * 研究案例21:字符串的乘法
@@ -439,10 +442,11 @@ var bee = (function(bee){
 		l('10'*'10');
 		l('10a'*'10a');
 		l(''*'');
-	};
+	}
 
 	/* 
-	 * 研究案例22: this 指的是谁？
+	 * 研究案例22: this 指的是谁？ 
+	 * 20191209 本案例同 caseE22
 	 */
 	bee.caseE22 = function(){
 		
@@ -460,6 +464,7 @@ var bee = (function(bee){
 
 	/* 
 	 * 研究案例23: this 指的是谁？
+	 * 20191209 这个案例比较傻逼，以后可以删了
 	 */
 	bee.caseE23 = function(){
 		
@@ -476,7 +481,7 @@ var bee = (function(bee){
 		l(arr[0].content)
 		*/
 		//这样子是不是比较明了了。this引用只取决于外层函数的使用！
-	};
+	}
 
 	/* 
 	 * 研究案例24: this 指的是谁？
@@ -505,7 +510,7 @@ var bee = (function(bee){
 		//所以，无论this是被放到数组中，还是对象中，其值的特点是：
 		//1.依旧是动态的
 		//2.只取决于外层函数的使用形式
-	};
+	}
 
 	/* 
 	 * 研究案例25: this 指的是谁？
@@ -518,11 +523,12 @@ var bee = (function(bee){
 		}
 		l(fun())
 		l(fun.call('123'));
-	};
+	}
 
 
 	/* 
 	 * 研究案例26: this 指的是谁？
+	 * 20191209 目前看是不会犯错了，这个题目也是为了理解而存在，本身没啥意思。
 	 */
 	bee.caseE26 = function(){
 		
@@ -540,11 +546,12 @@ var bee = (function(bee){
 		})()
 		
 		l(obj.fun())
-	};
+	}
 
 
 	/* 
 	 * 研究案例27: 构造函数中的行为
+	 * 20191209 这个案例意义何在？
 	 */
 	bee.caseE27 = function(){
 	
@@ -562,6 +569,7 @@ var bee = (function(bee){
 
 	/* 
 	 * 研究案例27_2: 上例变化
+	 * 2019 这个没意思。xxx要使用call才调用才能在 Shark上
 	 */
 	bee.caseE27_2 = function(){
 
@@ -582,6 +590,7 @@ var bee = (function(bee){
 
 	/* 
 	 * 研究案例27_3: 上例变化
+	 * 同 bee.caseD23 ，这27的三个例子都可以删除了。。
 	 */
 	bee.caseE27_3 = function(){
 
@@ -682,7 +691,7 @@ var bee = (function(bee){
 		//其实后来有对构造函数的原型进行扩展： Shark.prototype.superclass = fish;
 		//所以实例中是包含 superclass 属性的
 		//因为有new 操作，this 指代的是 实例。
-		//所以 this.superclass.constructor(200); 就是对实例对象的操作（函数调用）而已。
+		//所以 this.superclass.constructor(200)，即为 fish.constructor(200)，这个是属性的调用形式，this指向 fish，所以fish的属性被修改了
 		function Shark(){
 			this.superclass.constructor(200);
 		}
@@ -697,36 +706,19 @@ var bee = (function(bee){
 		l(s.age);
 		l(s.superclass.age);
 		l(fish)
-
-		//上式子简化下，其实就是类型下面：
-		/*function Shark(){
-			this.superclass = {a:111};  //这个是构造函数的通用写法
-			this.superclass.a = 222;    //这个就是给我困扰的地方，其实我应该要很熟悉这个样子的写法！
-		}*/
 	}
 
 	/* 
-	 * 研究案例27_5: this 是谁？
+	 * 研究案例28: this 指的是谁？
+	 *
+	 * 上例子中其实蕴含了这个道理。
 	 */
-	bee.caseE27_5 = function(){
-
-		function xxx(){
-			return function yyy(){
-				l(this);
-			}
-		}
-
-		//等价于 (new xxx())();
-		//看样子new和函数的结合优先级很高哟~
-		//首先执行的是 (new xxx()) ，注意，通常，new Fish 和 new Fish() 是一样的，运算结合的时候，默认会带上后面那对括号
-		//如果有return 对象的行为，构造函数就会返回这个对象，而不是新建一个实例。
-		//这里返回的是一个函数，然后被调用了。根据我们之前的法则，一个新的函数执行的时候，
-		//都会从一个新的堆栈开始，栈底就是window，所以这个时候this就是window
-		new xxx()();
-		
-		//这个this是 yyy的实例。
-		//因为现在是（）中的表达式先执行，最后执行的是new 操作，故而this是实例。
-		new (xxx.apply({a:123}))();
+	bee.caseE28_2 = function(age){
+		function Fish(age){this.age=age};
+		let f = new Fish(100);
+		l(f)
+		f.constructor(200); // f.constructor 虽然就是 Fish，但是和 直接调用 Fish 还是不一样的。这个道理虽然早明白，却也要搞错。
+		l(f)
 	}
 
 
@@ -741,6 +733,7 @@ var bee = (function(bee){
 	}
 	
 	// 研究案例29_2: 变化
+	// 20191209 同案例 caseE28_2 
 	bee.caseE29 = function(){
 		function Fish(age){
 			this.age = age;
@@ -760,7 +753,6 @@ var bee = (function(bee){
 	bee.caseE29 = function(){
 		function Fish(age){
 			this.age = age;
-			l(this);
 		}
 		var fish = new Fish(100);
 		//这里对构造函数使用了，new，所以产生一个新的实例fish2

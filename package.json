@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/xm94630/angularTask#readme",
   "devDependencies": {
-    "browser-sync": "^2.13.0",
+    "browser-sync": "^2.27.10",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
     "gulp-load-plugins": "^1.2.4",
